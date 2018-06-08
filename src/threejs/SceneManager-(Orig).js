@@ -1,29 +1,31 @@
 /* Imported From: https://itnext.io/how-to-use-plain-three-js-in-your-react-apps-417a79d926e0 */
 import * as THREE from 'three';
-import DataPoint from './DataPoint';
+import SceneSubject from './SceneSubject';
+import GeneralLights from './GeneralLights';
 
 export default canvas => {
 
-    //const clock = new THREE.Clock();
+    const clock = new THREE.Clock();
     const origin = new THREE.Vector3(0,0,0);
 
     const screenDimensions = {
         width: canvas.width,
         height: canvas.height
     }
-    
-    var dataPoint = new DataPoint();
-    var dataPoints = createSampleDataPoints();
+
+    const mousePosition = {
+        x: 0,
+        y: 0
+    }
+
     const scene = buildScene();
     const renderer = buildRender(screenDimensions);
     const camera = buildCamera(screenDimensions);
-   
+    const sceneSubjects = createSceneSubjects(scene);
+
     function buildScene() {
         const scene = new THREE.Scene();
         scene.background = new THREE.Color("#FFF");
-        for (var i = 0; i < dataPoints.length; i++){
-            scene.add(dataPoints[i]);
-        }
 
         return scene;
     }
@@ -41,35 +43,45 @@ export default canvas => {
     }
 
     function buildCamera({ width, height }) {
-        var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / - 2, height /2, 1, 1000 );
-        camera.position.set(0, 0, -10);
-        camera.lookAt(origin)
-        
-        return(camera);
+        const aspectRatio = width / height;
+        const fieldOfView = 60;
+        const nearPlane = 4;
+        const farPlane = 100; 
+        const camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane);
+
+        camera.position.z = 40;
+
+        return camera;
     }
 
-    function createSampleDataPoints(){
-        var hold = [];
-        hold[0] = dataPoint.createDataPoint(40, 0, 0);
-        hold[1] = dataPoint.createDataPoint(40, -300, 80);
-        hold[2] = dataPoint.createDataPoint(40, 400, 200);
+    function createSceneSubjects(scene) {
+        const sceneSubjects = [
+            new GeneralLights(scene),
+            new SceneSubject(scene)
+        ];
 
-        return hold;
+        return sceneSubjects;
     }
 
     function update() {
-       /*const elapsedTime = clock.getElapsedTime();
+        const elapsedTime = clock.getElapsedTime();
 
         for(let i=0; i<sceneSubjects.length; i++)
             sceneSubjects[i].update(elapsedTime);
 
-        updateCameraPositionRelativeToMouse();*/
+        updateCameraPositionRelativeToMouse();
 
         renderer.render(scene, camera);
     }
 
+    function updateCameraPositionRelativeToMouse() {
+        camera.position.x += (  (mousePosition.x * 0.01) - camera.position.x ) * 0.01;
+        camera.position.y += ( -(mousePosition.y * 0.01) - camera.position.y ) * 0.01;
+        camera.lookAt(origin);
+    }
+
     function onWindowResize() {
-        /*const { width, height } = canvas;
+        const { width, height } = canvas;
         
         screenDimensions.width = width;
         screenDimensions.height = height;
@@ -77,10 +89,17 @@ export default canvas => {
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         
-        renderer.setSize(width, height);*/
+        renderer.setSize(width, height);
+    }
+
+    function onMouseMove(x, y) {
+        mousePosition.x = x;
+        mousePosition.y = y;
     }
 
     return {
-        update
+        update,
+        onWindowResize,
+        onMouseMove
     }
 }
