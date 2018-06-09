@@ -1,6 +1,7 @@
 /* Imported From: https://itnext.io/how-to-use-plain-three-js-in-your-react-apps-417a79d926e0 */
 import * as THREE from 'three';
 import DataPoint from './DataPoint';
+import * as dat from 'dat.gui';
 
 export default canvas => {
 
@@ -12,11 +13,29 @@ export default canvas => {
         height: canvas.height
     }
     
-    var dataPoint = new DataPoint();
-    var dataPoints = createSampleDataPoints();
+    const controls = {
+        size: 40
+    }
+
+    var dataPointGeometry = new THREE.CircleGeometry( 40, 32 );
+    var dataPointMaterial = new THREE.MeshBasicMaterial( { color: 0x808080 } );
+    var dataPointScale = 1.0;
+    var dataPoints = createSampleDataPoints(40);
+    
     const scene = buildScene();
     const renderer = buildRender(screenDimensions);
     const camera = buildCamera(screenDimensions);
+    const gui = buildGUI();
+    
+
+    function buildGUI(){
+        var gui = new dat.GUI();
+        var sizeController = gui.add(controls, 'size').min(10).max(100).step(1);
+        sizeController.onChange(function(newValue){
+            dataPointScale = newValue/40.0; //Ratio of original size (40)
+            update();
+        });
+    }
    
     function buildScene() {
         const scene = new THREE.Scene();
@@ -48,23 +67,23 @@ export default canvas => {
         return(camera);
     }
 
-    function createSampleDataPoints(){
+    function createSampleDataPoints(radius){
         var hold = [];
-        hold[0] = dataPoint.createDataPoint(40, 0, 0);
-        hold[1] = dataPoint.createDataPoint(40, -300, 80);
-        hold[2] = dataPoint.createDataPoint(40, 400, 200);
+        for(var i = 0; i < 3; i++){
+            hold[i] = new DataPoint(dataPointGeometry, dataPointMaterial);
+        }
+        hold[0].position.set(0, 0, 1);
+        hold[1].position.set(-300, 80, 1);
+        hold[2].position.set(400, 200, 1);
 
         return hold;
     }
 
     function update() {
-       /*const elapsedTime = clock.getElapsedTime();
-
-        for(let i=0; i<sceneSubjects.length; i++)
-            sceneSubjects[i].update(elapsedTime);
-
-        updateCameraPositionRelativeToMouse();*/
-
+        for(var i = 0; i < dataPoints.length; i++){
+            dataPoints[i].scale.set(dataPointScale, dataPointScale, dataPointScale);
+        }
+        
         renderer.render(scene, camera);
     }
 
