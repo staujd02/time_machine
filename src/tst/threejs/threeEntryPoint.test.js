@@ -1,7 +1,7 @@
 import React from 'react';
 import jest from 'jest';
 import ReactDOM from 'react-dom';
-import threeEntryPoint from './threeEntryPoint';
+import threeEntryPoint from '../../threejs/threeEntryPoint';
 
 describe("The threeEntryPoint", () => {
     it("can create a scene on an element", () => {
