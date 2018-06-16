@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ThreeContainer from './ThreeContainer';
 import Navigation from './Navigation';
-import FileInput from './FileInput';
 
 class App extends Component {
   render() {
@@ -10,9 +9,6 @@ class App extends Component {
         <Navigation/>
         <div className="App-canvas">
           <ThreeContainer/>
-          <div className="fileInput">
-          <FileInput id="browse"/>
-          </div>
         </div>
       </div>
     );
