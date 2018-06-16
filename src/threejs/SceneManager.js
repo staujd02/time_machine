@@ -5,7 +5,6 @@ import * as dat from 'dat.gui';
 
 export default canvas => {
 
-    //const clock = new THREE.Clock();
     const origin = new THREE.Vector3(0,0,0);
 
     const screenDimensions = {
@@ -26,7 +25,6 @@ export default canvas => {
     const renderer = buildRender(screenDimensions);
     const camera = buildCamera(screenDimensions);
     const gui = buildGUI();
-    
 
     function buildGUI(){
         var gui = new dat.GUI();
@@ -85,18 +83,6 @@ export default canvas => {
         }
         
         renderer.render(scene, camera);
-    }
-
-    function onWindowResize() {
-        /*const { width, height } = canvas;
-        
-        screenDimensions.width = width;
-        screenDimensions.height = height;
-
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        
-        renderer.setSize(width, height);*/
     }
 
     return {
