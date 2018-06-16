@@ -13,7 +13,10 @@ export default canvas => {
     }
     
     const controls = {
-        size: 40
+        size: 40,
+        changeColor : function(){
+            changeColors();
+        }
     }
 
     var dataPointGeometry = new THREE.CircleGeometry( 40, 32 );
@@ -28,6 +31,7 @@ export default canvas => {
 
     function buildGUI(){
         var gui = new dat.GUI();
+        var colorChanger = gui.add(controls, 'changeColor').name("Change Color");
         var sizeController = gui.add(controls, 'size').min(10).max(100).step(1);
         sizeController.onChange(function(newValue){
             dataPointScale = newValue/40.0; //Ratio of original size (40)
@@ -75,6 +79,12 @@ export default canvas => {
         hold[2].position.set(400, 200, 1);
 
         return hold;
+    }
+
+    function changeColors(){
+        for (var i = 0; i < dataPoints.length; i++){
+           dataPoints[i].changeColor(20);
+        }
     }
 
     function update() {

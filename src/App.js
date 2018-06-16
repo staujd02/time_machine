@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import ThreeContainer from './ThreeContainer';
 import Navigation from './Navigation';
-import './css/bootstrap.min.css';
-import './fonts/glyphicons-halflings-regular.eot';
-import './css/bootstrap.min.css';
-import './css/bootstrap-theme.min.css';
-import './css/App.css';
+import FileInput from './FileInput';
 
 class App extends Component {
   render() {
@@ -14,10 +10,14 @@ class App extends Component {
         <Navigation/>
         <div className="App-canvas">
           <ThreeContainer/>
+          <div className="fileInput">
+          <FileInput id="browse"/>
+          </div>
         </div>
       </div>
     );
   }
 }
+
 
 export default App;
