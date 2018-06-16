@@ -8,7 +8,10 @@
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-scripts": "1.1.4",
-    "three": "^0.93.0"
+    "three": "^0.93.0",
+    "tinycolor": "0.0.1",
+    "tinycolor2": "^1.4.1",
+    "xlsx": "^0.13.0"
   },
   "scripts": {
     "start": "react-scripts start",
