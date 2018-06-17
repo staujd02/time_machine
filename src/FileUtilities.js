@@ -42,9 +42,9 @@ export default class FileUtilities  {
        i++;
      }
      //Create 2D array to hold xlsx data
-     this.data = new Array(numOfColumns);
-     for(i = 0; i < numOfColumns; i++){
-       this.data[i] = new Array(numOfRows);
+     this.data = new Array(numOfRows);
+     for(i = 0; i < numOfRows; i++){
+       this.data[i] = new Array(numOfColumns);
      }
      //Fill array
      for(i = 0; i  < this.data.length; i++){

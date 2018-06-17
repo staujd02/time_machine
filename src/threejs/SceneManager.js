@@ -14,13 +14,16 @@ export default (canvas, IController) => {
     
     const controls = {
         size: 40,
-        changeColor : function(){
-            changeColors();
+        changeStep : function(){
+            stepForward();
         }
     }
 
+    var step = 0;
+    var changeData = null; //Holds imported data 
+
     var dataPointGeometry = new THREE.CircleGeometry( 40, 32 );
-    var dataPointMaterial = new THREE.MeshBasicMaterial( { color: 0x808080 } );
+    var dataPointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
     var dataPointScale = 1.0;
     var dataPoints = createSampleDataPoints(40);
     
@@ -29,9 +32,11 @@ export default (canvas, IController) => {
     const camera = buildCamera(screenDimensions);
     const gui = buildGUI();
 
+    IController.injectDataPointList = processDataPointList;
+
     function buildGUI(){
         var gui = new dat.GUI();
-        gui.add(controls, 'changeColor').name("Change Color");
+        var stepController = gui.add(controls, 'changeStep').name("Step Forward");
         var sizeController = gui.add(controls, 'size').min(10).max(100).step(1);
         sizeController.onChange(function(newValue){
             dataPointScale = newValue/40.0; //Ratio of original size (40)
@@ -71,26 +76,40 @@ export default (canvas, IController) => {
 
     function createSampleDataPoints(radius){
         var hold = [];
-        for(var i = 0; i < 3; i++){
+        /*for(var i = 0; i < 3; i++){
             hold[i] = new DataPoint(dataPointGeometry, dataPointMaterial);
-        }
+        }*/
+        hold[0] = new DataPoint(dataPointGeometry, dataPointMaterial);
         hold[0].position.set(0, 0, 1);
-        hold[1].position.set(-300, 80, 1);
-        hold[2].position.set(400, 200, 1);
+        //hold[1].position.set(-300, 80, 1);
+       // hold[2].position.set(400, 200, 1);
 
         return hold;
     }
 
-    IController.injectDataPointList = processDataPointList;
     function processDataPointList(json){
-        alert(json);
+        changeData = json;
     }
 
-    function changeColors(){
-        for (var i = 0; i < dataPoints.length; i++){
-           dataPoints[i].changeColor(20);
+    async function stepForward(){
+        if(changeData == null){
+            alert("Please import data first");
+        }
+        else if (step < changeData.length){
+            for(var i = 0; i < dataPoints.length; i++){
+                dataPoints[i].lightenColor(changeData[step][i]);
+            }
+            step++;
+            await sleep(1000);
+            stepForward();
+        }else{
+            alert("No more data");
         }
     }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
 
     function update() {
         for(var i = 0; i < dataPoints.length; i++){
