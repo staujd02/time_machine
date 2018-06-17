@@ -1,6 +1,4 @@
 import * as THREE from 'three'
-import ThreeContainer from '../ThreeContainer';
-import * as tinycolor2 from 'tinycolor2';
 
 export default class DataPoint extends THREE.Mesh{   
    

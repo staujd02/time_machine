@@ -5,17 +5,25 @@ import FileUtilities from './FileUtilities';
 /* Imported From: https://itnext.io/how-to-use-plain-three-js-in-your-react-apps-417a79d926e0 */
 export default class ThreeContainer extends Component {
 
+  constructor(props) {
+    super(props);
+    // Don't call this.setState() here!
+    this.state = { counter: 0 };
+    this.IController = {
+      injectDataPointList: function(json){}
+    };
+  }
+
   componentDidMount() {
-    threeEntryPoint(this.threeRootElement);
-   // FileInput(this.threeRootElement);
+    threeEntryPoint(this.threeRootElement, this.IController);
   }
 
   readData(files){
     var fileUtil = new FileUtilities();
+    const cntrl = this.IController;
     fileUtil.readData(files, function(dataString){
-      alert(dataString);
+      cntrl.injectDataPointList(dataString);
     });
-
   }
 
   render () {

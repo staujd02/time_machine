@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import DataPoint from './DataPoint';
 import * as dat from 'dat.gui';
 
-export default canvas => {
+export default (canvas, IController) => {
 
     const origin = new THREE.Vector3(0,0,0);
 
@@ -31,7 +31,7 @@ export default canvas => {
 
     function buildGUI(){
         var gui = new dat.GUI();
-        var colorChanger = gui.add(controls, 'changeColor').name("Change Color");
+        gui.add(controls, 'changeColor').name("Change Color");
         var sizeController = gui.add(controls, 'size').min(10).max(100).step(1);
         sizeController.onChange(function(newValue){
             dataPointScale = newValue/40.0; //Ratio of original size (40)
@@ -79,6 +79,11 @@ export default canvas => {
         hold[2].position.set(400, 200, 1);
 
         return hold;
+    }
+
+    IController.injectDataPointList = processDataPointList;
+    function processDataPointList(json){
+        alert(json);
     }
 
     function changeColors(){

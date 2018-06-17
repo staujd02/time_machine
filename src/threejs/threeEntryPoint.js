@@ -1,9 +1,9 @@
 /** Imported From:  https://github.com/PierfrancescoSoffritti/pierfrancescosoffritti.com/blob/master/src/components/home/header/threejs/threeEntryPoint.js*/
 import SceneManager from './SceneManager';
 
-export default container => {
+export default (container, IController) => {
     const canvas = createCanvas(document, container);
-    const sceneManager = new SceneManager(canvas);
+    const sceneManager = new SceneManager(canvas, IController);
 
     render();
 
