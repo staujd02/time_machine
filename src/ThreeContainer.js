@@ -18,10 +18,10 @@ export default class ThreeContainer extends Component {
     threeEntryPoint(this.threeRootElement, this.IController);
   }
 
-  readData(files){
+  readFile(files){
     var fileUtil = new FileUtilities();
     const cntrl = this.IController;
-    fileUtil.readData(files, function(dataString){
+    fileUtil.processXLSXIntoCSV(files[0], function(dataString){
       cntrl.injectDataPointList(dataString);
     });
   }
@@ -30,7 +30,7 @@ export default class ThreeContainer extends Component {
       return (
         <div>
         <div ref={element => this.threeRootElement = element} />
-        <input id="fileInput" type="file" onChange={ (e) => this.readData(e.target.files)} ref={input => {this.fileInput = input;}}/>
+        <input id="fileInput" type="file" onChange={ (e) => this.readFile(e.target.files)} ref={input => {this.fileInput = input;}}/>
         </div>
       );
   }

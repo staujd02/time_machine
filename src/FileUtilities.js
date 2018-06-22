@@ -1,26 +1,27 @@
 export default class FileUtilities  {
-  readData(files, callback) {
-    var XLSX = require('xlsx')
-    var fr = new FileReader()
-    var csvString, data;
 
-    fr.readAsBinaryString(files[0]);
-
-    fr.onload = e => {
-        var dataString = fr.result;
-        var workbook = XLSX.read(dataString, {
-          type: 'binary'
-        });
-        
-        workbook.SheetNames.forEach(function(sheetName){//TODO: Deal with multiple sheets
-          csvString = XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]);
-        })
-        data = this.parseData(csvString)
-        callback(data);
+  processXLSXIntoCSV(xlsxFile, onComplete) {
+    var reader = new FileReader();
+    reader.readAsBinaryString(xlsxFile);
+    reader.onload = () => {
+      var csvSheetStrings = this.transformXLXSIntoCsvStrings(reader.result);
+      onComplete(this.parseSingleCSV(csvSheetStrings[0]));
     }
   }
+  
+  transformXLXSIntoCsvStrings(binaryContents){
+    const XLSX = require('xlsx')
+    const binaryType = {type: 'binary'};
+    var csvStrings = [];
+    var workbook = XLSX.read(binaryContents, binaryType);
+    workbook.SheetNames.forEach(name => {
+        csvStrings.push(XLSX.utils.sheet_to_csv(workbook.Sheets[name]));
+      });
 
-  parseData(csvString) {
+    return csvStrings;
+  }
+
+  parseSingleCSV(csvString) {
     var numOfRows = 0;
     var numOfColumns = 1;
     var ch, i;
@@ -28,7 +29,7 @@ export default class FileUtilities  {
     for(i = 0; i < csvString.length; i++){
       ch = csvString.charAt(i);
       if (ch === '\n'){
-        numOfRows++;
+        numOfRows++
       }
     }
      //Count columns
