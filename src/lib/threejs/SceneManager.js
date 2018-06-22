@@ -6,24 +6,23 @@ import * as dat from 'dat.gui';
 export default (canvas, IController) => {
 
     const origin = new THREE.Vector3(0,0,0);
-
     const screenDimensions = {
         width: canvas.width,
         height: canvas.height
     }
-    
     const controls = {
         size: 40,
         changeStep : function(){
             startStepping();
         }
     }
-
     var step = 0;
     var maxQuantity = 1; //Highest quantity the vitamin will reach
     var halfQuantity = maxQuantity/2.0;
     var baseColor = 0xaa00ff;
     var changeData = null; //Holds imported data 
+
+    var mouseDown = false;
 
     var dataPointGeometry = new THREE.CircleGeometry( 40, 32 );
     var dataPointMaterial = new THREE.MeshBasicMaterial( { color: baseColor } );
@@ -46,8 +45,51 @@ export default (canvas, IController) => {
             update();
         });
     }
+
+    function setupEventListeners(){
+        canvas.addEventListener("mousedown", function(evt) {
+            mouseDown = true;
+        });
+        canvas.addEventListener("mouseup", function(evt) {
+            mouseDown = false;
+        });
+        canvas.addEventListener("mousemove", function(evt) {
+            if(mouseDown){
+                var mousePos = getMousePos(canvas, evt);
+            var newMousePos = canvasToThreePos(mousePos);
+            dataPoints[0].position.set(newMousePos.x, newMousePos.y, 0);
+            }
+        });
+    }
+
+    function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+    }
+
+    function canvasToThreePos(mousePos){
+        var newX, newY;
+        if(mousePos.x > (canvas.width/2)){
+            newX = (canvas.width/2) - mousePos.x;
+        }else{
+            newX = (canvas.width/2) - mousePos.x;
+        }
+        if(mousePos.y > (canvas.height / 2)){
+            newY =  mousePos.y - (canvas.height/2);
+        }else{
+            newY = mousePos.y - (canvas.height/2);
+        }
+        return {
+           x: newX,
+           y: newY
+          };
+    }
    
     function buildScene() {
+        setupEventListeners();
         const scene = new THREE.Scene();
         scene.background = new THREE.Color("#FFF");
         for (var i = 0; i < dataPoints.length; i++){
@@ -79,7 +121,7 @@ export default (canvas, IController) => {
     function createSampleDataPoints(){
         var hold = [];
         hold[0] = new DataPoint(dataPointGeometry, dataPointMaterial);
-        hold[0].position.set(0, 0, 1);
+        hold[0].position.set(0, 0, 0);
         return hold;
     }
 
