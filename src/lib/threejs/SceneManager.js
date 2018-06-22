@@ -35,6 +35,8 @@ export default (canvas, IController) => {
     buildGUI();
 
     IController.injectDataPointList = processDataPointList;
+    IController.resetDataAnimation = () =>    { step = 0 };
+    IController.injectDataPointList = json => { changeData = json };
 
     function buildGUI(){
         var gui = new dat.GUI();

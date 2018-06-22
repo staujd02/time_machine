@@ -8,14 +8,15 @@ class App extends Component {
   constructor(props){
     super(props);
     this.ThreeController = {
-      injectDataPointList: function(json) {/*...*/}
+      injectDataPointList: function(json) {/*...*/},
+      resetDataAnimation: function() {}
     };
   }
 
   render() {
     return (
       <div className="App">
-        <Navigation />
+        <Navigation IController={this.ThreeController} />
         <FileInput IController={this.ThreeController} />
         <div className="App-canvas">
           <ThreeContainer IController={this.ThreeController}/>
