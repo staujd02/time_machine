@@ -20,10 +20,13 @@ export default (canvas, IController) => {
     }
 
     var step = 0;
+    var maxQuantity = 1; //Highest quantity the vitamin will reach
+    var halfQuantity = maxQuantity/2.0;
+    var baseColor = 0xaa00ff;
     var changeData = null; //Holds imported data 
 
     var dataPointGeometry = new THREE.CircleGeometry( 40, 32 );
-    var dataPointMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+    var dataPointMaterial = new THREE.MeshBasicMaterial( { color: baseColor } );
     var dataPointScale = 1.0;
     var dataPoints = createSampleDataPoints(40);
     
@@ -97,10 +100,20 @@ export default (canvas, IController) => {
         }
         else if (step < changeData.length){
             for(var i = 0; i < dataPoints.length; i++){
-                dataPoints[i].lightenColor(changeData[step][i]);
+                if(changeData[step][i] > halfQuantity){
+                    //Darken
+                    var diff = changeData[step][i] - halfQuantity;
+                    var changePercent = diff/halfQuantity;
+                    dataPoints[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
+                }else{
+                    //Lighten
+                   var diff = halfQuantity - changeData[step][i];
+                    var changePercent = diff/halfQuantity;
+                    dataPoints[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
+                }
             }
             step++;
-            await sleep(1000);
+            await sleep(600);
             stepForward();
         }else{
             alert("No more data");
