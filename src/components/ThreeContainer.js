@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import threeEntryPoint from './threejs/threeEntryPoint';
-import FileUtilities from './FileUtilities';
+import threeEntryPoint from '../lib/threejs/threeEntryPoint';
+import FileUtilities from '../lib/FileUtilities';
 
 /* Imported From: https://itnext.io/how-to-use-plain-three-js-in-your-react-apps-417a79d926e0 */
 export default class ThreeContainer extends Component {
 
   constructor(props) {
     super(props);
-    // Don't call this.setState() here!
     this.state = { counter: 0 };
     this.IController = {
       injectDataPointList: function(json){}

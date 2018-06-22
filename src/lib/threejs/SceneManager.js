@@ -15,7 +15,7 @@ export default (canvas, IController) => {
     const controls = {
         size: 40,
         changeStep : function(){
-            stepForward();
+            startStepping();
         }
     }
 
@@ -33,13 +33,13 @@ export default (canvas, IController) => {
     const scene = buildScene();
     const renderer = buildRender(screenDimensions);
     const camera = buildCamera(screenDimensions);
-    const gui = buildGUI();
+    buildGUI();
 
     IController.injectDataPointList = processDataPointList;
 
     function buildGUI(){
         var gui = new dat.GUI();
-        var stepController = gui.add(controls, 'changeStep').name("Step Forward");
+        gui.add(controls, 'changeStep').name("Step Forward");
         var sizeController = gui.add(controls, 'size').min(10).max(100).step(1);
         sizeController.onChange(function(newValue){
             dataPointScale = newValue/40.0; //Ratio of original size (40)
@@ -73,20 +73,13 @@ export default (canvas, IController) => {
         var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / - 2, height /2, 1, 1000 );
         camera.position.set(0, 0, -10);
         camera.lookAt(origin)
-        
         return(camera);
     }
 
-    function createSampleDataPoints(radius){
+    function createSampleDataPoints(){
         var hold = [];
-        /*for(var i = 0; i < 3; i++){
-            hold[i] = new DataPoint(dataPointGeometry, dataPointMaterial);
-        }*/
         hold[0] = new DataPoint(dataPointGeometry, dataPointMaterial);
         hold[0].position.set(0, 0, 1);
-        //hold[1].position.set(-300, 80, 1);
-       // hold[2].position.set(400, 200, 1);
-
         return hold;
     }
 
@@ -94,30 +87,50 @@ export default (canvas, IController) => {
         changeData = json;
     }
 
-    async function stepForward(){
-        if(changeData == null){
+    function validDataFound(changeData){
+        var b = changeData != null;
+        if(!b){
             alert("Please import data first");
         }
-        else if (step < changeData.length){
-            for(var i = 0; i < dataPoints.length; i++){
-                if(changeData[step][i] > halfQuantity){
-                    //Darken
-                    var diff = changeData[step][i] - halfQuantity;
-                    var changePercent = diff/halfQuantity;
-                    dataPoints[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
-                }else{
-                    //Lighten
-                   var diff = halfQuantity - changeData[step][i];
-                    var changePercent = diff/halfQuantity;
-                    dataPoints[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
-                }
-            }
-            step++;
-            await sleep(600);
+        return b;
+    }
+    
+    function dataExhausted(changeData){
+        var b = step >= changeData.length;
+        if(b)
+            alert("No more data!");
+        return step >= changeData.length;
+    }
+
+    async function startStepping(){
+        if(validDataFound(changeData))
             stepForward();
-        }else{
-            alert("No more data");
+    }
+
+    async function stepForward(){
+        if(!dataExhausted(changeData))
+            incrementData();
+    }
+
+    async function incrementData(){
+        let changePercent, diff;
+
+        for(var i = 0; i < dataPoints.length; i++){
+            if(changeData[step][i] > halfQuantity){
+                //Darken
+                diff = changeData[step][i] - halfQuantity;
+                changePercent = diff/halfQuantity;
+                dataPoints[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
+            }else{
+                //Lighten
+                diff = halfQuantity - changeData[step][i];
+                changePercent = diff/halfQuantity;
+                dataPoints[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
+            }
         }
+        step++;
+        await sleep(600);
+        stepForward();
     }
 
     function sleep(ms) {

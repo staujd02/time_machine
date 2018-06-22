@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Navbar from 'react-bootstrap/lib/Navbar';
 import Nav from 'react-bootstrap/lib/Nav';
 import NavItem from 'react-bootstrap/lib/NavItem';
-import './css/bootstrap.min.css';
 
 class Navigation extends Component {
 
