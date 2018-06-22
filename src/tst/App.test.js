@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from '../App';
-import threeEntryPoint from '../threejs/threeEntryPoint';
-import Navigation from '../Navigation';
-jest.mock('../threejs/threeEntryPoint');
-jest.mock('../Navigation');
+import threeEntryPoint from '../lib/threejs/threeEntryPoint';
+import Navigation from '../components/Navigation';
+jest.mock('../lib/threejs/threeEntryPoint');
+jest.mock('../components/Navigation');
 
 describe("The visualizer", () => {
 
@@ -12,6 +12,7 @@ describe("The visualizer", () => {
 
   beforeEach(() => {
     Navigation.mockClear();
+    threeEntryPoint.mockClear();
     div = document.createElement('div');
     ReactDOM.render(<App />, div);
   });
@@ -20,9 +21,12 @@ describe("The visualizer", () => {
     expect(Navigation).toHaveBeenCalledTimes(1);
   });
 
+  it("has an three entry point", () =>{
+    expect(threeEntryPoint).toHaveBeenCalledTimes(1);
+  });
+
   afterEach(() => {
     ReactDOM.unmountComponentAtNode(div);
   });
-
 
 });

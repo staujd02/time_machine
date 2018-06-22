@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from '../App';
-import ThreeContainer from '../ThreeContainer';
-jest.mock('../threejs/threeEntryPoint');
+import ThreeContainer from '../components/ThreeContainer';
+jest.mock('../lib/threejs/threeEntryPoint');
 
 describe("The ThreeContainer", () =>{
     it("renders without crashing", () =>{
