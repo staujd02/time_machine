@@ -2,20 +2,19 @@
 import * as THREE from 'three';
 import DataPoint from './DataPoint';
 import * as dat from 'dat.gui';
+import Action from '../ActionUtilities';
+import ActionUtilities from '../ActionUtilities';
 
 export default (canvas, IController) => {
+
+    const actionUtil = new ActionUtilities();
 
     const origin = new THREE.Vector3(0,0,0);
     const screenDimensions = {
         width: canvas.width,
         height: canvas.height
     }
-    const controls = {
-        size: 40,
-        changeStep : function(){
-            startStepping();
-        }
-    }
+   
     var step = 0;
     var maxQuantity = 1; //Highest quantity the vitamin will reach
     var halfQuantity = maxQuantity/2.0;
@@ -23,11 +22,23 @@ export default (canvas, IController) => {
     var changeData = null; //Holds imported data 
 
     var mouseDown = false;
+    var dataPointSelected = -1;
 
-    var dataPointGeometry = new THREE.CircleGeometry( 40, 32 );
+    var radius = 40;
+    var dataPointGeometry = new THREE.CircleGeometry( radius, 32 );
     var dataPointMaterial = new THREE.MeshBasicMaterial( { color: baseColor } );
     var dataPointScale = 1.0;
     var dataPoints = createSampleDataPoints(40);
+
+    const controls = {
+        size: radius,
+        changeStep : function(){
+            startStepping();
+        },
+        addPoint : function(){
+            addDataPoint(dataPoints.length);
+        }
+    }
     
     const scene = buildScene();
     const renderer = buildRender(screenDimensions);
@@ -41,9 +52,10 @@ export default (canvas, IController) => {
     function buildGUI(){
         var gui = new dat.GUI();
         gui.add(controls, 'changeStep').name("Step Forward");
+        gui.add(controls, 'addPoint').name("Add Data Point");
         var sizeController = gui.add(controls, 'size').min(10).max(100).step(1);
         sizeController.onChange(function(newValue){
-            dataPointScale = newValue/40.0; //Ratio of original size (40)
+            dataPointScale = newValue/radius; //Ratio of original size
             update();
         });
     }
@@ -51,17 +63,31 @@ export default (canvas, IController) => {
     function setupEventListeners(){
         canvas.addEventListener("mousedown", function(evt) {
             mouseDown = true;
+            checkWithinRange(canvas, evt);
         });
         canvas.addEventListener("mouseup", function(evt) {
             mouseDown = false;
+            dataPointSelected = -1; //No current selected dataPoint
         });
         canvas.addEventListener("mousemove", function(evt) {
             if(mouseDown){
                 var mousePos = getMousePos(canvas, evt);
             var newMousePos = canvasToThreePos(mousePos);
-            dataPoints[0].position.set(newMousePos.x, newMousePos.y, 0);
+            if(dataPointSelected > -1){
+                dataPoints[dataPointSelected].position.set(newMousePos.x, newMousePos.y, 0);
+            }
             }
         });
+    }
+
+    function checkWithinRange(canvas, evt){
+        var mousePos = canvasToThreePos(getMousePos(canvas, evt));
+        for(var i = 0; i < dataPoints.length; i++){
+            var selected = dataPoints[i].withinCircle(mousePos.x, mousePos.y, 40);
+            if(selected){
+                dataPointSelected = i;
+            }
+        }
     }
 
     function getMousePos(canvas, evt) {
@@ -173,13 +199,17 @@ export default (canvas, IController) => {
             }
         }
         step++;
-        await sleep(600);
+        await actionUtil.sleep(600);
         stepForward();
     }
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
+    function addDataPoint(index){
+        dataPoints[index] = new DataPoint(dataPointGeometry, dataPointMaterial);
+        dataPoints[index].position.set(0, 0, 0);
+        scene.add(dataPoints[index]);
+        update();
+    }
+
 
     function update() {
         for(var i = 0; i < dataPoints.length; i++){
