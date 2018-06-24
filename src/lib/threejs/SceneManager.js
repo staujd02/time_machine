@@ -22,7 +22,8 @@ export default (canvas, IController) => {
     var changeData = null; //Holds imported data 
 
     var mouseDown = false;
-    var dataPointSelected = -1;
+    var dataPointToMove = -1;
+    var dataPointToDelete = -1;
 
     var radius = 40;
     var dataPointGeometry = new THREE.CircleGeometry( radius, 32 );
@@ -37,6 +38,9 @@ export default (canvas, IController) => {
         },
         addPoint : function(){
             addDataPoint(dataPoints.length);
+        },
+        deletePoint : function(){
+            deleteDataPoint();
         }
     }
     
@@ -53,6 +57,7 @@ export default (canvas, IController) => {
         var gui = new dat.GUI();
         gui.add(controls, 'changeStep').name("Step Forward");
         gui.add(controls, 'addPoint').name("Add Data Point");
+        gui.add(controls, 'deletePoint').name("Delete Data Point");
         var sizeController = gui.add(controls, 'size').min(10).max(100).step(1);
         sizeController.onChange(function(newValue){
             dataPointScale = newValue/radius; //Ratio of original size
@@ -67,14 +72,14 @@ export default (canvas, IController) => {
         });
         canvas.addEventListener("mouseup", function(evt) {
             mouseDown = false;
-            dataPointSelected = -1; //No current selected dataPoint
+            dataPointToMove = -1; //No current selected dataPoint
         });
         canvas.addEventListener("mousemove", function(evt) {
             if(mouseDown){
                 var mousePos = getMousePos(canvas, evt);
             var newMousePos = canvasToThreePos(mousePos);
-            if(dataPointSelected > -1){
-                dataPoints[dataPointSelected].position.set(newMousePos.x, newMousePos.y, 0);
+            if(dataPointToMove > -1){
+                dataPoints[dataPointToMove].position.set(newMousePos.x, newMousePos.y, 0);
             }
             }
         });
@@ -85,8 +90,12 @@ export default (canvas, IController) => {
         for(var i = 0; i < dataPoints.length; i++){
             var selected = dataPoints[i].withinCircle(mousePos.x, mousePos.y, 40);
             if(selected){
-                dataPointSelected = i;
+                dataPointToMove = i;
+                dataPointToDelete = i;
             }
+        }
+        if(dataPointToMove == -1){//Click was not on a datapoint
+            dataPointToDelete = -1; //Deselect previous selection
         }
     }
 
@@ -123,7 +132,6 @@ export default (canvas, IController) => {
         for (var i = 0; i < dataPoints.length; i++){
             scene.add(dataPoints[i]);
         }
-
         return scene;
     }
 
@@ -210,10 +218,25 @@ export default (canvas, IController) => {
         update();
     }
 
+    function deleteDataPoint(){
+        if(dataPointToDelete > -1){
+            scene.remove(dataPoints[dataPointToDelete]);
+            dataPoints[dataPointToDelete] = null;
+            var idx = 0;
+            dataPoints = new Array();
+            for(var i = 0; i < dataPoints.length; i++){
+                if(dataPoints[i] != null){
+                    dataPoints[idx] = dataPoints[i];
+                    idx++;
+                }
+            }
+        }
+    }
+
 
     function update() {
         for(var i = 0; i < dataPoints.length; i++){
-            dataPoints[i].scale.set(dataPointScale, dataPointScale, dataPointScale);
+             dataPoints[i].scale.set(dataPointScale, dataPointScale, dataPointScale);
         }
         
         renderer.render(scene, camera);
