@@ -16,7 +16,6 @@ export default (canvas, IController) => {
     }
    
     var step = 0;
-    var editMode = false;
     var maxQuantity = 1; //Highest quantity the vitamin will reach
     var halfQuantity = maxQuantity/2.0;
     var baseColor = 0xaa00ff;
@@ -172,18 +171,22 @@ export default (canvas, IController) => {
     }
 
     function validDataFound(changeData){
-        var b = changeData != null;
-        if(!b){
+        var noData = changeData == null;
+        if(noData){
             alert("Please import data first");
         }
-        return b;
+        return !noData;
     }
     
-    function dataExhausted(changeData){
-        var b = step >= changeData.length;
-        if(b)
+    function dataExhausted(dataLength){
+        var stop = stepIndexExceedsDataLength(dataLength);
+        if(stop)
             alert("No more data!");
-        return step >= changeData.length;
+        return stop;
+    }
+
+    function stepIndexExceedsDataLength(dataLength){
+        return step >= dataLength;
     }
 
     async function startStepping(){
@@ -192,7 +195,7 @@ export default (canvas, IController) => {
     }
 
     async function stepForward(){
-        if(!dataExhausted(changeData))
+        if(!dataExhausted(changeData.length))
             incrementData();
     }
 

@@ -13,14 +13,14 @@ export default class ThreeContainer extends NavItem {
     this.IController = this.props.IController;
   }
 
-  noFiles(files){
+  hasNoFiles(files){
     return files.length == 0;
   }
 
   readXLSX(files){
     const cntrl = this.IController;
     let fileUtil = new FileUtilities();
-    if(this.noFiles(files))
+    if(this.hasNoFiles(files))
       return;
     fileUtil.processXLSXIntoCSV(files[0], function(dataString){
        cntrl.injectDataPointList(dataString);
