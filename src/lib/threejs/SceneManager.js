@@ -16,6 +16,7 @@ export default (canvas, IController) => {
     }
    
     var step = 0;
+    var editMode = false;
     var maxQuantity = 1; //Highest quantity the vitamin will reach
     var halfQuantity = maxQuantity/2.0;
     var baseColor = 0xaa00ff;
@@ -41,7 +42,8 @@ export default (canvas, IController) => {
         },
         deletePoint : function(){
             deleteDataPoint();
-        }
+        },
+        editMode: false
     }
     
     const scene = buildScene();
@@ -56,13 +58,17 @@ export default (canvas, IController) => {
     function buildGUI(){
         var gui = new dat.GUI();
         gui.add(controls, 'changeStep').name("Step Forward");
-        gui.add(controls, 'addPoint').name("Add Data Point");
-        gui.add(controls, 'deletePoint').name("Delete Data Point");
         var sizeController = gui.add(controls, 'size').min(10).max(100).step(1);
         sizeController.onChange(function(newValue){
             dataPointScale = newValue/radius; //Ratio of original size
             update();
         });
+        var editFolder = gui.addFolder("Edit");
+        editFolder.add(controls, 'editMode').name("Edit Mode").onChange(function(newValue){
+            toggleEditMode(newValue);
+        });
+        editFolder.add(controls, 'addPoint').name("Add Data Point");
+        editFolder.add(controls, 'deletePoint').name("Delete Data Point");
     }
 
     function setupEventListeners(){
@@ -233,6 +239,9 @@ export default (canvas, IController) => {
         }
     }
 
+    function toggleEditMode(newValue){
+        editMode = newValue;
+    }
 
     function update() {
         for(var i = 0; i < dataPoints.length; i++){
