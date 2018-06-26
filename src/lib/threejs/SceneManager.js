@@ -38,10 +38,14 @@ export default (canvas, IController) => {
             startStepping();
         },
         addPoint : function(){
-            addDataPoint(dataPoints.length);
+            if(editMode){
+                addDataPoint(dataPoints.length);
+            }
         },
         deletePoint : function(){
-            deleteDataPoint();
+            if(editMode){           
+                deleteDataPoint();
+            }
         },
         editMode: false
     }
@@ -73,20 +77,26 @@ export default (canvas, IController) => {
 
     function setupEventListeners(){
         canvas.addEventListener("mousedown", function(evt) {
-            mouseDown = true;
-            checkWithinRange(canvas, evt);
+            if(editMode){
+                mouseDown = true;
+                checkWithinRange(canvas, evt);
+            }
         });
         canvas.addEventListener("mouseup", function(evt) {
-            mouseDown = false;
-            dataPointToMove = -1; //No current selected dataPoint
+            if(editMode){
+                mouseDown = false;
+                dataPointToMove = -1; //No current selected dataPoint
+            }
         });
         canvas.addEventListener("mousemove", function(evt) {
-            if(mouseDown){
-                var mousePos = getMousePos(canvas, evt);
-            var newMousePos = canvasToThreePos(mousePos);
-            if(dataPointToMove > -1){
-                dataPoints[dataPointToMove].position.set(newMousePos.x, newMousePos.y, 0);
-            }
+            if(editMode){
+                if(mouseDown){
+                    var mousePos = getMousePos(canvas, evt);
+                    var newMousePos = canvasToThreePos(mousePos);
+                    if(dataPointToMove > -1){
+                        dataPoints[dataPointToMove].position.set(newMousePos.x, newMousePos.y, 0);
+                    }
+                }
             }
         });
     }
