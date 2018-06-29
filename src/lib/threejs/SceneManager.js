@@ -34,6 +34,8 @@ export default (canvas, IController) => {
 
     const controls = {
         size: radius,
+        maxValue: maxQuantity,
+        color : [ 170, 0, 255, 1 ],
         changeStep : function(){
             startStepping();
         },
@@ -61,18 +63,31 @@ export default (canvas, IController) => {
 
     function buildGUI(){
         var gui = new dat.GUI();
+        
         gui.add(controls, 'changeStep').name("Step Forward");
-        var sizeController = gui.add(controls, 'size').min(10).max(100).step(1);
+        var sizeController = gui.add(controls, 'size').name("Size").min(10).max(100).step(1);
         sizeController.onChange(function(newValue){
             dataPointScale = newValue/radius; //Ratio of original size
             update();
         });
+        var maxController = gui.add(controls, 'maxValue').name("Max Value");
+        maxController.onChange(function(newValue){
+            maxQuantity = newValue;
+            halfQuantity = maxQuantity / 2.0;
+        });
+        var colorController = gui.addColor(controls, 'color');
+        colorController.onChange(function(newValue){
+            baseColor = newValue;
+            changeColor(baseColor);
+        })
+
         var editFolder = gui.addFolder("Edit");
         editFolder.add(controls, 'editMode').name("Edit Mode").onChange(function(newValue){
             toggleEditMode(newValue);
         });
         editFolder.add(controls, 'addPoint').name("Add Data Point");
         editFolder.add(controls, 'deletePoint').name("Delete Data Point");
+        
     }
 
     function setupEventListeners(){
@@ -214,12 +229,12 @@ export default (canvas, IController) => {
                 //Darken
                 diff = changeData[step][i] - halfQuantity;
                 changePercent = diff/halfQuantity;
-                dataPoints[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
+                dataPoints[i].darkenColor(baseColor, changePercent * 50);//Multiply by 50 - percent available to darken by
             }else{
                 //Lighten
                 diff = halfQuantity - changeData[step][i];
                 changePercent = diff/halfQuantity;
-                dataPoints[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
+                dataPoints[i].lightenColor(baseColor, changePercent * 50);//Multiply by 50 - percent available to lighten by
             }
         }
         step++;
@@ -230,6 +245,7 @@ export default (canvas, IController) => {
     function addDataPoint(index){
         dataPoints[index] = new DataPoint(dataPointGeometry, dataPointMaterial);
         dataPoints[index].position.set(0, 0, 0);
+        dataPoints[index].changeColor(baseColor);
         scene.add(dataPoints[index]);
         update();
     }
@@ -251,6 +267,12 @@ export default (canvas, IController) => {
 
     function toggleEditMode(newValue){
         editMode = newValue;
+    }
+
+    function changeColor(newColor){
+        for(var i = 0; i < dataPoints.length; i++){
+            dataPoints[i].changeColor(newColor);
+        }
     }
 
     function update() {
