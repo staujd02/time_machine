@@ -16,7 +16,7 @@ export default (container, IController) => {
     }
 
    
-    function render(time) {
+    function render() {
         requestAnimationFrame(render);
         sceneManager.update();
     }
