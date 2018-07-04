@@ -14,7 +14,7 @@ export default class ThreeContainer extends NavItem {
   }
 
   hasNoFiles(files){
-    return files.length == 0;
+    return files.length === 0;
   }
 
   readXLSX(files){
