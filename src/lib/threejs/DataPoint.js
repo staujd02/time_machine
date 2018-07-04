@@ -2,15 +2,17 @@ import * as THREE from 'three'
 
 export default class DataPoint extends THREE.Mesh{   
 
-    constructor(props){
-        super(props);
+    constructor(dataPointGeometry, dataPointMaterial, hexColor){
+        super(dataPointGeometry, dataPointMaterial);
         const tinycolor = require("tinycolor2");
         this.properties = {
-            color: tinycolor("#aa00ff").toString(),
-            hexColor: "#aa00ff",
+            hexColor: hexColor || "#aa00ff",
             computedColor: () => { return this.properties.computedTinycolor().toString(); },
             computedTinycolor: () =>{ return new tinycolor(this.properties.hexColor); },
             computedMesh: () => { return new THREE.MeshBasicMaterial( this.properties ); }
+        };
+        this.properties = {
+            color: tinycolor(this.properties.hexColor).toString()
         };
     }
    
@@ -20,14 +22,29 @@ export default class DataPoint extends THREE.Mesh{
         this.material = this.properties.computedMesh();
     }
     
-    lightenColor(percent){
-        this.properties.color = this.properties.computedTinycolor().lighten(percent);
-        this.material = this.properties.computedMesh();
+    // lightenColor(percent){
+    //     this.properties.color = this.properties.computedTinycolor().lighten(percent);
+    //     this.material = this.properties.computedMesh();
+    // }
+
+    // darkenColor(percent){
+    //     this.properties.color = this.properties.computedTinycolor().darken(percent);
+    //     this.material = this.properties.computedMesh();
+    // }
+
+    changeColor(newColor){
+        var tinycolor = require("tinycolor2");
+        this.material = new THREE.MeshBasicMaterial( { color:tinycolor({r: newColor[0], g: newColor[1], b: newColor[2]}).toString()});
+    }
+    
+    lightenColor(baseColor, percent){
+        var tinycolor = require("tinycolor2");
+        this.material = new THREE.MeshBasicMaterial( { color:tinycolor({r: baseColor[0], g: baseColor[1], b: baseColor[2]}).lighten(percent).toString() } );
     }
 
-    darkenColor(percent){
-        this.properties.color = this.properties.computedTinycolor().darken(percent);
-        this.material = this.properties.computedMesh();
+    darkenColor(baseColor, percent){
+        var tinycolor = require("tinycolor2");
+        this.material = new THREE.MeshBasicMaterial( { color:tinycolor({r: baseColor[0], g: baseColor[1], b: baseColor[2]}).darken(percent).toString() } );
     }
 
     withinCircle(x, y, radius){//Checks if inputted point is within circle
