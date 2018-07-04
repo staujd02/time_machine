@@ -2,7 +2,6 @@
 import * as THREE from 'three';
 import DataPoint from './DataPoint';
 import * as dat from 'dat.gui';
-import Action from '../ActionUtilities';
 import ActionUtilities from '../ActionUtilities';
 
 export default (canvas, IController) => {
@@ -30,6 +29,7 @@ export default (canvas, IController) => {
     var dataPointMaterial = new THREE.MeshBasicMaterial( { color: baseColor } );
     var dataPointScale = 1.0;
     var dataPoints = createSampleDataPoints(40);
+    var editMode = true;
 
     const controls = {
         size: radius,
@@ -124,7 +124,7 @@ export default (canvas, IController) => {
                 dataPointToDelete = i;
             }
         }
-        if(dataPointToMove == -1){//Click was not on a datapoint
+        if(dataPointToMove === -1){//Click was not on a datapoint
             dataPointToDelete = -1; //Deselect previous selection
         }
     }
@@ -258,7 +258,7 @@ export default (canvas, IController) => {
             scene.remove(dataPoints[dataPointToDelete]);
             dataPoints[dataPointToDelete] = null;
             var idx = 0;
-            dataPoints = new Array();
+            dataPoints = [];
             for(var i = 0; i < dataPoints.length; i++){
                 if(dataPoints[i] != null){
                     dataPoints[idx] = dataPoints[i];
