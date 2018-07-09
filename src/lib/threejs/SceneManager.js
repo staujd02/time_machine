@@ -13,27 +13,28 @@ export default (canvas, IController) => {
         width: canvas.width,
         height: canvas.height
     }
+    const origRadius = 40;
 
     var step = 0;
     var maxQuantity = 1;
     var halfQuantity = maxQuantity / 2.0;
     var baseColor = 0xaa00ff;
-    var radius = 40;
+   var radius = origRadius;
     var changeData = null; //Holds imported data 
 
     var mouseDown = false;
     var dataPointToMove = -1;
     var dataPointToDelete = -1;
 
-    var dataPointScale = 1.0;
     var dataPoints = [];
+    var labels = [];
     var editMode;
 
-    var fontResouce;
+    var fontResource;
     var isLoading = true;
 
     const controls = {
-        size: radius,
+        size: origRadius,
         maxValue: maxQuantity,
         color: [170, 0, 255, 1],
         changeStep: function () {
@@ -70,7 +71,7 @@ export default (canvas, IController) => {
     }
 
     function fontLoadingComplete(font) {
-        fontResouce = font;
+        fontResource = font;
         isLoading = false;
     }
 
@@ -80,8 +81,8 @@ export default (canvas, IController) => {
         gui.add(controls, 'changeStep').name("Step Forward");
         var sizeController = gui.add(controls, 'size').name("Size").min(10).max(100).step(1);
         sizeController.onChange(function (newValue) {
-            dataPointScale = newValue / radius; //Ratio of original size
-            changeAllRadius(dataPointScale);
+            radius = newValue; //Ratio of original size
+            changeAllRadius();
             update();
         });
         var maxController = gui.add(controls, 'maxValue').name("Max Value");
@@ -124,6 +125,7 @@ export default (canvas, IController) => {
                     var newMousePos = canvasToThreePos(mousePos);
                     if (dataPointToMove > -1) {
                         dataPoints[dataPointToMove].position.set(newMousePos.x, newMousePos.y, 0);
+                        dataPoints[dataPointToMove].moveText(newMousePos.x, newMousePos.y + (2 * radius));
                     }
                 }
             }
@@ -155,16 +157,8 @@ export default (canvas, IController) => {
 
     function canvasToThreePos(mousePos) {
         var newX, newY;
-        if (mousePos.x > (canvas.width / 2)) {
-            newX = (canvas.width / 2) - mousePos.x;
-        } else {
-            newX = (canvas.width / 2) - mousePos.x;
-        }
-        if (mousePos.y > (canvas.height / 2)) {
-            newY = mousePos.y - (canvas.height / 2);
-        } else {
-            newY = mousePos.y - (canvas.height / 2);
-        }
+        newX = (canvas.width / 2) - mousePos.x;
+        newY = mousePos.y - (canvas.height / 2);
         return {
             x: newX,
             y: newY
@@ -253,7 +247,9 @@ export default (canvas, IController) => {
     function addDataPoint() {
         let dataPoint = new DataPoint(scene);
         dataPoint.changeColor(baseColor);
-        dataPoint.scale.set(dataPointScale, dataPointScale, dataPointScale);
+        dataPoint.scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
+        var labelText = window.prompt("Label your data point: ");
+        dataPoint.appendText(fontResource, labelText);
         dataPoints.push(dataPoint);
         update();
     }
@@ -277,9 +273,10 @@ export default (canvas, IController) => {
         update();
     }
 
-    function changeAllRadius(scale) {
+    function changeAllRadius() {
         for (var i = 0; i < dataPoints.length; i++) {
-            dataPoints[i].scale.set(scale, scale, scale);
+            dataPoints[i].scale.set(radius/origRadius, radius/origRadius, radius/origRadius);
+            dataPoints[i].changeTextSize(radius/origRadius)
         }
     }
 

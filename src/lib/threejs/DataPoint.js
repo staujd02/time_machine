@@ -6,6 +6,7 @@ class DataPoint {
     constructor(scene) {
         const defaultColor = "#aa00ff";
         var tinycolor = require('tinycolor2');
+        var textMesh;
 
         this.scene = scene;
         this.color = tinycolor(defaultColor);
@@ -33,10 +34,10 @@ class DataPoint {
             this.scene.remove(this.object.mesh);
         };
 
-        this.appendText = function (font) {
-            var geometry = new THREE.TextGeometry('Hello three.js!', {
+        this.appendText = function (font, text) {
+            var geometry = new THREE.TextGeometry(text , {
                 font: font,
-                size: 5,
+                size: 10,
                 height: 5,
                 curveSegments: 12,
                 bevelEnabled: false,
@@ -45,10 +46,20 @@ class DataPoint {
                 bevelSegments: 5
             });
             let material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            let mesh = new THREE.Mesh(geometry, material);
-            this.scene.add(mesh);
+            this.textMesh = new THREE.Mesh(geometry, material);
+            this.moveText(0, 80, 0);
+            this.textMesh.rotation.set(0, 0, Math.PI);
+            this.scene.add(this.textMesh);
         };
 
+        this.moveText = function(newX, newY){
+            var box = new THREE.Box3().setFromObject( this.textMesh );//To center text horizontally
+            this.textMesh.position.set(newX + .5*(box.max.x - box.min.x), newY, 0);
+        }
+
+        this.changeTextSize = function(scale){
+            this.textMesh.scale.set(scale, scale, scale)
+        }
         this.lighterColor = function (percent) {
             return this.color.lighten(percent).toString();
         };
