@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import DataPoint from './DataPoint';
 import * as dat from 'dat.gui';
 import ActionUtilities from '../ActionUtilities';
+import ProgressBar from './ProgressBar';
 
 export default (canvas, IController) => {
 
@@ -27,6 +28,7 @@ export default (canvas, IController) => {
     var dataPointToMove = -1;
     var dataPointToDelete = -1;
 
+    var progressBar;
     var dataPoints = [];
     var editMode;
 
@@ -57,6 +59,7 @@ export default (canvas, IController) => {
     const scene = buildScene();
     const renderer = buildRender(screenDimensions);
     const camera = buildCamera(screenDimensions);
+    buildProgressBar();
     buildGUI();
     loadFont();
 
@@ -108,6 +111,10 @@ export default (canvas, IController) => {
         editFolder.add(controls, 'addPoint').name("Add Data Point");
         editFolder.add(controls, 'deletePoint').name("Delete Data Point");
 
+    }
+
+    function buildProgressBar(){
+        progressBar = new ProgressBar(scene);
     }
 
     function setupEventListeners() {
@@ -228,7 +235,6 @@ export default (canvas, IController) => {
 
     async function incrementData() {
         let changePercent, diff;
-
         for (var i = 0; i < dataPoints.length; i++) {
             if (changeData[step][i] > halfQuantity) {
                 //Darken
@@ -244,6 +250,7 @@ export default (canvas, IController) => {
             //TODO: Remove this
             //Temporarily displays data as it changes
             dataPoints[i].appendText(fontResource, changeData[step][i], dataPoints[i].position.x, dataPoints[i].position.y + (2 * radius))
+            progressBar.updateProgress(changeData.length);
         }
         step++;
         await actionUtil.sleep(timeStep);
