@@ -15,10 +15,11 @@ export default (canvas, IController) => {
     }
     const origRadius = 40;
 
+    var timeStep = 300;
     var step = 0;
     var maxQuantity = 1;
     var halfQuantity = maxQuantity / 2.0;
-    var baseColor = 0xaa00ff;
+    var baseColor = [170, 0, 255, 1];
    var radius = origRadius;
     var changeData = null; //Holds imported data 
 
@@ -27,7 +28,6 @@ export default (canvas, IController) => {
     var dataPointToDelete = -1;
 
     var dataPoints = [];
-    var labels = [];
     var editMode;
 
     var fontResource;
@@ -36,6 +36,7 @@ export default (canvas, IController) => {
     const controls = {
         size: origRadius,
         maxValue: maxQuantity,
+        timeValue: timeStep,
         color: [170, 0, 255, 1],
         changeStep: function () {
             startStepping();
@@ -85,6 +86,10 @@ export default (canvas, IController) => {
             changeAllRadius();
             update();
         });
+        var timeController = gui.add(controls, 'timeValue').name("Milliseconds Per Step").min(0).max(500).step(10)
+        timeController.onChange(function (newValue) {
+            timeStep = newValue;
+        })
         var maxController = gui.add(controls, 'maxValue').name("Max Value");
         maxController.onChange(function (newValue) {
             maxQuantity = newValue;
@@ -117,6 +122,7 @@ export default (canvas, IController) => {
                 mouseDown = false;
                 dataPointToMove = -1; //No current selected dataPoint
             }
+            
         });
         canvas.addEventListener("mousemove", function (evt) {
             if (editMode) {
@@ -169,9 +175,6 @@ export default (canvas, IController) => {
         setupEventListeners();
         const scene = new THREE.Scene();
         scene.background = new THREE.Color("#FFF");
-        for (var i = 0; i < dataPoints.length; i++) {
-            scene.add(dataPoints[i]);
-        }
         return scene;
     }
 
@@ -238,9 +241,12 @@ export default (canvas, IController) => {
                 changePercent = diff / halfQuantity;
                 dataPoints[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
             }
+            //TODO: Remove this
+            //Temporarily displays data as it changes
+            dataPoints[i].appendText(fontResource, changeData[step][i], dataPoints[i].position.x, dataPoints[i].position.y + (2 * radius))
         }
         step++;
-        await actionUtil.sleep(600);
+        await actionUtil.sleep(timeStep);
         stepForward();
     }
 
@@ -249,7 +255,7 @@ export default (canvas, IController) => {
         dataPoint.changeColor(baseColor);
         dataPoint.scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
         var labelText = window.prompt("Label your data point: ");
-        dataPoint.appendText(fontResource, labelText);
+        dataPoint.appendText(fontResource, labelText, 0, (2*radius));
         dataPoints.push(dataPoint);
         update();
     }

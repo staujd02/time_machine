@@ -4,18 +4,16 @@ import * as THREE from 'three'
 class DataPoint {
 
     constructor(scene) {
-        const defaultColor = "#aa00ff";
         var tinycolor = require('tinycolor2');
-        var textMesh;
-
+        
+        this.baseColor = "#aa00ff";
         this.scene = scene;
-        this.color = tinycolor(defaultColor);
         this.radius = 40;
         this.object = {};
         this.object.geometry = new THREE.CircleGeometry(this.radius, 32);
         this.object.mesh = new THREE.Mesh(this.object.geometry);
         this.object.mesh.material =
-            new THREE.MeshBasicMaterial({ color: this.color.toString() });
+            new THREE.MeshBasicMaterial({ color: this.baseColor });
 
         this.object.mesh.position.set(0, 0, 0);
 
@@ -32,10 +30,14 @@ class DataPoint {
 
         this.delete = function () {
             this.scene.remove(this.object.mesh);
+            this.scene.remove(this.textMesh);
         };
 
-        this.appendText = function (font, text) {
-            var geometry = new THREE.TextGeometry(text , {
+        this.appendText = function (font, text, xpos, ypos) {
+            if(this.textMesh != null){
+                this.scene.remove(this.textMesh)
+            }
+            var geometry = new THREE.TextGeometry(text, {
                 font: font,
                 size: 10,
                 height: 5,
@@ -45,9 +47,9 @@ class DataPoint {
                 bevelSize: 2,
                 bevelSegments: 5
             });
-            let material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            let material = new THREE.MeshBasicMaterial({ color: 0x000000 });
             this.textMesh = new THREE.Mesh(geometry, material);
-            this.moveText(0, 80, 0);
+            this.textMesh.position.set(xpos, ypos, 0);
             this.textMesh.rotation.set(0, 0, Math.PI);
             this.scene.add(this.textMesh);
         };
@@ -60,36 +62,23 @@ class DataPoint {
         this.changeTextSize = function(scale){
             this.textMesh.scale.set(scale, scale, scale)
         }
-        this.lighterColor = function (percent) {
-            return this.color.lighten(percent).toString();
-        };
-
-        this.darkerColor = function (percent) {
-            return this.color.darken(percent).toString();
-        };
-
-        this.wrapColor = function(){
-            return {color: this.transformColor(this.colorValue).toString()};
-        };
 
         this.transformColor = function(colorObject){
-            return tinycolor({r: colorObject[0], g: colorObject[1], b: colorObject[2]});               
+            return tinycolor({r: colorObject[0], g: colorObject[1], b: colorObject[2]}).toHexString();               
         }
 
         this.changeColor = function (colorObject) {
-            this.color = this.transformColor(colorObject);
+            this.baseColor = this.transformColor(colorObject);
             this.object.mesh.material =
-                new THREE.MeshBasicMaterial({ color: this.color.toString() });
+                new THREE.MeshBasicMaterial({ color: this.baseColor.toString() });
         };
 
         this.lightenColor = function (percent) {
-            this.object.mesh.material =
-                new THREE.MeshBasicMaterial({ color: this.lighterColor(percent) });
+            this.object.mesh.material = new THREE.MeshBasicMaterial( { color:tinycolor(this.baseColor).lighten(percent).toString() } );
         };
 
         this.darkenColor = function (percent) {
-            this.object.mesh.material =
-                new THREE.MeshBasicMaterial({ color: this.darkerColor(percent) });
+            this.object.mesh.material = new THREE.MeshBasicMaterial( { color:tinycolor(this.baseColor).darken(percent).toString() } );
         };
 
         this.update = function () {

@@ -6,6 +6,7 @@
     "ajv": "^6.0.0",
     "dat.gui": "^0.7.2",
     "jquery": "^3.3.1",
+    "progressbar.js": "^1.0.1",
     "react": "^16.4.1",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.1",
@@ -13,7 +14,7 @@
     "three": "^0.93.0",
     "tinycolor": "0.0.1",
     "tinycolor2": "^1.4.1",
-    "xlsx": "^0.13.0"
+    "xlsx": "^0.13.1"
   },
   "scripts": {
     "start": "react-scripts start",

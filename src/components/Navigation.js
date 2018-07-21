@@ -21,7 +21,7 @@ class Navigation extends Component {
           </Navbar.Header>
           <Nav>
             <NavItem eventKey={1} href="/#/Run">Run</NavItem>
-            <NavItem eventKey={2} href="/#/Reset" onClick={this.IController.resetDataAnimation}>Reset</NavItem>
+            <NavItem eventKey={2} href="/#/Reset" onClick={this.IController.resetDataAnimation()}>Reset</NavItem>
             <NavItem eventKey={3} href="/#/Save">Save</NavItem>
             <NavItem eventKey={4} href="/#/Load"><FileInput IController={this.IController} /></NavItem>
           </Nav>
