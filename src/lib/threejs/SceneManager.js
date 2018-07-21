@@ -22,7 +22,7 @@ export default (canvas, IController) => {
     var halfQuantity = maxQuantity / 2.0;
     var baseColor = [170, 0, 255, 1];
    var radius = origRadius;
-    var changeData = null; //Holds imported data 
+    var changeData = null; //Holds imported data. Column 1 is time info
 
     var mouseDown = false;
     var dataPointToMove = -1;
@@ -59,12 +59,14 @@ export default (canvas, IController) => {
     const scene = buildScene();
     const renderer = buildRender(screenDimensions);
     const camera = buildCamera(screenDimensions);
-    buildProgressBar();
     buildGUI();
     loadFont();
 
     IController.resetDataAnimation = () => { step = 0 };
-    IController.injectDataPointList = json => { changeData = json };
+    IController.injectDataPointList = json => { 
+        changeData = json;
+        buildProgressBar();
+    };
 
     function loadFont() {
         var loader = new THREE.FontLoader();
@@ -114,15 +116,14 @@ export default (canvas, IController) => {
     }
 
     function buildProgressBar(){
-        progressBar = new ProgressBar(scene);
+        progressBar = new ProgressBar(scene, fontResource, changeData.length);
+        progressBar.appendText(changeData[0][0])
     }
 
     function setupEventListeners() {
         canvas.addEventListener("mousedown", function (evt) {
-            if (editMode) {
                 mouseDown = true;
                 checkWithinRange(canvas, evt);
-            }
         });
         canvas.addEventListener("mouseup", function (evt) {
             if (editMode) {
@@ -147,16 +148,26 @@ export default (canvas, IController) => {
 
     function checkWithinRange(canvas, evt) {
         var mousePos = canvasToThreePos(getMousePos(canvas, evt));
-        for (var i = 0; i < dataPoints.length; i++) {
-            var selected = dataPoints[i].withinCircle(mousePos.x, mousePos.y);
-            if (selected) {
-                dataPointToMove = i;
-                dataPointToDelete = i;
-                break;
+        //Check if click was on data point
+        if (editMode){
+            for (var i = 0; i < dataPoints.length; i++) {
+                var selected = dataPoints[i].withinCircle(mousePos.x, mousePos.y);
+                if (selected) {
+                    dataPointToMove = i;
+                    dataPointToDelete = i;
+                    break;
+                }
             }
         }
         if (dataPointToMove === -1) {//Click was not on a datapoint
             dataPointToDelete = -1; //Deselect previous selection
+            //Check if click was on progress bar
+            if (progressBar.withinBar(mousePos.x, mousePos.y)){
+                var clickedStep = progressBar.getStep(mousePos.x);
+                progressBar.updateProgress(clickedStep, changeData[clickedStep-1][0])
+                step = clickedStep - 1;
+                incrementData();
+            }
         }
     }
 
@@ -214,8 +225,6 @@ export default (canvas, IController) => {
 
     function dataExhausted(dataLength) {
         var stop = stepIndexExceedsDataLength(dataLength);
-        if (stop)
-            alert("No more data!");
         return stop;
     }
 
@@ -236,22 +245,22 @@ export default (canvas, IController) => {
     async function incrementData() {
         let changePercent, diff;
         for (var i = 0; i < dataPoints.length; i++) {
-            if (changeData[step][i] > halfQuantity) {
+            if (changeData[step][i+1] > halfQuantity) {//i+1 because column 0 holds time info
                 //Darken
-                diff = changeData[step][i] - halfQuantity;
+                diff = changeData[step][i+1] - halfQuantity;
                 changePercent = diff / halfQuantity;
                 dataPoints[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
             } else {
                 //Lighten
-                diff = halfQuantity - changeData[step][i];
+                diff = halfQuantity - changeData[step][i+1];
                 changePercent = diff / halfQuantity;
                 dataPoints[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
             }
             //TODO: Remove this
             //Temporarily displays data as it changes
-            dataPoints[i].appendText(fontResource, changeData[step][i], dataPoints[i].position.x, dataPoints[i].position.y + (2 * radius))
-            progressBar.updateProgress(changeData.length);
+            dataPoints[i].appendText(fontResource, changeData[step][i+1], dataPoints[i].position.x, dataPoints[i].position.y + (2 * radius))
         }
+        progressBar.updateProgress(step + 1, changeData[step][0]);
         step++;
         await actionUtil.sleep(timeStep);
         stepForward();
