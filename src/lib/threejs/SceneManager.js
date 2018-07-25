@@ -117,7 +117,7 @@ export default (canvas, IController) => {
 
     function buildProgressBar(){
         progressBar = new ProgressBar(scene, fontResource, changeData.length);
-        progressBar.appendText(changeData[0][0])
+        progressBar.appendText(changeData[0][0]);
     }
 
     function setupEventListeners() {
@@ -162,7 +162,7 @@ export default (canvas, IController) => {
         if (dataPointToMove === -1) {//Click was not on a datapoint
             dataPointToDelete = -1; //Deselect previous selection
             //Check if click was on progress bar
-            if (progressBar.withinBar(mousePos.x, mousePos.y)){
+            if (progressBar && progressBar.withinBar(mousePos.x, mousePos.y)){
                 var clickedStep = progressBar.getStep(mousePos.x);
                 progressBar.updateProgress(clickedStep, changeData[clickedStep-1][0])
                 step = clickedStep - 1;
@@ -258,7 +258,8 @@ export default (canvas, IController) => {
             }
             //TODO: Remove this
             //Temporarily displays data as it changes
-            dataPoints[i].appendText(fontResource, changeData[step][i+1], dataPoints[i].position.x, dataPoints[i].position.y + (2 * radius))
+            let text = changeData[step][i+1] ? changeData[step][i+1] : "Out Of Range";
+            dataPoints[i].appendText(fontResource, text, dataPoints[i].position.x, dataPoints[i].position.y + (2 * radius))
         }
         progressBar.updateProgress(step + 1, changeData[step][0]);
         step++;
