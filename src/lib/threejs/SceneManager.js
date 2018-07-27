@@ -62,7 +62,12 @@ export default (canvas, IController) => {
     buildGUI();
     loadFont();
 
-    IController.resetDataAnimation = () => { step = 0 };
+    IController.resetDataAnimation = function() { 
+        step = 0;
+        progressBar.updateProgress(0, changeData[step][0]);
+        applyStep();
+    };
+
     IController.injectDataPointList = json => { 
         changeData = json;
         buildProgressBar();
@@ -166,7 +171,7 @@ export default (canvas, IController) => {
                 var clickedStep = progressBar.getStep(mousePos.x);
                 progressBar.updateProgress(clickedStep, changeData[clickedStep-1][0])
                 step = clickedStep - 1;
-                incrementData();
+                applyStep();
             }
         }
     }
@@ -174,8 +179,8 @@ export default (canvas, IController) => {
     function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left,
-            y: evt.clientY - rect.top
+            x: evt.clientX - rect.left, // + 195,
+            y: evt.clientY - rect.top // + 86.5
         };
     }
 
@@ -238,11 +243,15 @@ export default (canvas, IController) => {
     }
 
     async function stepForward() {
-        if (!dataExhausted(changeData.length))
-            incrementData();
+        if (!dataExhausted(changeData.length)){
+            applyStep();
+            step++;
+            await actionUtil.sleep(timeStep);
+            stepForward();
+        }
     }
 
-    async function incrementData() {
+    function applyStep() {
         let changePercent, diff;
         for (var i = 0; i < dataPoints.length; i++) {
             if (changeData[step][i+1] > halfQuantity) {//i+1 because column 0 holds time info
@@ -262,9 +271,6 @@ export default (canvas, IController) => {
             dataPoints[i].appendText(fontResource, text, dataPoints[i].position.x, dataPoints[i].position.y + (2 * radius))
         }
         progressBar.updateProgress(step + 1, changeData[step][0]);
-        step++;
-        await actionUtil.sleep(timeStep);
-        stepForward();
     }
 
     function addDataPoint() {
