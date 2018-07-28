@@ -16,14 +16,14 @@ export default class ThreeContainer extends Component {
   }
 
   render() {
-    var divStyle = {
+    var threeStyle = {
+      width: '100%',
+      height: '100%',
       borderStyle: 'solid',
       borderWidth: '3px',
       borderColor: 'gray'
     };
 
-    return ( <div>
-      <div style = {divStyle} ref={element => this.threeRootElement = element} /> </div>
-    );
+    return ( <div title={"THREE"} style={threeStyle} ref={element => this.threeRootElement = element} > </div>);
   }
 }

@@ -21,7 +21,7 @@ export default (canvas, IController) => {
     var maxQuantity = 1;
     var halfQuantity = maxQuantity / 2.0;
     var baseColor = [170, 0, 255, 1];
-   var radius = origRadius;
+    var radius = origRadius;
     var changeData = null; //Holds imported data. Column 1 is time info
 
     var mouseDown = false;
@@ -33,7 +33,6 @@ export default (canvas, IController) => {
     var editMode;
 
     var fontResource;
-    var isLoading = true;
 
     const controls = {
         size: origRadius,
@@ -62,13 +61,13 @@ export default (canvas, IController) => {
     buildGUI();
     loadFont();
 
-    IController.resetDataAnimation = function() { 
+    IController.resetDataAnimation = function () {
         step = 0;
-        progressBar.updateProgress(0, changeData[step][0]);
+        progressBar.updateProgress(1, '1');
         applyStep();
     };
 
-    IController.injectDataPointList = json => { 
+    IController.injectDataPointList = json => {
         changeData = json;
         buildProgressBar();
     };
@@ -83,11 +82,15 @@ export default (canvas, IController) => {
 
     function fontLoadingComplete(font) {
         fontResource = font;
-        isLoading = false;
     }
 
     function buildGUI() {
-        var gui = new dat.GUI();
+        var gui = new dat.GUI({
+            autoPlace: false
+        });
+        var customContainer = document.getElementById('datGuiAnchor');
+        customContainer.appendChild(gui.domElement);
+        gui.domElement.id = 'datGuiAnchor';
 
         gui.add(controls, 'changeStep').name("Step Forward");
         var sizeController = gui.add(controls, 'size').name("Size").min(10).max(100).step(1);
@@ -120,22 +123,22 @@ export default (canvas, IController) => {
 
     }
 
-    function buildProgressBar(){
+    function buildProgressBar() {
         progressBar = new ProgressBar(scene, fontResource, changeData.length);
         progressBar.appendText(changeData[0][0]);
     }
 
     function setupEventListeners() {
         canvas.addEventListener("mousedown", function (evt) {
-                mouseDown = true;
-                checkWithinRange(canvas, evt);
+            mouseDown = true;
+            checkWithinRange(canvas, evt);
         });
         canvas.addEventListener("mouseup", function (evt) {
             if (editMode) {
                 mouseDown = false;
                 dataPointToMove = -1; //No current selected dataPoint
             }
-            
+
         });
         canvas.addEventListener("mousemove", function (evt) {
             if (editMode) {
@@ -154,7 +157,7 @@ export default (canvas, IController) => {
     function checkWithinRange(canvas, evt) {
         var mousePos = canvasToThreePos(getMousePos(canvas, evt));
         //Check if click was on data point
-        if (editMode){
+        if (editMode) {
             for (var i = 0; i < dataPoints.length; i++) {
                 var selected = dataPoints[i].withinCircle(mousePos.x, mousePos.y);
                 if (selected) {
@@ -164,12 +167,13 @@ export default (canvas, IController) => {
                 }
             }
         }
-        if (dataPointToMove === -1) {//Click was not on a datapoint
+        if (dataPointToMove === -1) { //Click was not on a datapoint
             dataPointToDelete = -1; //Deselect previous selection
             //Check if click was on progress bar
-            if (progressBar && progressBar.withinBar(mousePos.x, mousePos.y)){
+            if (progressBar && progressBar.withinBar(mousePos.x, mousePos.y)) {
                 var clickedStep = progressBar.getStep(mousePos.x);
-                progressBar.updateProgress(clickedStep, changeData[clickedStep-1][0])
+                let text = changeData[clickedStep - 1];
+                progressBar.updateProgress(clickedStep, text ? text[0] : "0")
                 step = clickedStep - 1;
                 applyStep();
             }
@@ -179,8 +183,8 @@ export default (canvas, IController) => {
     function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left, // + 195,
-            y: evt.clientY - rect.top // + 86.5
+            x: evt.clientX - rect.left + 145,
+            y: evt.clientY - rect.top + 86.5
         };
     }
 
@@ -201,8 +205,15 @@ export default (canvas, IController) => {
         return scene;
     }
 
-    function buildRender({ width, height }) {
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    function buildRender({
+        width,
+        height
+    }) {
+        const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true
+        });
         const DPR = window.devicePixelRatio ? window.devicePixelRatio : 1;
         renderer.setPixelRatio(DPR);
         renderer.setSize(width, height);
@@ -213,8 +224,11 @@ export default (canvas, IController) => {
         return renderer;
     }
 
-    function buildCamera({ width, height }) {
-        var camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / - 2, height / 2, 1, 1000);
+    function buildCamera({
+        width,
+        height
+    }) {
+        var camera = new THREE.OrthographicCamera(width / -2, width / 2, height / -2, height / 2, 1, 1000);
         camera.position.set(0, 0, -10);
         camera.lookAt(origin)
         return (camera);
@@ -243,7 +257,7 @@ export default (canvas, IController) => {
     }
 
     async function stepForward() {
-        if (!dataExhausted(changeData.length)){
+        if (!dataExhausted(changeData.length)) {
             applyStep();
             step++;
             await actionUtil.sleep(timeStep);
@@ -252,25 +266,33 @@ export default (canvas, IController) => {
     }
 
     function applyStep() {
+        let text = step < 0 ? '0' : changeData[step][0];
+        if (step >= 0) {
+            colorPoints();
+        }
+        progressBar.updateProgress(step + 1, text);
+    }
+
+    function colorPoints() {
         let changePercent, diff;
+
         for (var i = 0; i < dataPoints.length; i++) {
-            if (changeData[step][i+1] > halfQuantity) {//i+1 because column 0 holds time info
+            if (changeData[step][i + 1] > halfQuantity) { //i+1 because column 0 holds time info
                 //Darken
-                diff = changeData[step][i+1] - halfQuantity;
+                diff = changeData[step][i + 1] - halfQuantity;
                 changePercent = diff / halfQuantity;
-                dataPoints[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
+                dataPoints[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
             } else {
                 //Lighten
-                diff = halfQuantity - changeData[step][i+1];
+                diff = halfQuantity - changeData[step][i + 1];
                 changePercent = diff / halfQuantity;
-                dataPoints[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
+                dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
             }
             //TODO: Remove this
             //Temporarily displays data as it changes
-            let text = changeData[step][i+1] ? changeData[step][i+1] : "Out Of Range";
+            let text = changeData[step][i + 1] ? changeData[step][i + 1] : "No Assigned Data";
             dataPoints[i].appendText(fontResource, text, dataPoints[i].position.x, dataPoints[i].position.y + (2 * radius))
         }
-        progressBar.updateProgress(step + 1, changeData[step][0]);
     }
 
     function addDataPoint() {
@@ -278,7 +300,7 @@ export default (canvas, IController) => {
         dataPoint.changeColor(baseColor);
         dataPoint.scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
         var labelText = window.prompt("Label your data point: ");
-        dataPoint.appendText(fontResource, labelText, 0, (2*radius));
+        dataPoint.appendText(fontResource, labelText, 0, (2 * radius));
         dataPoints.push(dataPoint);
         update();
     }
@@ -304,8 +326,8 @@ export default (canvas, IController) => {
 
     function changeAllRadius() {
         for (var i = 0; i < dataPoints.length; i++) {
-            dataPoints[i].scale.set(radius/origRadius, radius/origRadius, radius/origRadius);
-            dataPoints[i].changeTextSize(radius/origRadius)
+            dataPoints[i].scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
+            dataPoints[i].changeTextSize(radius / origRadius)
         }
     }
 

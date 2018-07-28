@@ -9,12 +9,11 @@ export default (container, IController) => {
 
     function createCanvas(document, container) {
         const canvas = document.createElement('canvas');  
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = container.scrollWidth;
+        canvas.height = container.scrollHeight;
         container.appendChild(canvas);
         return canvas;
     }
-
    
     function render() {
         requestAnimationFrame(render);

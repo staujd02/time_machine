@@ -16,6 +16,10 @@ class Navigation extends Component {
   
   render() {
 
+    var s = {
+      margin: 0
+    }
+
     this.reset = () => {
       toast("Resetting Animation", { 
         position: toast.POSITION.TOP_LEFT
@@ -24,7 +28,7 @@ class Navigation extends Component {
     }
 
     return (
-        <Navbar inverse >
+        <Navbar inverse style={s}>
           <Navbar.Header>
             <Navbar.Brand>
               <a href="/#">Time Machine</a>
