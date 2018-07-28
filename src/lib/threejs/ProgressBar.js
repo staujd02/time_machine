@@ -7,6 +7,8 @@ class ProgressBar {
         const stepLength = 500/numOfSteps;
         this.bar = {};
         this.progress = {};
+        this.start = {};
+        this.stop = {};
 
         this.bar.geometry = new THREE.BoxGeometry( barLength, 20, 1 );
         this.bar.mesh = new THREE.Mesh(this.bar.geometry);
@@ -63,11 +65,39 @@ class ProgressBar {
             return withinHeight && withinWidth
         };
 
+        this.withinStart = function (x, y) {
+            var withinHeight = (y > 115) && (y < 145)
+            var withinWidth = (x < 375) && ( x > 325)
+            return withinHeight && withinWidth
+        };
+
+        this.withinStop = function (x, y) {
+            var withinHeight = (y > 160) && (y < 190)
+            var withinWidth = (x < 375) && ( x > 325)
+            return withinHeight && withinWidth
+        };
+
         this.getStep = function (x) {
             var clickedPos = 250 - x;
             var step = Math.round(clickedPos/stepLength);
             return step;
         };
+
+        this.addStart = function (){
+            this.start.geometry = new THREE.BoxGeometry( 50, 30, 1 );
+            this.start.mesh = new THREE.Mesh(this.start.geometry);
+            this.start.mesh.material = new THREE.MeshBasicMaterial( {color: "#00ff00"} );
+            this.start.mesh.position.set(350, 130, 0);
+            scene.add(this.start.mesh);
+        }
+
+        this.addStop = function (){
+            this.stop.geometry = new THREE.BoxGeometry( 50, 30, 1 );
+            this.stop.mesh = new THREE.Mesh(this.stop.geometry);
+            this.stop.mesh.material = new THREE.MeshBasicMaterial( {color: "#ff0000"} );
+            this.stop.mesh.position.set(350, 175, 1);
+            scene.add(this.stop.mesh);
+        }
     };
 }
 

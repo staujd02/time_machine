@@ -16,6 +16,7 @@ export default (canvas, IController) => {
     }
     const origRadius = 40;
 
+    var paused = true;
     var timeStep = 300;
     var step = 0;
     var maxQuantity = 1;
@@ -63,13 +64,16 @@ export default (canvas, IController) => {
 
     IController.resetDataAnimation = function () {
         step = 0;
-        progressBar.updateProgress(1, '1');
+        paused = true;
+        progressBar.updateProgress(0, changeData[0][0]);
         applyStep();
     };
 
     IController.injectDataPointList = json => {
         changeData = json;
         buildProgressBar();
+        addStartStopText();
+        progressBar.appendText(changeData[0][0]);
     };
 
     function loadFont() {
@@ -126,6 +130,8 @@ export default (canvas, IController) => {
     function buildProgressBar() {
         progressBar = new ProgressBar(scene, fontResource, changeData.length);
         progressBar.appendText(changeData[0][0]);
+        progressBar.addStart();
+        progressBar.addStop();
     }
 
     function setupEventListeners() {
@@ -176,6 +182,11 @@ export default (canvas, IController) => {
                 progressBar.updateProgress(clickedStep, text ? text[0] : "0")
                 step = clickedStep - 1;
                 applyStep();
+            }else if (progressBar.withinStop(mousePos.x, mousePos.y)){
+                paused = true;
+            }else if (progressBar.withinStart(mousePos.x, mousePos.y)){
+                paused = false;
+                stepForward();
             }
         }
     }
@@ -253,15 +264,18 @@ export default (canvas, IController) => {
 
     async function startStepping() {
         if (validDataFound(changeData))
+            paused = false;
             stepForward();
     }
 
     async function stepForward() {
         if (!dataExhausted(changeData.length)) {
-            applyStep();
+            if(!paused){
+                applyStep();
             step++;
             await actionUtil.sleep(timeStep);
             stepForward();
+            }
         }
     }
 
@@ -288,10 +302,6 @@ export default (canvas, IController) => {
                 changePercent = diff / halfQuantity;
                 dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
             }
-            //TODO: Remove this
-            //Temporarily displays data as it changes
-            let text = changeData[step][i + 1] ? changeData[step][i + 1] : "No Assigned Data";
-            dataPoints[i].appendText(fontResource, text, dataPoints[i].position.x, dataPoints[i].position.y + (2 * radius))
         }
     }
 
@@ -329,6 +339,29 @@ export default (canvas, IController) => {
             dataPoints[i].scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
             dataPoints[i].changeTextSize(radius / origRadius)
         }
+    }
+
+    function addStartStopText(){
+        var startText = document.createElement('div');
+        startText.id = "startText";
+        startText.style.position = 'absolute';
+        startText.innerHTML = "Start";
+        startText.style.top =  75 + 445 + 'px';//75 is navbar height
+        startText.style.left = 200 + 'px';
+        var stopText = document.createElement('div');
+        stopText.id = "stopText";
+        stopText.style.position = 'absolute';
+        stopText.innerHTML = "Stop";
+        stopText.style.top = 75 + 490 + 'px';//75 is navbar height
+        stopText.style.left = 200 + 'px';
+        removeTextSelection(startText);
+        removeTextSelection(stopText);
+        document.body.appendChild(startText);
+        document.body.appendChild(stopText);
+    }
+
+    function removeTextSelection(text){
+        text.style.MozUserSelect = "none";
     }
 
     function update() {
