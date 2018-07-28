@@ -183,8 +183,8 @@ export default (canvas, IController) => {
     function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left + 145,
-            y: evt.clientY - rect.top + 86.5
+            x: evt.clientX - rect.left, // + 145,
+            y: evt.clientY - rect.top // + 86.5
         };
     }
 
