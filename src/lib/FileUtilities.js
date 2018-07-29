@@ -1,19 +1,5 @@
 export default class FileUtilities {
 
-  save(contents, options = null) {
-    
-    let args = Object.assign({
-      name: "plot.json",
-      path: './'
-    }, options);
-
-    let file = new File(args.path + args.name, "write");
-
-    file.open();
-    file.writeline(JSON.stringify(contents));
-    file.close();
-  }
-
   processXLSXIntoCSV(xlsxFile, onComplete) {
     var reader = new FileReader();
     reader.readAsBinaryString(xlsxFile);

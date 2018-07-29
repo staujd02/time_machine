@@ -28,7 +28,6 @@ export default (canvas, IController, data) => {
     var dataPointToDelete = -1;
 
     var progressBar;
-    var dataPoints = [];
     var editMode;
 
     var fontResource;
@@ -149,8 +148,8 @@ export default (canvas, IController, data) => {
                     var mousePos = getMousePos(canvas, evt);
                     var newMousePos = canvasToThreePos(mousePos);
                     if (dataPointToMove > -1) {
-                        dataPoints[dataPointToMove].position.set(newMousePos.x, newMousePos.y, 0);
-                        dataPoints[dataPointToMove].moveText(newMousePos.x, newMousePos.y + (2 * radius));
+                        data.dataPoints[dataPointToMove].position.set(newMousePos.x, newMousePos.y, 0);
+                        data.dataPoints[dataPointToMove].moveText(newMousePos.x, newMousePos.y + (2 * radius));
                     }
                 }
             }
@@ -161,8 +160,8 @@ export default (canvas, IController, data) => {
         var mousePos = canvasToThreePos(getMousePos(canvas, evt));
         //Check if click was on data point
         if (editMode) {
-            for (var i = 0; i < dataPoints.length; i++) {
-                var selected = dataPoints[i].withinCircle(mousePos.x, mousePos.y);
+            for (var i = 0; i < data.dataPoints.length; i++) {
+                var selected = data.dataPoints[i].withinCircle(mousePos.x, mousePos.y);
                 if (selected) {
                     dataPointToMove = i;
                     dataPointToDelete = i;
@@ -278,17 +277,17 @@ export default (canvas, IController, data) => {
     function colorPoints() {
         let changePercent, diff;
 
-        for (var i = 0; i < dataPoints.length; i++) {
+        for (var i = 0; i < data.dataPoints.length; i++) {
             if (data.animationData[data.step][i + 1] > halfQuantity) { //i+1 because column 0 holds time info
                 //Darken
                 diff = data.animationData[data.step][i + 1] - halfQuantity;
                 changePercent = diff / halfQuantity;
-                dataPoints[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
+                data.dataPoints[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
             } else {
                 //Lighten
                 diff = halfQuantity - data.animationData[data.step][i + 1];
                 changePercent = diff / halfQuantity;
-                dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
+                data.dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
             }
         }
     }
@@ -299,15 +298,15 @@ export default (canvas, IController, data) => {
         dataPoint.scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
         var labelText = window.prompt("Label your data point: ");
         dataPoint.appendText(fontResource, labelText, 0, (2 * radius));
-        dataPoints.push(dataPoint);
+        data.dataPoints.push(dataPoint);
         update();
     }
 
 
     function deleteDataPoint() {
         if (dataPointToDelete > -1) {
-            dataPoints[dataPointToDelete].delete();
-            dataPoints.splice(dataPointToDelete, 1);
+            data.dataPoints[dataPointToDelete].delete();
+            data.dataPoints.splice(dataPointToDelete, 1);
         }
     }
 
@@ -316,16 +315,16 @@ export default (canvas, IController, data) => {
     }
 
     function changeColor(newColor) {
-        for (var i = 0; i < dataPoints.length; i++) {
-            dataPoints[i].changeColor(newColor);
+        for (var i = 0; i < data.dataPoints.length; i++) {
+            data.dataPoints[i].changeColor(newColor);
         }
         update();
     }
 
     function changeAllRadius() {
-        for (var i = 0; i < dataPoints.length; i++) {
-            dataPoints[i].scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
-            dataPoints[i].changeTextSize(radius / origRadius)
+        for (var i = 0; i < data.dataPoints.length; i++) {
+            data.dataPoints[i].scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
+            data.dataPoints[i].changeTextSize(radius / origRadius)
         }
     }
 
