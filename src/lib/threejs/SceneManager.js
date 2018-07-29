@@ -31,6 +31,8 @@ export default (canvas, IController) => {
 
     var progressBar;
     var dataPoints = [];
+    var labels = [];
+    var labelMode = false;
     var editMode;
 
     var fontResource;
@@ -53,14 +55,15 @@ export default (canvas, IController) => {
                 deleteDataPoint();
             }
         },
-        editMode: false
+        editMode: false,
+        labelMode: false
     }
 
+    loadFont();
     const scene = buildScene();
     const renderer = buildRender(screenDimensions);
     const camera = buildCamera(screenDimensions);
     buildGUI();
-    loadFont();
 
     IController.resetDataAnimation = function () {
         step = 0;
@@ -69,11 +72,13 @@ export default (canvas, IController) => {
         applyStep();
     };
 
-    IController.injectDataPointList = json => {
-        changeData = json;
-        buildProgressBar();
+    IController.injectDataPointList = xlsxData => {
+        labels = xlsxData[0];
+        xlsxData.splice(0, 1);//Remove label column
+        changeData = xlsxData;
         addStartStopText();
         progressBar.appendText(changeData[0][0]);
+        progressBar.setSteps(changeData.length);
     };
 
     function loadFont() {
@@ -86,6 +91,7 @@ export default (canvas, IController) => {
 
     function fontLoadingComplete(font) {
         fontResource = font;
+        buildProgressBar();
     }
 
     function buildGUI() {
@@ -120,7 +126,10 @@ export default (canvas, IController) => {
 
         var editFolder = gui.addFolder("Edit");
         editFolder.add(controls, 'editMode').name("Edit Mode").onChange(function (newValue) {
-            toggleEditMode(newValue);
+            editMode = newValue;
+        });
+        editFolder.add(controls, 'labelMode').name("Import Labels").onChange(function (newValue) {
+            labelMode = newValue;
         });
         editFolder.add(controls, 'addPoint').name("Add Data Point");
         editFolder.add(controls, 'deletePoint').name("Delete Data Point");
@@ -128,10 +137,11 @@ export default (canvas, IController) => {
     }
 
     function buildProgressBar() {
-        progressBar = new ProgressBar(scene, fontResource, changeData.length);
-        progressBar.appendText(changeData[0][0]);
+        progressBar = new ProgressBar(scene, fontResource);
+        progressBar.appendText("0");
         progressBar.addStart();
         progressBar.addStop();
+        addStartStopText();
     }
 
     function setupEventListeners() {
@@ -183,10 +193,18 @@ export default (canvas, IController) => {
                 step = clickedStep - 1;
                 applyStep();
             }else if (progressBar.withinStop(mousePos.x, mousePos.y)){
+                if (changeData == null) {
+                    alert("Please import data first");
+                }else{
                 paused = true;
+                }
             }else if (progressBar.withinStart(mousePos.x, mousePos.y)){
-                paused = false;
-                stepForward();
+                if (changeData == null) {
+                    alert("Please import data first");
+                }else{
+                    paused = false;
+                    stepForward();
+                }
             }
         }
     }
@@ -309,7 +327,18 @@ export default (canvas, IController) => {
         let dataPoint = new DataPoint(scene);
         dataPoint.changeColor(baseColor);
         dataPoint.scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
-        var labelText = window.prompt("Label your data point: ");
+        var labelText;
+        if(labelMode && labels.length > dataPoints.length + 1){
+            labelText = labels[dataPoints.length + 1]
+        }else{
+            if (labels.length <= dataPoints.length){
+                labelText = window.prompt("Imported data does not contain a column #" + dataPoints.length + ".\nPlease label your data point: ");
+
+            }else{
+                labelText = window.prompt("Label your data point: ");
+            }
+        }
+        
         dataPoint.appendText(fontResource, labelText, 0, (2 * radius));
         dataPoints.push(dataPoint);
         update();
@@ -321,10 +350,6 @@ export default (canvas, IController) => {
             dataPoints[dataPointToDelete].delete();
             dataPoints.splice(dataPointToDelete, 1);
         }
-    }
-
-    function toggleEditMode(newValue) {
-        editMode = newValue;
     }
 
     function changeColor(newColor) {

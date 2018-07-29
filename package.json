@@ -13,6 +13,7 @@
     "react-scripts": "1.1.4",
     "react-toastify": "^4.1.0",
     "three": "^0.93.0",
+    "threex.domevents": "^1.0.1",
     "tinycolor": "0.0.1",
     "tinycolor2": "^1.4.1",
     "xlsx": "^0.13.1"

@@ -2,9 +2,10 @@ import * as THREE from 'three'
 
 class ProgressBar {
 
-    constructor(scene, fontResource, numOfSteps) {
+    constructor(scene, fontResource) {
         const barLength = 500;
-        const stepLength = 500/numOfSteps;
+        this.stepLength = 0;
+        
         this.bar = {};
         this.progress = {};
         this.start = {};
@@ -25,8 +26,8 @@ class ProgressBar {
         scene.add(this.progress.mesh);
 
         this.updateProgress = function(step, timeInfo){
-            if (stepLength * step <= barLength){
-                this.progressLength = stepLength * step;
+            if (this.stepLength * step <= barLength){
+                this.progressLength = this.stepLength * step;
                 this.progress.mesh.geometry = new THREE.BoxGeometry( this.progressLength, 20, 1 );
                 this.progress.mesh.position.set((barLength-this.progressLength)/2, 175, 0);//TODO: Make height to bottom of screen + padding
                 this.appendText(timeInfo)
@@ -79,7 +80,7 @@ class ProgressBar {
 
         this.getStep = function (x) {
             var clickedPos = 250 - x;
-            var step = Math.round(clickedPos/stepLength);
+            var step = Math.round(clickedPos/this.stepLength);
             return step;
         };
 
@@ -87,7 +88,7 @@ class ProgressBar {
             this.start.geometry = new THREE.BoxGeometry( 50, 30, 1 );
             this.start.mesh = new THREE.Mesh(this.start.geometry);
             this.start.mesh.material = new THREE.MeshBasicMaterial( {color: "#00ff00"} );
-            this.start.mesh.position.set(350, 130, 0);
+            this.start.mesh.position.set(345, 130, 0);
             scene.add(this.start.mesh);
         }
 
@@ -95,8 +96,16 @@ class ProgressBar {
             this.stop.geometry = new THREE.BoxGeometry( 50, 30, 1 );
             this.stop.mesh = new THREE.Mesh(this.stop.geometry);
             this.stop.mesh.material = new THREE.MeshBasicMaterial( {color: "#ff0000"} );
-            this.stop.mesh.position.set(350, 175, 1);
+            this.stop.mesh.position.set(345, 175, 1);
             scene.add(this.stop.mesh);
+        }
+
+       this.setSteps = function (numOfSteps){
+            this.stepLength = barLength/numOfSteps;
+        }
+
+        this.getBar = function (){
+            return this.progress.mesh
         }
     };
 }
