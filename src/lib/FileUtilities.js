@@ -1,4 +1,18 @@
-export default class FileUtilities  {
+export default class FileUtilities {
+
+  save(contents, options = null) {
+    
+    let args = Object.assign({
+      name: "plot.json",
+      path: './'
+    }, options);
+
+    let file = new File(args.path + args.name, "write");
+
+    file.open();
+    file.writeline(JSON.stringify(contents));
+    file.close();
+  }
 
   processXLSXIntoCSV(xlsxFile, onComplete) {
     var reader = new FileReader();
@@ -8,15 +22,17 @@ export default class FileUtilities  {
       onComplete(this.parseSingleCSV(csvSheetStrings[0]));
     }
   }
-  
-  transformXLXSIntoCsvStrings(binaryContents){
+
+  transformXLXSIntoCsvStrings(binaryContents) {
     const XLSX = require('xlsx')
-    const binaryType = {type: 'binary'};
+    const binaryType = {
+      type: 'binary'
+    };
     var csvStrings = [];
     var workbook = XLSX.read(binaryContents, binaryType);
     workbook.SheetNames.forEach(name => {
-        csvStrings.push(XLSX.utils.sheet_to_csv(workbook.Sheets[name]));
-      });
+      csvStrings.push(XLSX.utils.sheet_to_csv(workbook.Sheets[name]));
+    });
 
     return csvStrings;
   }
@@ -26,32 +42,32 @@ export default class FileUtilities  {
     var numOfColumns = 1;
     var ch, i;
     //Count rows
-    for(i = 0; i < csvString.length; i++){
+    for (i = 0; i < csvString.length; i++) {
       ch = csvString.charAt(i);
-      if (ch === '\n'){
+      if (ch === '\n') {
         numOfRows++
       }
     }
-     //Count columns
-     ch = '';
-     i = 0;
-     while (ch !== '\n'){
-       ch = csvString.charAt(i);
-       if(ch === ','){
-         numOfColumns++;
-       }
-       i++;
-     }
-     //Create 2D array to hold xlsx data
-     this.data = new Array(numOfRows);
-     for(i = 0; i < numOfRows; i++){
-       this.data[i] = new Array(numOfColumns);
-     }
-     //Fill array
-     for(i = 0; i  < this.data.length; i++){
-       var rows = csvString.split("\n");
-       this.data[i] = rows[i].split(",");
-     }
-     return this.data;
-   }
+    //Count columns
+    ch = '';
+    i = 0;
+    while (ch !== '\n') {
+      ch = csvString.charAt(i);
+      if (ch === ',') {
+        numOfColumns++;
+      }
+      i++;
+    }
+    //Create 2D array to hold xlsx data
+    this.data = new Array(numOfRows);
+    for (i = 0; i < numOfRows; i++) {
+      this.data[i] = new Array(numOfColumns);
+    }
+    //Fill array
+    for (i = 0; i < this.data.length; i++) {
+      var rows = csvString.split("\n");
+      this.data[i] = rows[i].split(",");
+    }
+    return this.data;
+  }
 }

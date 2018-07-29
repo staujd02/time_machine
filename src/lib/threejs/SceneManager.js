@@ -5,7 +5,7 @@ import * as dat from 'dat.gui';
 import ActionUtilities from '../ActionUtilities';
 import ProgressBar from './ProgressBar';
 
-export default (canvas, IController) => {
+export default (canvas, IController, data) => {
 
     const actionUtil = new ActionUtilities();
 
@@ -18,12 +18,10 @@ export default (canvas, IController) => {
 
     var paused = true;
     var timeStep = 300;
-    var step = 0;
     var maxQuantity = 1;
     var halfQuantity = maxQuantity / 2.0;
     var baseColor = [170, 0, 255, 1];
     var radius = origRadius;
-    var changeData = null; //Holds imported data. Column 1 is time info
 
     var mouseDown = false;
     var dataPointToMove = -1;
@@ -63,17 +61,16 @@ export default (canvas, IController) => {
     loadFont();
 
     IController.resetDataAnimation = function () {
-        step = 0;
+        data.step = 0;
         paused = true;
-        progressBar.updateProgress(0, changeData[0][0]);
+        progressBar.updateProgress(0, data.animationData[0][0]);
         applyStep();
     };
 
-    IController.injectDataPointList = json => {
-        changeData = json;
+    IController.onLoad = () => {
         buildProgressBar();
         addStartStopText();
-        progressBar.appendText(changeData[0][0]);
+        progressBar.appendText(data.animationData[0][0]);
     };
 
     function loadFont() {
@@ -128,8 +125,8 @@ export default (canvas, IController) => {
     }
 
     function buildProgressBar() {
-        progressBar = new ProgressBar(scene, fontResource, changeData.length);
-        progressBar.appendText(changeData[0][0]);
+        progressBar = new ProgressBar(scene, fontResource, data.animationData.length);
+        progressBar.appendText(data.animationData[0][0]);
         progressBar.addStart();
         progressBar.addStop();
     }
@@ -173,18 +170,18 @@ export default (canvas, IController) => {
                 }
             }
         }
-        if (dataPointToMove === -1) { //Click was not on a datapoint
+        if (dataPointToMove === -1 && progressBar) { //Click was not on a datapoint
             dataPointToDelete = -1; //Deselect previous selection
             //Check if click was on progress bar
-            if (progressBar && progressBar.withinBar(mousePos.x, mousePos.y)) {
+            if (progressBar.withinBar(mousePos.x, mousePos.y)) {
                 var clickedStep = progressBar.getStep(mousePos.x);
-                let text = changeData[clickedStep - 1];
+                let text = data.animationData[clickedStep - 1];
                 progressBar.updateProgress(clickedStep, text ? text[0] : "0")
-                step = clickedStep - 1;
+                data.step = clickedStep - 1;
                 applyStep();
-            }else if (progressBar.withinStop(mousePos.x, mousePos.y)){
+            } else if (progressBar.withinStop(mousePos.x, mousePos.y)) {
                 paused = true;
-            }else if (progressBar.withinStart(mousePos.x, mousePos.y)){
+            } else if (progressBar.withinStart(mousePos.x, mousePos.y)) {
                 paused = false;
                 stepForward();
             }
@@ -194,8 +191,8 @@ export default (canvas, IController) => {
     function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left, // + 145,
-            y: evt.clientY - rect.top // + 86.5
+            x: evt.clientX - rect.left + 145,
+            y: evt.clientY - rect.top + 86.5
         };
     }
 
@@ -245,60 +242,51 @@ export default (canvas, IController) => {
         return (camera);
     }
 
-    function validDataFound(changeData) {
-        var noData = changeData == null;
-        if (noData) {
+    function isDataLoaded() {
+        if (!data.dataLoaded()) {
             alert("Please import data first");
         }
-        return !noData;
-    }
-
-    function dataExhausted(dataLength) {
-        var stop = stepIndexExceedsDataLength(dataLength);
-        return stop;
-    }
-
-    function stepIndexExceedsDataLength(dataLength) {
-        return step >= dataLength;
+        return data.dataLoaded();
     }
 
     async function startStepping() {
-        if (validDataFound(changeData))
+        if (isDataLoaded()){
             paused = false;
             stepForward();
+        }
     }
 
     async function stepForward() {
-        if (!dataExhausted(changeData.length)) {
-            if(!paused){
+        if (data.hasNextStep()) {
+            if (!paused) {
                 applyStep();
-            step++;
-            await actionUtil.sleep(timeStep);
-            stepForward();
+                data.step++;
+                await actionUtil.sleep(timeStep);
+                stepForward();
             }
         }
     }
 
     function applyStep() {
-        let text = step < 0 ? '0' : changeData[step][0];
-        if (step >= 0) {
+        let text = data.step < 0 ? '0' : data.animationData[data.step][0];
+        if (data.step >= 0) {
             colorPoints();
         }
-        progressBar.updateProgress(step + 1, text);
+        progressBar.updateProgress(data.step + 1, text);
     }
 
     function colorPoints() {
         let changePercent, diff;
 
         for (var i = 0; i < dataPoints.length; i++) {
-            if (changeData[step][i + 1] > halfQuantity) { //i+1 because column 0 holds time info
+            if (data.animationData[data.step][i + 1] > halfQuantity) { //i+1 because column 0 holds time info
                 //Darken
-                diff = changeData[step][i + 1] - halfQuantity;
+                diff = data.animationData[data.step][i + 1] - halfQuantity;
                 changePercent = diff / halfQuantity;
                 dataPoints[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
             } else {
                 //Lighten
-                diff = halfQuantity - changeData[step][i + 1];
+                diff = halfQuantity - data.animationData[data.step][i + 1];
                 changePercent = diff / halfQuantity;
                 dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
             }
@@ -341,18 +329,18 @@ export default (canvas, IController) => {
         }
     }
 
-    function addStartStopText(){
+    function addStartStopText() {
         var startText = document.createElement('div');
         startText.id = "startText";
         startText.style.position = 'absolute';
         startText.innerHTML = "Start";
-        startText.style.top =  75 + 445 + 'px';//75 is navbar height
+        startText.style.top = 75 + 445 + 'px'; //75 is navbar height
         startText.style.left = 200 + 'px';
         var stopText = document.createElement('div');
         stopText.id = "stopText";
         stopText.style.position = 'absolute';
         stopText.innerHTML = "Stop";
-        stopText.style.top = 75 + 490 + 'px';//75 is navbar height
+        stopText.style.top = 75 + 490 + 'px'; //75 is navbar height
         stopText.style.left = 200 + 'px';
         removeTextSelection(startText);
         removeTextSelection(stopText);
@@ -360,7 +348,7 @@ export default (canvas, IController) => {
         document.body.appendChild(stopText);
     }
 
-    function removeTextSelection(text){
+    function removeTextSelection(text) {
         text.style.MozUserSelect = "none";
     }
 

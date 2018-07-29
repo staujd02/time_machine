@@ -27,6 +27,13 @@ class Navigation extends Component {
       this.IController.resetDataAnimation();
     }
 
+    this.save = () => {
+      toast("Saving...", { 
+        position: toast.POSITION.TOP_LEFT
+      });
+      this.IController.saveLayout();
+    }
+
     return (
         <Navbar inverse style={s}>
           <Navbar.Header>
@@ -39,7 +46,9 @@ class Navigation extends Component {
             <NavItem eventKey={2} href="/#/Reset" onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
             </NavItem>
-            <NavItem eventKey={3} href="/#/Save">Save</NavItem>
+            <NavItem eventKey={3} href="/#/Save" onClick={this.save}>Save
+              <ToastContainer autoClose={1500} />
+            </NavItem>
             <NavItem eventKey={4} href="/#/Load"><FileInput IController={this.IController} /></NavItem>
           </Nav>
         </Navbar>
