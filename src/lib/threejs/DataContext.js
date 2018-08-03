@@ -4,7 +4,7 @@ export default (IController) => {
     this.dataPoints = [];
     this.labels = [];
     this.labelMode = false;
-    this.step = 0;
+    this.step = 0; 
 
     IController.injectDataPointList = json => loadData(json, this);
     IController.getData = () => {

@@ -178,13 +178,13 @@ export default (canvas, IController, data) => {
         }
         if (dataPointToMove === -1 && progressBar) { //Click was not on a datapoint
             dataPointToDelete = -1; //Deselect previous selection
-            if (!data.isDataLoaded()) {
+            if (data.animationData && !data.animationData.isDataLoaded()) {
                 alert("Please import data first");
                 return;
-            }
+        }
 
             //Check if click was on progress bar
-            if (progressBar.withinBar(mousePos.x, mousePos.y)) {
+            if (progressBar.withinBar(mousePos.x, mousePos.y) && data.animationData) {
                 var clickedStep = progressBar.getStep(mousePos.x);
                 let text = data.animationData[clickedStep - 1];
                 progressBar.updateProgress(clickedStep, text ? text[0] : "0")
@@ -254,7 +254,7 @@ export default (canvas, IController, data) => {
     }
 
     function isDataLoaded() {
-        if (!data.dataLoaded()) {
+        if (data && !data.dataLoaded()) {
             alert("Please import data first");
         }
         return data.dataLoaded();
