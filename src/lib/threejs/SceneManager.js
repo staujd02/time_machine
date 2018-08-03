@@ -102,7 +102,7 @@ export default (canvas, IController, data) => {
             changeAllRadius();
             update();
         });
-        var timeController = gui.add(controls, 'timeValue').name("Milliseconds Per Step").min(0).max(500).step(10)
+        var timeController = gui.add(controls, 'timeValue').name("Delay (in ms)").min(0).max(500).step(10)
         timeController.onChange(function (newValue) {
             timeStep = newValue;
         })
@@ -178,10 +178,10 @@ export default (canvas, IController, data) => {
         }
         if (dataPointToMove === -1 && progressBar) { //Click was not on a datapoint
             dataPointToDelete = -1; //Deselect previous selection
-            if (data.animationData && !data.animationData.isDataLoaded()) {
+            if (data.animationData && !isDataLoaded()) {
                 alert("Please import data first");
                 return;
-        }
+            }
 
             //Check if click was on progress bar
             if (progressBar.withinBar(mousePos.x, mousePos.y) && data.animationData) {
@@ -323,7 +323,8 @@ export default (canvas, IController, data) => {
                 labelText = window.prompt("Label your data point: ");
             }
         }
-
+        if (!labelText)
+            labelText = "";
         dataPoint.appendText(fontResource, labelText, 0, (2 * radius));
         dataPoints.push(dataPoint);
         update();
