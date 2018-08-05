@@ -4,6 +4,7 @@ import DataPoint from './DataPoint';
 import * as dat from 'dat.gui';
 import ActionUtilities from '../ActionUtilities';
 import ProgressBar from './ProgressBar';
+import FluxArrow from './FluxArrow';
 
 export default (canvas, IController, data) => {
 
@@ -29,6 +30,8 @@ export default (canvas, IController, data) => {
 
     var progressBar;
     var editMode;
+    var arrowMode = 0;//0 = Off, 1 = Waiting for 1st point, 2 = Waiting for 2nd point
+    var arrowPoints = [4]//[0] = point1.x, [1] = point1.y, [2] = point2.x, [3] = point2.y
 
     var fontResource;
 
@@ -43,6 +46,12 @@ export default (canvas, IController, data) => {
         addPoint: function () {
             if (editMode) {
                 addDataPoint();
+            }
+        },
+        addArrow: function () {
+            if (editMode) {
+                arrowMode = 1;
+                alert("Drag line from data point 1 to data point 2")
             }
         },
         deletePoint: function () {
@@ -100,7 +109,6 @@ export default (canvas, IController, data) => {
         sizeController.onChange(function (newValue) {
             radius = newValue; //Ratio of original size
             changeAllRadius();
-            update();
         });
         var timeController = gui.add(controls, 'timeValue').name("Delay (in ms)").min(0).max(500).step(10)
         timeController.onChange(function (newValue) {
@@ -125,6 +133,7 @@ export default (canvas, IController, data) => {
             data.labelMode = newValue;
         });
         editFolder.add(controls, 'addPoint').name("Add Data Point");
+        editFolder.add(controls, 'addArrow').name("Add Arrow");
         editFolder.add(controls, 'deletePoint').name("Delete Data Point");
 
     }
@@ -144,6 +153,11 @@ export default (canvas, IController, data) => {
         });
         canvas.addEventListener("mouseup", function (evt) {
             if (editMode) {
+                if (arrowMode == 1){
+                    arrowMode = 2;
+                    checkWithinRange(canvas, evt);
+                    addArrow();
+                }
                 mouseDown = false;
                 dataPointToMove = -1; //No current selected dataPoint
             }
@@ -169,7 +183,13 @@ export default (canvas, IController, data) => {
         if (editMode) {
             for (var i = 0; i < data.dataPoints.length; i++) {
                 var selected = data.dataPoints[i].withinCircle(mousePos.x, mousePos.y);
-                if (selected) {
+                if (selected && arrowMode == 1){
+                    arrowPoints[0] = data.dataPoints[i].position.x
+                    arrowPoints[1] = data.dataPoints[i].position.y
+                }else if (selected && arrowMode == 2){
+                    arrowPoints[2] = data.dataPoints[i].position.x
+                    arrowPoints[3] = data.dataPoints[i].position.y
+                }else if (selected) {
                     dataPointToMove = i;
                     dataPointToDelete = i;
                     break;
@@ -202,8 +222,8 @@ export default (canvas, IController, data) => {
     function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left + 145,
-            y: evt.clientY - rect.top + 86.5
+            x: evt.clientX - rect.left, //+ 145,
+            y: evt.clientY - rect.top //+ 86.5
         };
     }
 
@@ -316,7 +336,7 @@ export default (canvas, IController, data) => {
         if (labelMode && labels.length > dataPoints.length + 1) {
             labelText = labels[dataPoints.length + 1]
         } else {
-            if (labels.length <= dataPoints.length) {
+            if (labelMode && labels.length <= dataPoints.length) {
                 labelText = window.prompt("Imported data does not contain a column #" + dataPoints.length + ".\nPlease label your data point: ");
 
             } else {
@@ -327,9 +347,19 @@ export default (canvas, IController, data) => {
             labelText = "";
         dataPoint.appendText(fontResource, labelText, 0, (2 * radius));
         dataPoints.push(dataPoint);
-        update();
     }
 
+    function addArrow(){
+        var arrowInfo = {
+            len: 200,
+            dir: new THREE.Vector3(1, 0, 0),
+            point1: new THREE.Vector2(arrowPoints[0], arrowPoints[1]),
+            point2: new THREE.Vector2(arrowPoints[2], arrowPoints[3]),
+            dataPointRadius: radius,
+        }
+        let arrow = new FluxArrow(scene, arrowInfo);
+        arrowMode = 0;
+    }
 
     function deleteDataPoint() {
         if (dataPointToDelete > -1) {
@@ -342,7 +372,6 @@ export default (canvas, IController, data) => {
         for (var i = 0; i < data.dataPoints.length; i++) {
             data.dataPoints[i].changeColor(newColor);
         }
-        update();
     }
 
     function changeAllRadius() {
@@ -375,7 +404,7 @@ export default (canvas, IController, data) => {
         text.style.MozUserSelect = "none";
     }
 
-    function update() {
+    function update(){
         renderer.render(scene, camera);
     }
 

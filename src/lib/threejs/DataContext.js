@@ -3,6 +3,7 @@ export default (IController) => {
     this.animationData = null; //Holds imported data. Column 1 is time info
     this.dataPoints = [];
     this.labels = [];
+    this.arrows = [];
     this.labelMode = false;
     this.step = 0; 
 

@@ -54,6 +54,12 @@ export default class FileUtilities {
       var rows = csvString.split("\n");
       this.data[i] = rows[i].split(",");
     }
+    //Remove multiple label rows, starting at 1 (after first label row)
+   /* for (i = 1; i < this.data.length; i++){
+      if (this.data[i][0] == "t") {
+        this.data.splice(i, i+1);
+      }
+    }*/
     return this.data;
   }
 }

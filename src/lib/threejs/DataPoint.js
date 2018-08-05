@@ -27,7 +27,6 @@ class DataPoint {
         this.withinCircle = function (x, y) {
             let pos = this.object.mesh.position;
             let distance = Math.sqrt((x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y));
-
             return !(distance > this.radius);
         };
 
