@@ -31,7 +31,7 @@ export default (canvas, IController, data) => {
     var progressBar;
     var editMode;
     var arrowMode = 0;//0 = Off, 1 = Waiting for 1st point, 2 = Waiting for 2nd point
-    var arrowPoints = [4]//[0] = point1.x, [1] = point1.y, [2] = point2.x, [3] = point2.y
+    var arrowPoints = [2]//After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
 
     var fontResource;
 
@@ -51,7 +51,6 @@ export default (canvas, IController, data) => {
         addArrow: function () {
             if (editMode) {
                 arrowMode = 1;
-                alert("Drag line from data point 1 to data point 2")
             }
         },
         deletePoint: function () {
@@ -161,7 +160,9 @@ export default (canvas, IController, data) => {
                 mouseDown = false;
                 dataPointToMove = -1; //No current selected dataPoint
             }
-
+            if (data.arrows.length > 0){
+               updateArrows();
+            }
         });
         canvas.addEventListener("mousemove", function (evt) {
             if (editMode) {
@@ -184,11 +185,9 @@ export default (canvas, IController, data) => {
             for (var i = 0; i < data.dataPoints.length; i++) {
                 var selected = data.dataPoints[i].withinCircle(mousePos.x, mousePos.y);
                 if (selected && arrowMode == 1){
-                    arrowPoints[0] = data.dataPoints[i].position.x
-                    arrowPoints[1] = data.dataPoints[i].position.y
+                    arrowPoints[0] = i
                 }else if (selected && arrowMode == 2){
-                    arrowPoints[2] = data.dataPoints[i].position.x
-                    arrowPoints[3] = data.dataPoints[i].position.y
+                    arrowPoints[1] = i
                 }else if (selected) {
                     dataPointToMove = i;
                     dataPointToDelete = i;
@@ -322,6 +321,19 @@ export default (canvas, IController, data) => {
                 data.dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
             }
         }
+        for (var i = 0; i < data.arrows.length; i++) {
+            if (data.animationData[data.step][i + 1] > halfQuantity) { //i+1 because column 0 holds time info
+                //Darken
+                diff = data.animationData[data.step][i + 1] - halfQuantity;
+                changePercent = diff / halfQuantity;
+                data.arrows[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
+            } else {
+                //Lighten
+                diff = halfQuantity - data.animationData[data.step][i + 1];
+                changePercent = diff / halfQuantity;
+                data.arrows[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
+            }
+        }
     }
 
     function addDataPoint() {
@@ -350,15 +362,29 @@ export default (canvas, IController, data) => {
     }
 
     function addArrow(){
+        alert("Drag a line from desired 'FROM' data point to 'TO' data point");
+        let arrows = data.arrows;
+        let len = data.arrows.length;
         var arrowInfo = {
             len: 200,
-            dir: new THREE.Vector3(1, 0, 0),
-            point1: new THREE.Vector2(arrowPoints[0], arrowPoints[1]),
-            point2: new THREE.Vector2(arrowPoints[2], arrowPoints[3]),
+            pointIndex1: arrowPoints[0],
+            pointIndex2: arrowPoints[1],
+            point1: data.dataPoints[arrowPoints[0]].position,
+            point2: data.dataPoints[arrowPoints[1]].position,
             dataPointRadius: radius,
         }
         let arrow = new FluxArrow(scene, arrowInfo);
         arrowMode = 0;
+        arrows.push(arrow);
+    }
+
+    function updateArrows(){
+        let arrows = data.arrows;
+        for (var i = 0; i < arrows.length; i++){
+            var index1 = arrows[i].arrowInfo.pointIndex1;
+            var index2 = arrows[i].arrowInfo.pointIndex2;
+            arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
+        }
     }
 
     function deleteDataPoint() {
