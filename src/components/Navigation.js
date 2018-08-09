@@ -35,6 +35,11 @@ class Navigation extends Component {
       this.IController.saveLayout();
     }
 
+    function handleSelect(selectedKey, IController) {
+      IController.id = selectedKey;
+      alert(IController.id);
+    }
+
     return (
         <Navbar inverse style={s}>
           <Navbar.Header>
@@ -42,13 +47,14 @@ class Navigation extends Component {
               <a href="/#">Time Machine</a>
             </Navbar.Brand>
           </Navbar.Header>
-          <Nav>
+          <Nav activeKey={1} onSelect={k => handleSelect(k, this.IController)}>
             <NavItem eventKey={1} href="/#/Run">Run</NavItem>
             <NavItem eventKey={2} href="/#/Reset" onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
             </NavItem>
             <NavItem eventKey={3} href="/#/Save"> <Save IController={this.IController}></Save> </NavItem>
-            <NavItem eventKey={4} href="/#/Load"><FileInput IController={this.IController} /></NavItem>
+            <NavItem eventKey={4} href="/#/LoadPoint"><FileInput IController={this.IController} />  -point data</NavItem>
+            <NavItem eventKey={5} href="/#/LoadFlux"><FileInput IController={this.IController} />  -flux data</NavItem>
           </Nav>
         </Navbar>
     );
