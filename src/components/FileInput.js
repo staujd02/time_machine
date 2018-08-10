@@ -9,7 +9,7 @@ export default class FileInput extends NavItem {
 
   constructor(props) {
     super(props);
-    this.onUpload = this.props.onUpload;
+    this.onDone = this.props.onDone;
   }
 
   hasNoFiles(files){
@@ -34,7 +34,7 @@ export default class FileInput extends NavItem {
               <FormControl id="fileUpload"
                            type="file" 
                            accept=".xlsx" 
-                           onChange={ (e) => this.readXLSX(e.target.files, this.onUpload)} 
+                           onChange={ (e) => this.readXLSX(e.target.files, this.onDone)} 
                            ref={input => {this.fileInput = input;}} 
                            style={{ display: "none" }} />
           </ControlLabel>

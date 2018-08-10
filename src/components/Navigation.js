@@ -35,6 +35,20 @@ class Navigation extends Component {
       this.IController.saveLayout();
     }
 
+    this.uploadDataPoints = data => {
+      toast("Upload Complete", { 
+        position: toast.POSITION.TOP_LEFT
+      });
+      this.dataContext.injectDataPointList(data);
+    }
+
+    this.uploadFluxData = data => {
+      toast("Upload Complete", { 
+        position: toast.POSITION.TOP_LEFT
+      });
+      this.dataContext.injectFluxList(data);
+    }
+
     function handleSelect(selectedKey, IController) {
       IController.id = selectedKey;
     }
@@ -51,9 +65,15 @@ class Navigation extends Component {
             <NavItem eventKey={2} href="/#/Reset" onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
             </NavItem>
-            <NavItem eventKey={3} href="/#/Save"> <Save IController={this.IController}></Save> </NavItem>
-            <NavItem eventKey={4} href="/#/LoadPoint"><FileInput onUpload={this.dataContext.injectDataPointList} /> - Point Data</NavItem>
-            <NavItem eventKey={5} href="/#/LoadFlux"><FileInput onUpload={this.dataContext.injectFluxList} /> - Flux Data</NavItem>
+            <NavItem eventKey={3} href="/#/Save"> 
+                <Save IController={this.IController}/> 
+            </NavItem>
+            <NavItem eventKey={4} href="/#/LoadPoint">
+                <FileInput onDone={this.uploadDataPoints} /> - Point Data
+             </NavItem>
+            <NavItem eventKey={5} href="/#/LoadFlux">
+                <FileInput onDone={this.uploadFluxData} /> - Flux Data
+            </NavItem>
           </Nav>
         </Navbar>
     );

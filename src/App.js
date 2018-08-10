@@ -12,8 +12,6 @@ class App extends Component {
   constructor(props){
     super(props);
     this.ThreeController = {
-      // injectDataPointList: function(json) {/*...*/},
-      // injectFluxList: function(json) {/*...*/},
       resetDataAnimation: function() {},
       getDataToSave: function () {},
       onLoad: function() {},
