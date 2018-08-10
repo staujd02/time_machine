@@ -78,7 +78,7 @@ export default (canvas, IController, data) => {
     };
 
     data.onFluxLoad = () => {
-
+        
     }
 
     data.onLoad = () => {

@@ -69,10 +69,10 @@ class Navigation extends Component {
                 <Save IController={this.IController}/> 
             </NavItem>
             <NavItem eventKey={4} href="/#/LoadPoint">
-                <FileInput onDone={this.uploadDataPoints} /> - Point Data
+                <FileInput onDone={this.uploadDataPoints} title={"Upload Point Data"}/>
              </NavItem>
             <NavItem eventKey={5} href="/#/LoadFlux">
-                <FileInput onDone={this.uploadFluxData} /> - Flux Data
+                <FileInput onDone={this.uploadFluxData} title={"Upload Flux Data"}/>
             </NavItem>
           </Nav>
         </Navbar>

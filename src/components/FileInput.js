@@ -10,6 +10,7 @@ export default class FileInput extends NavItem {
   constructor(props) {
     super(props);
     this.onDone = this.props.onDone;
+    this.title = this.props.title || "Upload file";
   }
 
   hasNoFiles(files){
@@ -30,7 +31,7 @@ export default class FileInput extends NavItem {
       return (
         <FormGroup>
          <ControlLabel htmlFor="fileUpload" style={{ cursor: "pointer" }}>
-              Upload file
+              {this.title}
               <FormControl id="fileUpload"
                            type="file" 
                            accept=".xlsx" 
