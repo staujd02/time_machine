@@ -9,6 +9,17 @@ class DataPoint {
         this.baseColor = "#aa00ff";
         this.scene = scene;
         this.radius = 40;
+        this.shadowMargin = 7;
+        this.shadowPushBack = 1;
+
+        this.shadow = {};
+        this.shadow .geometry = new THREE.CircleGeometry(this.radius + this.shadowMargin, 32);
+        this.shadow.mesh = new THREE.Mesh(this.shadow.geometry);
+        this.shadow.mesh.material =
+            new THREE.MeshBasicMaterial({
+                color: "#cccccc" 
+            });
+
         this.object = {};
         this.object.geometry = new THREE.CircleGeometry(this.radius, 32);
         this.object.mesh = new THREE.Mesh(this.object.geometry);
@@ -18,11 +29,15 @@ class DataPoint {
             });
 
         this.object.mesh.position.set(0, 0, 0);
+        this.shadow.mesh.position.set(0, 0, this.shadowPushBack);
 
         this.position = this.object.mesh.position;
-        this.scale = this.object.mesh.scale;
+        this.shadow.position = this.shadow.mesh.position;
+        this.object.scale = this.object.mesh.scale;
+        this.shadow.scale = this.shadow.mesh.scale;
 
         scene.add(this.object.mesh);
+        scene.add(this.shadow.mesh);
 
         this.withinCircle = function (x, y) {
             let pos = this.object.mesh.position;
@@ -32,7 +47,13 @@ class DataPoint {
 
         this.delete = function () {
             this.scene.remove(this.object.mesh);
+            this.scene.remove(this.shadow.mesh);
             this.scene.remove(this.textMesh);
+        };
+
+        this.adjustScale = function(newScale) {
+            this.object.scale.set(newScale, newScale, newScale);
+            this.shadow.scale.set(newScale, newScale, newScale);
         };
 
         this.appendText = function (font, text, xpos, ypos) {
@@ -61,6 +82,11 @@ class DataPoint {
         this.moveText = function (newX, newY) {
             var box = new THREE.Box3().setFromObject(this.textMesh); //To center text horizontally
             this.textMesh.position.set(newX + .5 * (box.max.x - box.min.x), newY, 0);
+        }
+
+        this.setPosition = function(x, y, z){
+           this.position.set(x, y, z);
+           this.shadow.position.set(x, y, this.shadowPushBack);
         }
 
         this.changeTextSize = function (scale) {

@@ -78,7 +78,7 @@ export default (canvas, IController, data) => {
     };
 
     data.onFluxLoad = () => {
-        
+
     }
 
     data.onLoad = () => {
@@ -176,7 +176,7 @@ export default (canvas, IController, data) => {
                     var mousePos = getMousePos(canvas, evt);
                     var newMousePos = canvasToThreePos(mousePos);
                     if (dataPointToMove > -1) {
-                        data.dataPoints[dataPointToMove].position.set(newMousePos.x, newMousePos.y, 0);
+                        data.dataPoints[dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
                         data.dataPoints[dataPointToMove].moveText(newMousePos.x, newMousePos.y + (2 * radius));
                     }
                 }
@@ -349,7 +349,7 @@ export default (canvas, IController, data) => {
         let labels = data.labels;
 
         dataPoint.changeColor(baseColor);
-        dataPoint.scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
+        dataPoint.adjustScale(radius / origRadius);
         var labelText;
         if (labelMode && labels.length > dataPoints.length + 1) {
             labelText = labels[dataPoints.length + 1]
@@ -407,7 +407,7 @@ export default (canvas, IController, data) => {
 
     function changeAllRadius() {
         for (var i = 0; i < data.dataPoints.length; i++) {
-            data.dataPoints[i].scale.set(radius / origRadius, radius / origRadius, radius / origRadius);
+            data.dataPoints[i].adjustScale(radius / origRadius);
             data.dataPoints[i].changeTextSize(radius / origRadius)
         }
     }
