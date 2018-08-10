@@ -11,6 +11,7 @@ class DataPoint {
         this.radius = 40;
         this.shadowMargin = 7;
         this.shadowPushBack = 1;
+        this.textPullForward = -5;
 
         this.shadow = {};
         this.shadow .geometry = new THREE.CircleGeometry(this.radius + this.shadowMargin, 32);
@@ -74,14 +75,14 @@ class DataPoint {
                 color: 0x000000
             });
             this.textMesh = new THREE.Mesh(geometry, material);
-            this.textMesh.position.set(xpos, ypos, 0);
+            this.moveText(xpos, ypos);
             this.textMesh.rotation.set(0, 0, Math.PI);
             this.scene.add(this.textMesh);
         };
 
         this.moveText = function (newX, newY) {
             var box = new THREE.Box3().setFromObject(this.textMesh); //To center text horizontally
-            this.textMesh.position.set(newX + .5 * (box.max.x - box.min.x), newY, 0);
+            this.textMesh.position.set(newX + .5 * (box.max.x - box.min.x), newY, this.textPullForward);
         }
 
         this.setPosition = function(x, y, z){
@@ -90,7 +91,7 @@ class DataPoint {
         }
 
         this.changeTextSize = function (scale) {
-            this.textMesh.scale.set(scale, scale, scale)
+            this.textMesh.scale.set(scale, scale, scale + this.textPullForward);
         }
 
         this.transformColor = function (colorObject) {

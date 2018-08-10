@@ -177,7 +177,7 @@ export default (canvas, IController, data) => {
                     var newMousePos = canvasToThreePos(mousePos);
                     if (dataPointToMove > -1) {
                         data.dataPoints[dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
-                        data.dataPoints[dataPointToMove].moveText(newMousePos.x, newMousePos.y + (2 * radius));
+                        data.dataPoints[dataPointToMove].moveText(newMousePos.x, newMousePos.y);
                     }
                 }
             }
@@ -363,7 +363,7 @@ export default (canvas, IController, data) => {
         }
         if (!labelText)
             labelText = "";
-        dataPoint.appendText(fontResource, labelText, 0, (2 * radius));
+        dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
         dataPoints.push(dataPoint);
     }
 
