@@ -12,9 +12,9 @@ class Navigation extends Component {
   constructor(props){
     super(props);
     this.IController = this.props.IController;
+    this.dataContext = this.props.dataContext;
   }
 
-  
   render() {
 
     var s = {
@@ -37,7 +37,6 @@ class Navigation extends Component {
 
     function handleSelect(selectedKey, IController) {
       IController.id = selectedKey;
-      alert(IController.id);
     }
 
     return (
@@ -53,8 +52,8 @@ class Navigation extends Component {
               <ToastContainer autoClose={1500} />
             </NavItem>
             <NavItem eventKey={3} href="/#/Save"> <Save IController={this.IController}></Save> </NavItem>
-            <NavItem eventKey={4} href="/#/LoadPoint"><FileInput IController={this.IController} />  -point data</NavItem>
-            <NavItem eventKey={5} href="/#/LoadFlux"><FileInput IController={this.IController} />  -flux data</NavItem>
+            <NavItem eventKey={4} href="/#/LoadPoint"><FileInput onUpload={this.dataContext.injectDataPointList} /> - Point Data</NavItem>
+            <NavItem eventKey={5} href="/#/LoadFlux"><FileInput onUpload={this.dataContext.injectFluxList} /> - Flux Data</NavItem>
           </Nav>
         </Navbar>
     );

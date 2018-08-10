@@ -5,17 +5,21 @@ import Navigation from './components/Navigation';
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
+import DataContext from './lib/threejs/DataContext';
 
 class App extends Component {
  
   constructor(props){
     super(props);
     this.ThreeController = {
-      injectDataPointList: function(json) {/*...*/},
+      // injectDataPointList: function(json) {/*...*/},
+      // injectFluxList: function(json) {/*...*/},
       resetDataAnimation: function() {},
-      getData: function () {},
-      onLoad: function() {}
+      getDataToSave: function () {},
+      onLoad: function() {},
+      onFluxLoad: function() {}
     };
+    this.dataContext = new DataContext(this.ThreeController);
   }
 
   render() {
@@ -38,11 +42,11 @@ class App extends Component {
       <div className="App" style={styleFill}>
             <Grid fluid={true} style={styleFill}>
               <Row>
-                  <Navigation IController={this.ThreeController} />
+                  <Navigation dataContext={this.dataContext} IController={this.ThreeController} />
               </Row>
               <Row style={styleFill}>
                 <Col sm={10} md={10} style={col}> 
-                  <ThreeContainer IController={this.ThreeController}/> 
+                  <ThreeContainer dataContext={this.dataContext} IController={this.ThreeController}/> 
                 </Col>
                 <Col sm={2} md={2} style={datStyle} id="datGuiAnchor"></Col>
               </Row>

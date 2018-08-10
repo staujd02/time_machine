@@ -5,25 +5,24 @@ import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FileUtilities from '../lib/FileUtilities';
 import NavItem from 'react-bootstrap/lib/NavItem';
 
-/* Imported From: https://itnext.io/how-to-use-plain-three-js-in-your-react-apps-417a79d926e0 */
-export default class ThreeContainer extends NavItem {
+export default class FileInput extends NavItem {
 
   constructor(props) {
     super(props);
-    this.IController = this.props.IController;
+    this.onUpload = this.props.onUpload;
   }
 
   hasNoFiles(files){
     return files.length === 0;
   }
 
-  readXLSX(files){
-    const cntrl = this.IController;
+  readXLSX(files, callback){
+    const call = callback;
     let fileUtil = new FileUtilities();
     if(this.hasNoFiles(files))
       return;
     fileUtil.processXLSXIntoCSV(files[0], function(dataString){
-       cntrl.injectDataPointList(dataString);
+       call(dataString);
     });
   }
 
@@ -35,7 +34,7 @@ export default class ThreeContainer extends NavItem {
               <FormControl id="fileUpload"
                            type="file" 
                            accept=".xlsx" 
-                           onChange={ (e) => this.readXLSX(e.target.files)} 
+                           onChange={ (e) => this.readXLSX(e.target.files, this.onUpload)} 
                            ref={input => {this.fileInput = input;}} 
                            style={{ display: "none" }} />
           </ControlLabel>

@@ -25,7 +25,7 @@ class Save extends Component {
       });
       let name = window.prompt("Name of the File: ");
       if(name)
-        this.download(dataHook.getData(), name);
+        this.download(dataHook.getDataToSave(), name);
   }
   
   render() {
@@ -33,7 +33,7 @@ class Save extends Component {
         <FormGroup>
             <ControlLabel htmlFor="saveFile" onClick={this.onClick} style={{ cursor: "pointer" }}> Save </ControlLabel>
             <ToastContainer autoClose={1500} />
-            <a id="downloadAnchorElem" style={{ display: "none"}}></a>
+            <label id="downloadAnchorElem" style={{ display: "none"}}>Invisible DOM hook </label>
         </FormGroup>
     );
   }

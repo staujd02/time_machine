@@ -1,10 +1,10 @@
 /** Imported From:  https://github.com/PierfrancescoSoffritti/pierfrancescosoffritti.com/blob/master/src/components/home/header/threejs/threeEntryPoint.js*/
 import SceneManager from './SceneManager';
-import DataContext from './DataContext';
+// import DataContext from './DataContext';
 
-export default (container, IController) => {
+export default (container, dataContext, IController) => {
     const canvas = createCanvas(document, container);
-    const dataContext = new DataContext(IController);
+    // const dataContext = new DataContext(IController);
     const sceneManager = new SceneManager(canvas, IController, dataContext);
 
     render();

@@ -1,14 +1,18 @@
 export default (IController) => {
 
     this.animationData = null; //Holds imported data. Column 1 is time info
+    this.fluxData = null; //Holds imported data. Column 1 is time info
     this.dataPoints = [];
     this.labels = [];
     this.arrows = [];
     this.labelMode = false;
-    this.step = 0; 
+    this.step = 0;
+    this.onLoad = null;
 
-    IController.injectDataPointList = json => loadData(json, this);
-    IController.getData = () => {
+    this.injectDataPointList = json => loadPointData(json, this);
+    this.injectFluxList = json => loadFluxData(json, this);
+
+    IController.getDataToSave = () => {
         let data = [];
         data.push(this.animationData);
         data.push(this.dataPoints);
@@ -25,11 +29,19 @@ export default (IController) => {
 
     return this;
 
-    function loadData(xlsxData, instance) {
+    function loadFluxData(xlsxData, instance){
+        xlsxData.splice(0, 1);  //Remove label column
+        instance.fluxData = xlsxData;
+        if(instance.onLoad && typeof instance.onLoad === "function")
+            instance.onLoad();
+    }
+
+    function loadPointData(xlsxData, instance) {
         instance.labels = xlsxData[0];
-        xlsxData.splice(0, 1);//Remove label column
+        xlsxData.splice(0, 1);  //Remove label column
         instance.animationData = xlsxData;
-        IController.onLoad();
+        if(instance.onLoad && typeof instance.onLoad === "function")
+            instance.onLoad();
     }
 
 }

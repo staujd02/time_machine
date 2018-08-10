@@ -69,13 +69,19 @@ export default (canvas, IController, data) => {
     buildGUI();
 
     IController.resetDataAnimation = function () {
-        data.step = 0;
-        paused = true;
-        progressBar.updateProgress(0, data.animationData[0][0]);
-        applyStep();
+        if(data.animationData){
+            data.step = 0;
+            paused = true;
+            progressBar.updateProgress(0, data.animationData[0][0]);
+            applyStep();
+        }
     };
 
-    IController.onLoad = () => {
+    data.onFluxLoad = () => {
+
+    }
+
+    data.onLoad = () => {
         buildProgressBar();
         addStartStopText();
         progressBar.appendText(data.animationData[0][0]);
@@ -152,7 +158,7 @@ export default (canvas, IController, data) => {
         });
         canvas.addEventListener("mouseup", function (evt) {
             if (editMode) {
-                if (arrowMode == 1){
+                if (arrowMode === 1){
                     arrowMode = 2;
                     checkWithinRange(canvas, evt);
                     addArrow();
@@ -184,9 +190,9 @@ export default (canvas, IController, data) => {
         if (editMode) {
             for (var i = 0; i < data.dataPoints.length; i++) {
                 var selected = data.dataPoints[i].withinCircle(mousePos.x, mousePos.y);
-                if (selected && arrowMode == 1){
+                if (selected && arrowMode === 1){
                     arrowPoints[0] = i
-                }else if (selected && arrowMode == 2){
+                }else if (selected && arrowMode === 2){
                     arrowPoints[1] = i
                 }else if (selected) {
                     dataPointToMove = i;
@@ -221,8 +227,8 @@ export default (canvas, IController, data) => {
     function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left, //+ 145,
-            y: evt.clientY - rect.top //+ 86.5
+            x: evt.clientX - rect.left + 145,
+            y: evt.clientY - rect.top + 86.5
         };
     }
 
@@ -308,7 +314,7 @@ export default (canvas, IController, data) => {
     function colorPoints() {
         let changePercent, diff;
 
-        for (var i = 0; i < data.dataPoints.length; i++) {
+        for (let i = 0; i < data.dataPoints.length; i++) {
             if (data.animationData[data.step][i + 1] > halfQuantity) { //i+1 because column 0 holds time info
                 //Darken
                 diff = data.animationData[data.step][i + 1] - halfQuantity;
@@ -321,7 +327,7 @@ export default (canvas, IController, data) => {
                 data.dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
             }
         }
-        for (var i = 0; i < data.arrows.length; i++) {
+        for (let i = 0; i < data.arrows.length; i++) {
             if (data.animationData[data.step][i + 1] > halfQuantity) { //i+1 because column 0 holds time info
                 //Darken
                 diff = data.animationData[data.step][i + 1] - halfQuantity;
@@ -364,7 +370,6 @@ export default (canvas, IController, data) => {
     function addArrow(){
         alert("Drag a line from desired 'FROM' data point to 'TO' data point");
         let arrows = data.arrows;
-        let len = data.arrows.length;
         var arrowInfo = {
             len: 200,
             pointIndex1: arrowPoints[0],

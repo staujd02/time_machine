@@ -56,7 +56,7 @@ export default class FileUtilities {
     }
     //Remove multiple label rows, starting at 1 (after first label row)
     for (i = 1; i < this.data.length; i++){
-      if (this.data[i][0] == "t") {
+      if (this.data[i][0] === "t") {
         this.data.splice(i, 1);
       }
     }
