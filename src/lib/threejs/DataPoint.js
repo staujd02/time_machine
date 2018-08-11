@@ -14,11 +14,11 @@ class DataPoint {
         this.textPullForward = -5;
 
         this.shadow = {};
-        this.shadow .geometry = new THREE.CircleGeometry(this.radius + this.shadowMargin, 32);
+        this.shadow.geometry = new THREE.CircleGeometry(this.radius + this.shadowMargin, 32);
         this.shadow.mesh = new THREE.Mesh(this.shadow.geometry);
         this.shadow.mesh.material =
             new THREE.MeshBasicMaterial({
-                color: "#cccccc" 
+                color: "#cccccc"
             });
 
         this.object = {};
@@ -52,7 +52,7 @@ class DataPoint {
             this.scene.remove(this.textMesh);
         };
 
-        this.adjustScale = function(newScale) {
+        this.adjustScale = function (newScale) {
             this.object.scale.set(newScale, newScale, newScale);
             this.shadow.scale.set(newScale, newScale, newScale);
         };
@@ -85,9 +85,9 @@ class DataPoint {
             this.textMesh.position.set(newX + .5 * (box.max.x - box.min.x), newY, this.textPullForward);
         }
 
-        this.setPosition = function(x, y, z){
-           this.position.set(x, y, z);
-           this.shadow.position.set(x, y, this.shadowPushBack);
+        this.setPosition = function (x, y, z) {
+            this.position.set(x, y, z);
+            this.shadow.position.set(x, y, this.shadowPushBack);
         }
 
         this.changeTextSize = function (scale) {
@@ -120,6 +120,45 @@ class DataPoint {
             this.object.mesh.material = new THREE.MeshBasicMaterial({
                 color: tinycolor(this.baseColor).darken(percent).toString()
             });
+        };
+
+        this.toDataObject = function () {
+            let dp = this;
+            return {
+                color: dp.object.mesh.material.color,
+                text: dp.textMesh ? dp.textMesh.geometry.parameters.text : null,
+                object: {
+                    scale: dp.object.mesh.scale,
+                    position: dp.object.mesh.position
+                },
+                shadow: {
+                    scale: dp.shadow.mesh.scale,
+                    position: dp.shadow.mesh.position
+                }
+            };
+        };
+
+        this.fromDataObject = (options, font) => {
+            this.object.mesh.material.color = options.color;
+
+            this.object.mesh.position.set(
+                options.object.position.x,
+                options.object.position.y,
+                options.object.position.z
+            );
+            let s = options.object.scale;  
+            this.object.scale.set(s, s, s);
+
+            this.shadow.mesh.position.set(
+                options.shadow.position.x,
+                options.shadow.position.y,
+                options.shadow.position.z
+            );
+            let s = options.shadow.scale;  
+            this.shadow.scale.set(s, s, s);
+
+            this.appendText(font, options.text, options.object.position.x, 
+                                                options.object.position.y);
         };
 
         this.update = function () {
