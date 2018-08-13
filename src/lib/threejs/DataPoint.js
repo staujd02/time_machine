@@ -104,23 +104,14 @@ class DataPoint {
 
         this.changeColor = function (colorObject) {
             this.baseColor = this.transformColor(colorObject);
-            this.object.mesh.material =
-                new THREE.MeshBasicMaterial({
-                    color: this.baseColor.toString()
-                });
+            this.object.mesh.material.color.set(this.baseColor.toString());
         };
 
         this.lightenColor = function (percent) {
-            // this.object.mesh.material = new THREE.MeshBasicMaterial({
-            //     color: tinycolor(this.baseColor).lighten(percent).toString()
-            // });
             this.object.mesh.material.color.set(tinycolor(this.baseColor).lighten(percent).toString());
         };
 
         this.darkenColor = function (percent) {
-            // this.object.mesh.material = new THREE.MeshBasicMaterial({
-            //     color: tinycolor(this.baseColor).darken(percent).toString()
-            // });
             this.object.mesh.material.color.set(tinycolor(this.baseColor).darken(percent).toString());
         };
 
