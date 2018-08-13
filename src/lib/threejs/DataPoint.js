@@ -111,15 +111,17 @@ class DataPoint {
         };
 
         this.lightenColor = function (percent) {
-            this.object.mesh.material = new THREE.MeshBasicMaterial({
-                color: tinycolor(this.baseColor).lighten(percent).toString()
-            });
+            // this.object.mesh.material = new THREE.MeshBasicMaterial({
+            //     color: tinycolor(this.baseColor).lighten(percent).toString()
+            // });
+            this.object.mesh.material.color.set(tinycolor(this.baseColor).lighten(percent).toString());
         };
 
         this.darkenColor = function (percent) {
-            this.object.mesh.material = new THREE.MeshBasicMaterial({
-                color: tinycolor(this.baseColor).darken(percent).toString()
-            });
+            // this.object.mesh.material = new THREE.MeshBasicMaterial({
+            //     color: tinycolor(this.baseColor).darken(percent).toString()
+            // });
+            this.object.mesh.material.color.set(tinycolor(this.baseColor).darken(percent).toString());
         };
 
         this.toDataObject = function () {
@@ -154,7 +156,8 @@ class DataPoint {
                 options.shadow.position.y,
                 options.shadow.position.z
             );
-            let s = options.shadow.scale;  
+            
+            s = options.shadow.scale;  
             this.shadow.scale.set(s, s, s);
 
             this.appendText(font, options.text, options.object.position.x, 

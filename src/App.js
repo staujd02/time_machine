@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './css/App.css';
 import ThreeContainer from './components/ThreeContainer';
 import Navigation from './components/Navigation';
+import WebStorage from './components/WebStorage.js';
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
@@ -46,7 +47,12 @@ class App extends Component {
                 <Col sm={10} md={10} style={col}> 
                   <ThreeContainer dataContext={this.dataContext} IController={this.ThreeController}/> 
                 </Col>
-                <Col sm={2} md={2} style={datStyle} id="datGuiAnchor"></Col>
+                <Col sm={2} md={2}>
+                  <Row sm={2} md={2} style={datStyle} id="datGuiAnchor"></Row>
+                  <Row>
+                    <WebStorage sm={2} md={2}></WebStorage >
+                  </Row>
+                </Col>
               </Row>
             </Grid>
       </div>
