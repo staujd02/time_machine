@@ -48,9 +48,15 @@ class App extends Component {
                   <ThreeContainer dataContext={this.dataContext} IController={this.ThreeController}/> 
                 </Col>
                 <Col sm={2} md={2}>
-                  <Row sm={2} md={2} style={datStyle} id="datGuiAnchor"></Row>
-                  <Row>
-                    <WebStorage sm={2} md={2}></WebStorage >
+                  <Row sm={2} md={2}>
+                    <div style={datStyle} id="datGuiAnchor"></div>
+                  </Row>
+                  <Row sm={2} md={2}>
+                    <br/>
+                    <br/>
+                  </Row>
+                  <Row sm={2} md={2}>
+                    <WebStorage></WebStorage >
                   </Row>
                 </Col>
               </Row>
