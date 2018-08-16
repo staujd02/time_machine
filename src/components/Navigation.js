@@ -54,7 +54,6 @@ class Navigation extends Component {
             </Navbar.Brand>
           </Navbar.Header>
           <Nav activeKey={1} onSelect={k => handleSelect(k, this.IController)}>
-            <NavItem eventKey={1} href="/#/Run">Run</NavItem>
             <NavItem eventKey={2} href="/#/Reset" onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
             </NavItem>

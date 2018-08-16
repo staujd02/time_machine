@@ -349,8 +349,6 @@ export default (canvas, IController, data) => {
                     data.arrows[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
                 }
             }
-        }else{
-            alert("NO FLUX DATA INPUTTED")
         }
     }
 

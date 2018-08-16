@@ -31,7 +31,7 @@ class Save extends Component {
   render() {
     return (
         <FormGroup>
-            <ControlLabel htmlFor="saveFile" onClick={this.onClick} style={{ cursor: "pointer" }}> Save </ControlLabel>
+            <ControlLabel htmlFor="saveFile" onClick={this.onClick} style={{ cursor: "pointer" }}> Download Backup </ControlLabel>
             <ToastContainer autoClose={1500} />
             <label id="downloadAnchorElem" style={{ display: "none"}}>Invisible DOM hook </label>
         </FormGroup>
