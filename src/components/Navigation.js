@@ -29,14 +29,14 @@ class Navigation extends Component {
     }
 
     this.uploadDataPoints = data => {
-      toast("Upload Complete", { 
+      toast("Upload Point Data Complete", { 
         position: toast.POSITION.TOP_LEFT
       });
       this.dataContext.injectDataPointList(data);
     }
 
     this.uploadFluxData = data => {
-      toast("Upload Complete", { 
+      toast("Upload Flux Data Complete", { 
         position: toast.POSITION.TOP_LEFT
       });
       this.dataContext.injectFluxList(data);
