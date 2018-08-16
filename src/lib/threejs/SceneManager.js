@@ -20,7 +20,9 @@ export default (canvas, IController, data) => {
     var paused = true;
     var timeStep = 300;
     var maxQuantity = 1;
+    var maxFlux = 1;
     var halfQuantity = maxQuantity / 2.0;
+    var halfFlux = maxFlux / 2.0;
     var baseColor = [170, 0, 255, 1];
     var radius = origRadius;
 
@@ -38,6 +40,7 @@ export default (canvas, IController, data) => {
     const controls = {
         size: origRadius,
         maxValue: maxQuantity,
+        maxFlux: maxFlux,
         timeValue: timeStep,
         color: [170, 0, 255, 1],
         changeStep: function () {
@@ -123,6 +126,11 @@ export default (canvas, IController, data) => {
         maxController.onChange(function (newValue) {
             maxQuantity = newValue;
             halfQuantity = maxQuantity / 2.0;
+        });
+        var maxFluxController = gui.add(controls, 'maxFlux').name("Max Flux");
+        maxFluxController.onChange(function (newValue) {
+            maxFlux = newValue;
+            halfFlux = maxFlux / 2.0;
         });
         var colorController = gui.addColor(controls, 'color');
         colorController.onChange(function (newValue) {
@@ -227,8 +235,8 @@ export default (canvas, IController, data) => {
     function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left + 145,
-            y: evt.clientY - rect.top + 86.5
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
         };
     }
 
@@ -327,18 +335,22 @@ export default (canvas, IController, data) => {
                 data.dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
             }
         }
-        for (let i = 0; i < data.arrows.length; i++) {
-            if (data.animationData[data.step][i + 1] > halfQuantity) { //i+1 because column 0 holds time info
-                //Darken
-                diff = data.animationData[data.step][i + 1] - halfQuantity;
-                changePercent = diff / halfQuantity;
-                data.arrows[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
-            } else {
-                //Lighten
-                diff = halfQuantity - data.animationData[data.step][i + 1];
-                changePercent = diff / halfQuantity;
-                data.arrows[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
+        if (data.fluxData != null) {
+            for (let i = 0; i < data.arrows.length; i++) {
+                if (data.fluxData[data.step][i + 1] > halfFlux) { //i+1 because column 0 holds time info
+                    //Darken
+                    diff = data.fluxData[data.step][i + 1] - halfFlux;
+                    changePercent = diff / halfFlux;
+                    data.arrows[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
+                } else {
+                    //Lighten
+                    diff = halfFlux - data.fluxData[data.step][i + 1];
+                    changePercent = diff / halfFlux;
+                    data.arrows[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
+                }
             }
+        }else{
+            alert("NO FLUX DATA INPUTTED")
         }
     }
 
