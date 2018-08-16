@@ -7,6 +7,7 @@ import LocalStorage from './lib/LocalStorage.js';
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
+import DataContext from './lib/threejs/DataContext';
 
 class App extends Component {
  
@@ -14,12 +15,12 @@ class App extends Component {
     super(props);
     this.ThreeController = {
       resetDataAnimation: function() {},
-      getDataToSave: function () {},
       onLoad: function() {},
       onFluxLoad: function() {}
     };
     this.plots = (new LocalStorage()).loadFromStorage(this.ThreeController);
-    this.currentContext = this.plots[0].versions[0].context;
+    this.currentPlot = this.plots[0].versions[0].plot;
+    this.currentContext = new DataContext(this.currentPlot);
   }
 
   render() {
@@ -57,7 +58,7 @@ class App extends Component {
                     <br/>
                   </Row>
                   <Row sm={2} md={2}>
-                    <StorageList plots={this.plots} currentContext={this.currentContext}></StorageList>
+                    <StorageList plots={this.plots} currentPlot={this.currentPlot}></StorageList>
                   </Row>
                 </Col>
               </Row>

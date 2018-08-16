@@ -8,7 +8,7 @@ class Save extends Component {
 
   constructor(props){
     super(props);
-    this.onClick = () => {this.save(this.props.IController)}
+    this.onClick = () => {this.save(this.props.context)}
   }
 
   download(contents, name) {

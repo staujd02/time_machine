@@ -1,22 +1,24 @@
-export default (IController) => {
+export default (PlotData) => {
 
-    this.animationData = null; //Holds imported data. Column 1 is time info
-    this.fluxData = null; //Holds imported data. Column 1 is time info
-    this.dataPoints = [];
-    this.labels = [];
-    this.arrows = [];
+    this.animationData = PlotData.animationData;    //Holds imported data. Column 1 is time info
+    this.fluxData =  PlotData.fluxData;             //Holds imported data. Column 1 is time info
+    this.dataPoints = PlotData.dataPoints;
+    this.labels = PlotData.labels;
+    this.arrows = PlotData.arrows;
+    this.step = PlotData.step;
+
     this.labelMode = false;
-    this.step = 0;
     this.onLoad = null;
 
     this.injectDataPointList = json => loadPointData(json, this);
     this.injectFluxList = json => loadFluxData(json, this);
 
-    IController.getDataToSave = () => {
-        let data = [];
-        data.push(this.animationData);
-        data.push(this.dataPoints);
-        return data;
+    this.getDataToSave = () => {
+        // let data = [];
+        // data.push(plotData.animationData);
+        // data.push(this.dataPoints);
+        // return data;
+        return PlotData;
     }
 
     this.dataLoaded = function dataLoaded() {
@@ -29,18 +31,18 @@ export default (IController) => {
 
     return this;
 
-    function loadFluxData(xlsxData, instance){
-        xlsxData.splice(0, 1);  //Remove label column
+    function loadFluxData(xlsxData, instance) {
+        xlsxData.splice(0, 1); //Remove label column
         instance.fluxData = xlsxData;
-        if(instance.onLoad && typeof instance.onLoad === "function")
+        if (instance.onLoad && typeof instance.onLoad === "function")
             instance.onLoad();
     }
 
     function loadPointData(xlsxData, instance) {
         instance.labels = xlsxData[0];
-        xlsxData.splice(0, 1);  //Remove label column
+        xlsxData.splice(0, 1); //Remove label column
         instance.animationData = xlsxData;
-        if(instance.onLoad && typeof instance.onLoad === "function")
+        if (instance.onLoad && typeof instance.onLoad === "function")
             instance.onLoad();
     }
 

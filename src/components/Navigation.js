@@ -28,13 +28,6 @@ class Navigation extends Component {
       this.IController.resetDataAnimation();
     }
 
-    this.save = () => {
-      toast("Saving...", { 
-        position: toast.POSITION.TOP_LEFT
-      });
-      this.IController.saveLayout();
-    }
-
     this.uploadDataPoints = data => {
       toast("Upload Complete", { 
         position: toast.POSITION.TOP_LEFT
@@ -66,7 +59,7 @@ class Navigation extends Component {
               <ToastContainer autoClose={1500} />
             </NavItem>
             <NavItem eventKey={3} href="/#/Save"> 
-                <Save IController={this.IController}/> 
+                <Save context={this.dataContext} /> 
             </NavItem>
             <NavItem eventKey={4} href="/#/LoadPoint">
                 <FileInput onDone={this.uploadDataPoints} title={"Upload Point Data"}/>

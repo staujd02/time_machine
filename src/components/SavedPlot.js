@@ -7,7 +7,7 @@ export default class SavedPlot extends Component {
     super(param);
     this.dataCapsule = this.props.dataCapsule;
     this.name = this.dataCapsule.name;
-    this.activeContext = this.props.active;
+    this.activePlot = this.props.active;
   }
 
   render() {
