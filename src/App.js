@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import './css/App.css';
 import ThreeContainer from './components/ThreeContainer';
 import Navigation from './components/Navigation';
-import WebStorage from './components/WebStorage.js';
+import StorageList from './components/StorageList.js';
+import LocalStorage from './lib/LocalStorage.js';
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
-import DataContext from './lib/threejs/DataContext';
 
 class App extends Component {
  
@@ -18,7 +18,8 @@ class App extends Component {
       onLoad: function() {},
       onFluxLoad: function() {}
     };
-    this.dataContext = new DataContext(this.ThreeController);
+    this.plots = (new LocalStorage()).loadFromStorage(this.ThreeController);
+    this.currentContext = this.plots[0].versions[0].context;
   }
 
   render() {
@@ -41,11 +42,11 @@ class App extends Component {
       <div className="App" style={styleFill}>
             <Grid fluid={true} style={styleFill}>
               <Row>
-                  <Navigation dataContext={this.dataContext} IController={this.ThreeController} />
+                  <Navigation dataContext={this.currentContext} IController={this.ThreeController} />
               </Row>
               <Row style={styleFill}>
                 <Col sm={10} md={10} style={col}> 
-                  <ThreeContainer dataContext={this.dataContext} IController={this.ThreeController}/> 
+                  <ThreeContainer dataContext={this.currentContext} IController={this.ThreeController}/> 
                 </Col>
                 <Col sm={2} md={2}>
                   <Row sm={2} md={2}>
@@ -56,7 +57,7 @@ class App extends Component {
                     <br/>
                   </Row>
                   <Row sm={2} md={2}>
-                    <WebStorage></WebStorage >
+                    <StorageList plots={this.plots} currentContext={this.currentContext}></StorageList>
                   </Row>
                 </Col>
               </Row>
