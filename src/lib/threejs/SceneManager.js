@@ -34,10 +34,11 @@ export default (canvas, IController, data) => {
 
     var progressBar;
     var editMode;
-    var arrowMode = 0;//0 = Off, 1 = Waiting for 1st point, 2 = Waiting for 2nd point
-    var arrowPoints = [2]//After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
+    var arrowMode = 0; //0 = Off, 1 = Waiting for 1st point, 2 = Waiting for 2nd point
+    var arrowPoints = [2] //After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
 
     var fontResource;
+
 
     const controls = {
         size: origRadius,
@@ -76,7 +77,7 @@ export default (canvas, IController, data) => {
     buildGUI();
 
     IController.resetDataAnimation = function () {
-        if(data.animationData){
+        if (data.animationData) {
             data.step = 0;
             paused = true;
             progressBar.updateProgress(0, data.animationData[0][0]);
@@ -106,6 +107,11 @@ export default (canvas, IController, data) => {
     function fontLoadingComplete(font) {
         fontResource = font;
         buildProgressBar();
+        let hydratedPoints = [];
+        data.dataPoints.forEach(oldPoint => { 
+            hydratedPoints.push(addDataPoint(oldPoint)); 
+        });
+        data.dataPoints = hydratedPoints;
     }
 
     function buildGUI() {
@@ -178,7 +184,7 @@ export default (canvas, IController, data) => {
         });
         canvas.addEventListener("mouseup", function (evt) {
             if (editMode) {
-                if (arrowMode === 1){
+                if (arrowMode === 1) {
                     arrowMode = 2;
                     checkWithinRange(canvas, evt);
                     addArrow();
@@ -186,8 +192,8 @@ export default (canvas, IController, data) => {
                 mouseDown = false;
                 dataPointToMove = -1; //No current selected dataPoint
             }
-            if (data.arrows.length > 0){
-               updateArrows();
+            if (data.arrows.length > 0) {
+                updateArrows();
             }
         });
         canvas.addEventListener("mousemove", function (evt) {
@@ -210,11 +216,11 @@ export default (canvas, IController, data) => {
         if (editMode) {
             for (var i = 0; i < data.dataPoints.length; i++) {
                 var selected = data.dataPoints[i].withinCircle(mousePos.x, mousePos.y);
-                if (selected && arrowMode === 1){
+                if (selected && arrowMode === 1) {
                     arrowPoints[0] = i
-                }else if (selected && arrowMode === 2){
+                } else if (selected && arrowMode === 2) {
                     arrowPoints[1] = i
-                }else if (selected) {
+                } else if (selected) {
                     dataPointToMove = i;
                     dataPointToDelete = i;
                     break;
@@ -353,43 +359,54 @@ export default (canvas, IController, data) => {
                     //Darken
                     diff = data.fluxData[data.step][i + 1] - halfFlux;
                     changePercent = diff / halfFlux;
-                    data.arrows[i].darkenColor(changePercent * 50);//Multiply by 50 - percent available to darken by
+                    data.arrows[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
                 } else {
                     //Lighten
                     diff = halfFlux - data.fluxData[data.step][i + 1];
                     changePercent = diff / halfFlux;
-                    data.arrows[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
+                    data.arrows[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
                 }
             }
         }
     }
 
-    function addDataPoint() {
-        let dataPoint = new DataPoint(scene);
-        let dataPoints = data.dataPoints;
-        let labelMode = data.labelMode;
-        let labels = data.labels;
+    function addDataPoint(reinstate = null) {
+        if (reinstate == null) {
+            let dataPoint = new DataPoint(scene);
+            let dataPoints = data.dataPoints;
+            let labelMode = data.labelMode;
+            let labels = data.labels;
 
-        dataPoint.changeColor(baseColor);
-        dataPoint.adjustScale(radius / origRadius);
-        var labelText;
-        if (labelMode && labels.length > dataPoints.length + 1) {
-            labelText = labels[dataPoints.length + 1]
-        } else {
-            if (labelMode && labels.length <= dataPoints.length) {
-                labelText = window.prompt("Imported data does not contain a column #" + dataPoints.length + ".\nPlease label your data point: ");
-
+            dataPoint.changeColor(baseColor);
+            dataPoint.adjustScale(radius / origRadius);
+            var labelText;
+            if (labelMode && labels.length > dataPoints.length + 1) {
+                labelText = labels[dataPoints.length + 1]
             } else {
-                labelText = window.prompt("Label your data point: ");
+                if (labelMode && labels.length <= dataPoints.length) {
+                    labelText = window.prompt("Imported data does not contain a column #" + dataPoints.length + ".\nPlease label your data point: ");
+
+                } else {
+                    labelText = window.prompt("Label your data point: ");
+                }
             }
+            if (!labelText)
+                labelText = "";
+            dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
+            dataPoints.push(dataPoint);
+        } else {
+            let dataPoint = new DataPoint(scene, reinstate);
+            let labelText = reinstate.textMesh ? reinstate.textMesh.geometries[0].text : "";
+            if (!labelText)
+                labelText = "";
+            dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
+            return dataPoint;
         }
-        if (!labelText)
-            labelText = "";
-        dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
-        dataPoints.push(dataPoint);
     }
 
-    function addArrow(){
+    
+
+    function addArrow() {
         let arrows = data.arrows;
         var arrowInfo = {
             len: 200,
@@ -404,9 +421,9 @@ export default (canvas, IController, data) => {
         arrows.push(arrow);
     }
 
-    function updateArrows(){
+    function updateArrows() {
         let arrows = data.arrows;
-        for (var i = 0; i < arrows.length; i++){
+        for (var i = 0; i < arrows.length; i++) {
             var index1 = arrows[i].arrowInfo.pointIndex1;
             var index2 = arrows[i].arrowInfo.pointIndex2;
             arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
@@ -456,7 +473,7 @@ export default (canvas, IController, data) => {
         text.style.MozUserSelect = "none";
     }
 
-    function update(){
+    function update() {
         renderer.render(scene, camera);
     }
 

@@ -3,13 +3,15 @@ import * as THREE from 'three'
 
 class DataPoint {
 
-    constructor(scene) {
+    constructor(scene, previousState = null) {
         var tinycolor = require('tinycolor2');
 
-        this.baseColor = "#aa00ff";
+        let isState = !!previousState;
+
+        this.baseColor = isState ? previousState.baseColor : "#aa00ff";
         this.scene = scene;
-        this.radius = 40;
-        this.shadowMargin = 4;
+        this.radius = isState ? previousState.radius : 40;
+        this.shadowMargin = isState ? previousState.shadowMargin : 7;
         this.shadowPushBack = 1;
         this.textPullForward = -5;
 
@@ -18,7 +20,7 @@ class DataPoint {
         this.shadow.mesh = new THREE.Mesh(this.shadow.geometry);
         this.shadow.mesh.material =
             new THREE.MeshBasicMaterial({
-                color: "#888888"
+                color: isState ? previousState.shadow.mesh.material : "#cccccc"
             });
 
         this.object = {};
@@ -26,16 +28,22 @@ class DataPoint {
         this.object.mesh = new THREE.Mesh(this.object.geometry);
         this.object.mesh.material =
             new THREE.MeshBasicMaterial({
-                color: this.baseColor
+                color: isState ? previousState.object.mesh.material : this.baseColor
             });
 
-        this.object.mesh.position.set(0, 0, 0);
-        this.shadow.mesh.position.set(0, 0, this.shadowPushBack);
+        isState ? (this.object.mesh.position.set(previousState.position)) : this.object.mesh.position.set(0, 0, 0);
+        isState ? (this.shadow.mesh.position.set(previousState.shadow.position)) : this.shadow.mesh.position.set(0, 0, this.shadowPushBack);
 
         this.position = this.object.mesh.position;
         this.shadow.position = this.shadow.mesh.position;
+
         this.object.scale = this.object.mesh.scale;
         this.shadow.scale = this.shadow.mesh.scale;
+
+        if (isState) {
+            this.object.scale.set(previousState.object.scale);
+            this.shadow.scale.set(previousState.shadow.scale);
+        }
 
         scene.add(this.object.mesh);
         scene.add(this.shadow.mesh);
@@ -139,7 +147,7 @@ class DataPoint {
                 options.object.position.y,
                 options.object.position.z
             );
-            let s = options.object.scale;  
+            let s = options.object.scale;
             this.object.scale.set(s, s, s);
 
             this.shadow.mesh.position.set(
@@ -147,12 +155,12 @@ class DataPoint {
                 options.shadow.position.y,
                 options.shadow.position.z
             );
-            
-            s = options.shadow.scale;  
+
+            s = options.shadow.scale;
             this.shadow.scale.set(s, s, s);
 
-            this.appendText(font, options.text, options.object.position.x, 
-                                                options.object.position.y);
+            this.appendText(font, options.text, options.object.position.x,
+                options.object.position.y);
         };
 
         this.update = function () {

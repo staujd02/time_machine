@@ -4,7 +4,7 @@ export default (PlotData) => {
     this.fluxData = PlotData.fluxData; //Holds imported data. Column 1 is time info
     this.dataPoints = PlotData.dataPoints;
     this.labels = PlotData.labels;
-    this.arrows = PlotData.arrows;
+    this.arrows = [];
     this.step = PlotData.step;
 
     this.currentPlot = PlotData;
