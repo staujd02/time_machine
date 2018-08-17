@@ -1,7 +1,7 @@
 export default (PlotData) => {
 
-    this.animationData = PlotData.animationData;    //Holds imported data. Column 1 is time info
-    this.fluxData =  PlotData.fluxData;             //Holds imported data. Column 1 is time info
+    this.animationData = PlotData.animationData; //Holds imported data. Column 1 is time info
+    this.fluxData = PlotData.fluxData; //Holds imported data. Column 1 is time info
     this.dataPoints = PlotData.dataPoints;
     this.labels = PlotData.labels;
     this.arrows = PlotData.arrows;

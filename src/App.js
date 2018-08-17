@@ -19,7 +19,7 @@ class App extends Component {
       onFluxLoad: function() {}
     };
     this.plots = (new LocalStorage()).loadFromStorage(this.ThreeController);
-    this.currentPlot = this.plots[0].versions[0].plot;
+    this.currentPlot = this.plots[0].versions[this.plots[0].versions.length - 1].plot;
     this.currentContext = new DataContext(this.currentPlot);
   }
 

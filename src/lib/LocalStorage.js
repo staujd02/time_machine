@@ -13,10 +13,10 @@ export default class LocalStorage {
 
     //  item must have name of plot
     //  addition must be PlotData
-    updateStorage(item, addition){
+    updateStorage(name, addition){
         let plots = this.loadPlotsFromDefaultContainer();
         for (const plotId in plots) {
-            if (plots.hasOwnProperty(plotId) && plots[plotId].name === item.name) {
+            if (plots.hasOwnProperty(plotId) && plots[plotId].name === name) {
                 const element = plots[plotId];
                 let id = element.versions.length + 1;
                 addition.id = id;
