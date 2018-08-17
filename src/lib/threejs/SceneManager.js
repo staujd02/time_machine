@@ -424,7 +424,13 @@ export default (canvas, IController, data) => {
         for (var i = 0; i < arrows.length; i++){
             var index1 = arrows[i].arrowInfo.pointIndex1;
             var index2 = arrows[i].arrowInfo.pointIndex2;
-            arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
+            if ((data.dataPoints[index1] == null) || (data.dataPoints[index2] == null)){
+                arrows[i].delete();
+                arrows.splice(i, 1);
+                i--; //To go back and check arrow that just moved into i'th position
+            }else{
+                arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
+            }
         }
     }
 
@@ -434,6 +440,7 @@ export default (canvas, IController, data) => {
             data.dataPoints.splice(dataPointToDelete, 1);
             data.labels.splice(dataPointToDelete, 1);
         }
+        updateArrows();
     }
 
     function changeColor(newColor) {

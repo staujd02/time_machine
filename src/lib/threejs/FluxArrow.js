@@ -65,7 +65,11 @@ class FluxArrow {
 
         this.setLength = function (len){
             this.object.setLength(len);
-        }
+        };
+
+        this.delete = function () {
+            this.scene.remove(this.object);
+        };
     };
 }
 
