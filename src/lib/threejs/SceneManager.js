@@ -245,8 +245,8 @@ export default (canvas, IController, data) => {
         newX = (canvas.width / 2) - mousePos.x;
         newY = mousePos.y - (canvas.height / 2);
         return {
-            x: newX - 125,
-            y: newY - 125
+            x: newX,
+            y: newY
         };
     }
 
