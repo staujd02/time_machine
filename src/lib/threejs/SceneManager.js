@@ -19,6 +19,8 @@ export default (canvas, IController, data) => {
 
     var paused = true;
     var timeStep = 300;
+    var stepInc = 1;
+    var percentInc = 0;
     var maxQuantity = 1;
     var maxFlux = 1;
     var halfQuantity = maxQuantity / 2.0;
@@ -61,6 +63,8 @@ export default (canvas, IController, data) => {
                 deleteDataPoint();
             }
         },
+        incrementStep: stepInc,
+        incrementPercent: percentInc,
         editMode: false,
         labelMode: false
     }
@@ -149,6 +153,14 @@ export default (canvas, IController, data) => {
         editFolder.add(controls, 'addArrow').name("Add Arrow");
         editFolder.add(controls, 'deletePoint').name("Delete Data Point");
 
+        var incFolder = gui.addFolder("Adjust Increment")
+        incFolder.add(controls, 'incrementStep').name("Skip Steps").onChange(function (newValue) {
+            stepInc = newValue;
+        })
+        var incrementPercentGUI = incFolder.add(controls, 'incrementPercent').name("Skip Percent").min(0).max(100)
+        incrementPercentGUI.onChange(function (newValue) {
+            percentInc = newValue;
+        })
     }
 
     function buildProgressBar() {
@@ -304,7 +316,7 @@ export default (canvas, IController, data) => {
         if (data.hasNextStep()) {
             if (!paused) {
                 applyStep();
-                data.step++;
+                data.step += stepInc;
                 await actionUtil.sleep(timeStep);
                 stepForward();
             }
@@ -378,7 +390,6 @@ export default (canvas, IController, data) => {
     }
 
     function addArrow(){
-        alert("Drag a line from desired 'FROM' data point to 'TO' data point");
         let arrows = data.arrows;
         var arrowInfo = {
             len: 200,
