@@ -245,8 +245,8 @@ export default (canvas, IController, data) => {
         newX = (canvas.width / 2) - mousePos.x;
         newY = mousePos.y - (canvas.height / 2);
         return {
-            x: newX,
-            y: newY
+            x: newX - 125,
+            y: newY - 125
         };
     }
 
@@ -349,8 +349,6 @@ export default (canvas, IController, data) => {
                     data.arrows[i].lightenColor(changePercent * 50);//Multiply by 50 - percent available to lighten by
                 }
             }
-        }else{
-            alert("NO FLUX DATA IMPORTED");
         }
     }
 

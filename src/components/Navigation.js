@@ -13,33 +13,37 @@ class Navigation extends Component {
     super(props);
     this.IController = this.props.IController;
     this.dataContext = this.props.dataContext;
+
+    this.uploadPoints = this.uploadDataPoints.bind(this);
+    this.uploadFlux = this.uploadFluxData.bind(this);
+    this.reset = this.reset.bind(this);
+  }
+
+  reset(){
+    toast("Resetting Animation", { 
+      position: toast.POSITION.TOP_LEFT
+    });
+    this.IController.resetDataAnimation();
+  }
+
+  uploadDataPoints(data){
+      toast("Upload Point Data Complete", { 
+        position: toast.POSITION.TOP_LEFT
+      });
+      this.dataContext.injectDataPointList(data);
+  }
+
+  uploadFluxData(data) {
+    toast("Upload Flux Data Complete", { 
+      position: toast.POSITION.TOP_LEFT
+    });
+    this.dataContext.injectFluxList(data);
   }
 
   render() {
 
     var s = {
       margin: 0
-    }
-
-    this.reset = () => {
-      toast("Resetting Animation", { 
-        position: toast.POSITION.TOP_LEFT
-      });
-      this.IController.resetDataAnimation();
-    }
-
-    this.uploadDataPoints = data => {
-      toast("Upload Point Data Complete", { 
-        position: toast.POSITION.TOP_LEFT
-      });
-      this.dataContext.injectDataPointList(data);
-    }
-
-    this.uploadFluxData = data => {
-      toast("Upload Flux Data Complete", { 
-        position: toast.POSITION.TOP_LEFT
-      });
-      this.dataContext.injectFluxList(data);
     }
 
     function handleSelect(selectedKey, IController) {
@@ -61,10 +65,10 @@ class Navigation extends Component {
                 <Save context={this.dataContext} /> 
             </NavItem>
             <NavItem eventKey={4} href="/#/LoadPoint">
-                <FileInput onDone={this.uploadDataPoints} title={"Upload Point Data"}/>
+                <FileInput onDone={this.uploadPoints} title={"Upload Point Data"}/>
              </NavItem>
             <NavItem eventKey={5} href="/#/LoadFlux">
-                <FileInput onDone={this.uploadFluxData} title={"Upload Flux Data"}/>
+                <FileInput onDone={this.uploadFlux} title={"Upload Flux Data"}/>
             </NavItem>
           </Nav>
         </Navbar>

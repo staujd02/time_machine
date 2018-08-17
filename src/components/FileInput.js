@@ -9,12 +9,17 @@ export default class FileInput extends NavItem {
 
   constructor(props) {
     super(props);
-    this.onDone = this.props.onDone;
     this.title = this.props.title || "Upload file";
+    this.processUpload = this.processUpload.bind(this);
+    this.state = { callback: this.props.onDone };
   }
 
   hasNoFiles(files){
     return files.length === 0;
+  }
+
+  processUpload(e){
+    this.readXLSX(e.target.files, this.state.callback);
   }
 
   readXLSX(files, callback){
@@ -30,12 +35,12 @@ export default class FileInput extends NavItem {
   render () {
       return (
         <FormGroup>
-         <ControlLabel htmlFor="fileUpload" style={{ cursor: "pointer" }}>
+         <ControlLabel htmlFor={this.title} style={{ cursor: "pointer" }}>
               {this.title}
-              <FormControl id="fileUpload"
+              <FormControl id={this.title}
                            type="file" 
                            accept=".xlsx" 
-                           onChange={ (e) => this.readXLSX(e.target.files, this.onDone)} 
+                           onChange={this.processUpload} 
                            ref={input => {this.fileInput = input;}} 
                            style={{ display: "none" }} />
           </ControlLabel>
