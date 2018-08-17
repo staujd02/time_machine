@@ -20,7 +20,6 @@ export default (canvas, IController, data) => {
     var paused = true;
     var timeStep = 300;
     var stepInc = 1;
-    var percentInc = 0;
     var maxQuantity = 1;
     var maxFlux = 1;
     var halfQuantity = maxQuantity / 2.0;
@@ -64,7 +63,6 @@ export default (canvas, IController, data) => {
             }
         },
         incrementStep: stepInc,
-        incrementPercent: percentInc,
         editMode: false,
         labelMode: false
     }
@@ -90,7 +88,6 @@ export default (canvas, IController, data) => {
 
     data.onLoad = () => {
         buildProgressBar();
-        addStartStopText();
         progressBar.appendText(data.animationData[0][0]);
         progressBar.setSteps(data.animationData.length);
     }
@@ -157,18 +154,27 @@ export default (canvas, IController, data) => {
         incFolder.add(controls, 'incrementStep').name("Skip Steps").onChange(function (newValue) {
             stepInc = newValue;
         })
-        var incrementPercentGUI = incFolder.add(controls, 'incrementPercent').name("Skip Percent").min(0).max(100)
-        incrementPercentGUI.onChange(function (newValue) {
-            percentInc = newValue;
-        })
     }
 
     function buildProgressBar() {
-        progressBar = new ProgressBar(scene, fontResource);
+        //Calculate positions for start/stop buttons
+        var startPos = {
+            x: (canvas.width/5), 
+            y: (canvas.height/4) * 3,
+        }
+        startPos = canvasToThreePos(startPos);
+        var stopPos = {
+            x: startPos.x, 
+            y: startPos.y + 50,
+        }
+        var buttonInfo = {
+            startPos: startPos,
+            stopPos: stopPos,
+        }
+        progressBar = new ProgressBar(scene, fontResource, buttonInfo);
         progressBar.appendText("0");
         progressBar.addStart();
         progressBar.addStop();
-        addStartStopText();
     }
 
     function setupEventListeners() {
@@ -431,29 +437,6 @@ export default (canvas, IController, data) => {
             data.dataPoints[i].adjustScale(radius / origRadius);
             data.dataPoints[i].changeTextSize(radius / origRadius)
         }
-    }
-
-    function addStartStopText() {
-        var startText = document.createElement('div');
-        startText.id = "startText";
-        startText.style.position = 'absolute';
-        startText.innerHTML = "Start";
-        startText.style.top = 75 + 445 + 'px'; //75 is navbar height
-        startText.style.left = 200 + 'px';
-        var stopText = document.createElement('div');
-        stopText.id = "stopText";
-        stopText.style.position = 'absolute';
-        stopText.innerHTML = "Stop";
-        stopText.style.top = 75 + 490 + 'px'; //75 is navbar height
-        stopText.style.left = 200 + 'px';
-        removeTextSelection(startText);
-        removeTextSelection(stopText);
-        document.body.appendChild(startText);
-        document.body.appendChild(stopText);
-    }
-
-    function removeTextSelection(text) {
-        text.style.MozUserSelect = "none";
     }
 
     function update(){
