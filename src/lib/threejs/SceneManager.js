@@ -34,7 +34,7 @@ export default (canvas, IController, data) => {
     var progressBar;
     var editMode;
     var arrowMode = 0;//0 = Off, 1 = Waiting for 1st point, 2 = Waiting for 2nd point
-    var arrowPoints = [2]//After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
+    var arrowPoints = []//After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
 
     var fontResource;
 
@@ -87,9 +87,10 @@ export default (canvas, IController, data) => {
     }
 
     data.onLoad = () => {
-        buildProgressBar();
-        progressBar.appendText(data.animationData[0][0]);
-        progressBar.setSteps(data.animationData.length);
+        if (data.animationData != null){
+            progressBar.appendText(data.animationData[0][0]);
+            progressBar.setSteps(data.animationData.length);
+        }
     }
 
     function loadFont() {
@@ -187,7 +188,14 @@ export default (canvas, IController, data) => {
                 if (arrowMode === 1){
                     arrowMode = 2;
                     checkWithinRange(canvas, evt);
-                    addArrow();
+                    if ((arrowPoints[0] != null) && (arrowPoints[1] != null)){
+                        addArrow();
+                    }else{
+                        alert("Dragged line was not between two data points");
+                    }
+                    //Reset arrow points
+                    arrowPoints[0] = null;
+                    arrowPoints[1] = null;
                 }
                 mouseDown = false;
                 dataPointToMove = -1; //No current selected dataPoint
@@ -393,6 +401,7 @@ export default (canvas, IController, data) => {
             labelText = "";
         dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
         dataPoints.push(dataPoint);
+        labels.push(labelText);
     }
 
     function addArrow(){
@@ -423,6 +432,7 @@ export default (canvas, IController, data) => {
         if (dataPointToDelete > -1) {
             data.dataPoints[dataPointToDelete].delete();
             data.dataPoints.splice(dataPointToDelete, 1);
+            data.labels.splice(dataPointToDelete, 1);
         }
     }
 
