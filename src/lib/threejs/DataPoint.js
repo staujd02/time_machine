@@ -9,7 +9,7 @@ class DataPoint {
         this.baseColor = "#aa00ff";
         this.scene = scene;
         this.radius = 40;
-        this.shadowMargin = 7;
+        this.shadowMargin = 4;
         this.shadowPushBack = 1;
         this.textPullForward = -5;
 
@@ -18,7 +18,7 @@ class DataPoint {
         this.shadow.mesh = new THREE.Mesh(this.shadow.geometry);
         this.shadow.mesh.material =
             new THREE.MeshBasicMaterial({
-                color: "#cccccc"
+                color: "#888888"
             });
 
         this.object = {};
