@@ -8,9 +8,11 @@ export default class StorageList extends Component {
   constructor(param){
     super(param);
     this.entries = [];
-    this.state = {current: this.props.currentPlot};
+    var parent = this;
+    this.state = {dataContext: parent.props.dataContext};
     this.props.plots.forEach(p => {
-      this.entries.push(<SavedPlot active={this.state.current} key={this.entries.length} dataCapsule={p}/>);
+      let Component = <SavedPlot key={this.entries.length} dataContext={parent.state.dataContext} dataCapsule={p}/>;
+      this.entries.push(Component);
     });
   }
 
@@ -26,7 +28,7 @@ export default class StorageList extends Component {
           <ul>
             {this.entries}
           </ul>
-          <Button onClick={this.addToLocal}>Add</Button>
+          <Button onClick={this.addToLocal}>New Plot</Button>
         </div>
     );
   }

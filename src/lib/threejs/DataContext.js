@@ -7,19 +7,13 @@ export default (PlotData) => {
     this.arrows = PlotData.arrows;
     this.step = PlotData.step;
 
+    this.currentPlot = PlotData;
+
     this.labelMode = false;
     this.onLoad = null;
 
     this.injectDataPointList = json => loadPointData(json, this);
     this.injectFluxList = json => loadFluxData(json, this);
-
-    this.getDataToSave = () => {
-        // let data = [];
-        // data.push(plotData.animationData);
-        // data.push(this.dataPoints);
-        // return data;
-        return PlotData;
-    }
 
     this.dataLoaded = function dataLoaded() {
         return this.animationData != null;

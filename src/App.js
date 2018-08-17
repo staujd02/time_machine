@@ -58,7 +58,7 @@ class App extends Component {
                     <br/>
                   </Row>
                   <Row sm={2} md={2}>
-                    <StorageList plots={this.plots} currentPlot={this.currentPlot}></StorageList>
+                    <StorageList dataContext={this.currentContext} plots={this.plots}></StorageList>
                   </Row>
                 </Col>
               </Row>
