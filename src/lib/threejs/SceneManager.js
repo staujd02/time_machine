@@ -20,7 +20,6 @@ export default (canvas, IController, data) => {
     var paused = true;
     var timeStep = 300;
     var stepInc = 1;
-    var percentInc = 0;
     var maxQuantity = 1;
     var maxFlux = 1;
     var halfQuantity = maxQuantity / 2.0;
@@ -35,7 +34,7 @@ export default (canvas, IController, data) => {
     var progressBar;
     var editMode;
     var arrowMode = 0; //0 = Off, 1 = Waiting for 1st point, 2 = Waiting for 2nd point
-    var arrowPoints = [2] //After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
+    var arrowPoints = [] //After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
 
     var fontResource;
 
@@ -65,7 +64,6 @@ export default (canvas, IController, data) => {
             }
         },
         incrementStep: stepInc,
-        incrementPercent: percentInc,
         editMode: false,
         labelMode: false
     }
@@ -90,10 +88,10 @@ export default (canvas, IController, data) => {
     }
 
     data.onLoad = () => {
-        buildProgressBar();
-        addStartStopText();
-        progressBar.appendText(data.animationData[0][0]);
-        progressBar.setSteps(data.animationData.length);
+        if (data.animationData != null) {
+            progressBar.appendText(data.animationData[0][0]);
+            progressBar.setSteps(data.animationData.length);
+        }
     }
 
     function loadFont() {
@@ -108,8 +106,8 @@ export default (canvas, IController, data) => {
         fontResource = font;
         buildProgressBar();
         let hydratedPoints = [];
-        data.dataPoints.forEach(oldPoint => { 
-            hydratedPoints.push(addDataPoint(oldPoint)); 
+        data.dataPoints.forEach(oldPoint => {
+            hydratedPoints.push(addDataPoint(oldPoint));
         });
         data.dataPoints = hydratedPoints;
     }
@@ -163,18 +161,27 @@ export default (canvas, IController, data) => {
         incFolder.add(controls, 'incrementStep').name("Skip Steps").onChange(function (newValue) {
             stepInc = newValue;
         })
-        var incrementPercentGUI = incFolder.add(controls, 'incrementPercent').name("Skip Percent").min(0).max(100)
-        incrementPercentGUI.onChange(function (newValue) {
-            percentInc = newValue;
-        })
     }
 
     function buildProgressBar() {
-        progressBar = new ProgressBar(scene, fontResource);
+        //Calculate positions for start/stop buttons
+        var startPos = {
+            x: (canvas.width / 5),
+            y: (canvas.height / 4) * 3,
+        }
+        startPos = canvasToThreePos(startPos);
+        var stopPos = {
+            x: startPos.x,
+            y: startPos.y + 50,
+        }
+        var buttonInfo = {
+            startPos: startPos,
+            stopPos: stopPos,
+        }
+        progressBar = new ProgressBar(scene, fontResource, buttonInfo);
         progressBar.appendText("0");
         progressBar.addStart();
         progressBar.addStop();
-        addStartStopText();
     }
 
     function setupEventListeners() {
@@ -187,7 +194,14 @@ export default (canvas, IController, data) => {
                 if (arrowMode === 1) {
                     arrowMode = 2;
                     checkWithinRange(canvas, evt);
-                    addArrow();
+                    if ((arrowPoints[0] != null) && (arrowPoints[1] != null)) {
+                        addArrow();
+                    } else {
+                        alert("Dragged line was not between two data points");
+                    }
+                    //Reset arrow points
+                    arrowPoints[0] = null;
+                    arrowPoints[1] = null;
                 }
                 mouseDown = false;
                 dataPointToMove = -1; //No current selected dataPoint
@@ -371,11 +385,12 @@ export default (canvas, IController, data) => {
     }
 
     function addDataPoint(reinstate = null) {
+        let labels = data.labels;
+
         if (reinstate == null) {
             let dataPoint = new DataPoint(scene);
             let dataPoints = data.dataPoints;
             let labelMode = data.labelMode;
-            let labels = data.labels;
 
             dataPoint.changeColor(baseColor);
             dataPoint.adjustScale(radius / origRadius);
@@ -391,20 +406,22 @@ export default (canvas, IController, data) => {
                 }
             }
             if (!labelText)
-                labelText = "";
+                labelText = " ";
             dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
             dataPoints.push(dataPoint);
+            labels.push(labelText);
         } else {
             let dataPoint = new DataPoint(scene, reinstate);
-            let labelText = reinstate.textMesh ? reinstate.textMesh.geometries[0].text : "";
+            let labelText = reinstate.textMesh ? reinstate.textMesh.geometries[0].text : " ";
             if (!labelText)
-                labelText = "";
+                labelText = " ";
             dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
+            labels.push(labelText);
             return dataPoint;
         }
     }
 
-    
+
 
     function addArrow() {
         let arrows = data.arrows;
@@ -426,7 +443,13 @@ export default (canvas, IController, data) => {
         for (var i = 0; i < arrows.length; i++) {
             var index1 = arrows[i].arrowInfo.pointIndex1;
             var index2 = arrows[i].arrowInfo.pointIndex2;
-            arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
+            if ((data.dataPoints[index1] == null) || (data.dataPoints[index2] == null)) {
+                arrows[i].delete();
+                arrows.splice(i, 1);
+                i--; //To go back and check arrow that just moved into i'th position
+            } else {
+                arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
+            }
         }
     }
 
@@ -434,7 +457,9 @@ export default (canvas, IController, data) => {
         if (dataPointToDelete > -1) {
             data.dataPoints[dataPointToDelete].delete();
             data.dataPoints.splice(dataPointToDelete, 1);
+            data.labels.splice(dataPointToDelete, 1);
         }
+        updateArrows();
     }
 
     function changeColor(newColor) {

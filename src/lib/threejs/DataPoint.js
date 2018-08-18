@@ -20,7 +20,7 @@ class DataPoint {
         this.shadow.mesh = new THREE.Mesh(this.shadow.geometry);
         this.shadow.mesh.material =
             new THREE.MeshBasicMaterial({
-                color: isState ? previousState.shadow.mesh.material : "#cccccc"
+                color: "#cccccc"
             });
 
         this.object = {};
@@ -28,11 +28,11 @@ class DataPoint {
         this.object.mesh = new THREE.Mesh(this.object.geometry);
         this.object.mesh.material =
             new THREE.MeshBasicMaterial({
-                color: isState ? previousState.object.mesh.material : this.baseColor
+                color: this.baseColor
             });
 
-        isState ? (this.object.mesh.position.set(previousState.position)) : this.object.mesh.position.set(0, 0, 0);
-        isState ? (this.shadow.mesh.position.set(previousState.shadow.position)) : this.shadow.mesh.position.set(0, 0, this.shadowPushBack);
+        this.object.mesh.position.set(0, 0, 0);
+        this.shadow.mesh.position.set(0, 0, this.shadowPushBack);
 
         this.position = this.object.mesh.position;
         this.shadow.position = this.shadow.mesh.position;
@@ -41,8 +41,12 @@ class DataPoint {
         this.shadow.scale = this.shadow.mesh.scale;
 
         if (isState) {
-            this.object.scale.set(previousState.object.scale);
-            this.shadow.scale.set(previousState.shadow.scale);
+            // this.object.scale.set(previousState.object.scale);
+            // this.shadow.scale.set(previousState.shadow.scale);
+            // this.object.mesh.material.color.set(previousState.object.mesh.materials[0].color.toString());
+            // this.shadow.mesh.material.color.set(previousState.shadow.mesh.materials[0].color.toString());
+            // this.object.mesh.position.set(previousState.position);
+            // this.shadow.mesh.position.set(previousState.shadow.position);
         }
 
         scene.add(this.object.mesh);
