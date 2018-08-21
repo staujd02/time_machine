@@ -3,13 +3,12 @@ import * as THREE from 'three'
 
 class DataPoint {
 
-    constructor(scene, previousState = null) {
+    constructor(previousState = null) {
         var tinycolor = require('tinycolor2');
 
         let isState = !!previousState;
 
         this.baseColor = isState ? previousState.baseColor : "#aa00ff";
-        this.scene = scene;
         this.radius = isState ? previousState.radius : 40;
         this.shadowMargin = isState ? previousState.shadowMargin : 7;
         this.shadowPushBack = 1;
@@ -48,21 +47,12 @@ class DataPoint {
             // this.object.mesh.position.set(previousState.position);
             // this.shadow.mesh.position.set(previousState.shadow.position);
         }
-
-        scene.add(this.object.mesh);
-        scene.add(this.shadow.mesh);
-
         this.withinCircle = function (x, y) {
             let pos = this.object.mesh.position;
             let distance = Math.sqrt((x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y));
             return !(distance > this.radius);
         };
 
-        this.delete = function () {
-            this.scene.remove(this.object.mesh);
-            this.scene.remove(this.shadow.mesh);
-            this.scene.remove(this.textMesh);
-        };
 
         this.adjustScale = function (newScale) {
             this.object.scale.set(newScale, newScale, newScale);
@@ -70,9 +60,6 @@ class DataPoint {
         };
 
         this.appendText = function (font, text, xpos, ypos) {
-            if (this.textMesh != null) {
-                this.scene.remove(this.textMesh)
-            }
             var geometry = new THREE.TextGeometry(text, {
                 font: font,
                 size: 10,
@@ -89,7 +76,6 @@ class DataPoint {
             this.textMesh = new THREE.Mesh(geometry, material);
             this.moveText(xpos, ypos);
             this.textMesh.rotation.set(0, 0, Math.PI);
-            this.scene.add(this.textMesh);
         };
 
         this.moveText = function (newX, newY) {

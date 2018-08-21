@@ -388,7 +388,10 @@ export default (canvas, IController, data) => {
         let labels = data.labels;
 
         if (reinstate == null) {
-            let dataPoint = new DataPoint(scene);
+            let dataPoint = new DataPoint();
+            scene.add(dataPoint.object.mesh);
+            scene.add(dataPoint.shadow.mesh);
+
             let dataPoints = data.dataPoints;
             let labelMode = data.labelMode;
 
@@ -408,6 +411,7 @@ export default (canvas, IController, data) => {
             if (!labelText)
                 labelText = " ";
             dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
+            scene.add(dataPoint.textMesh);
             dataPoints.push(dataPoint);
             labels.push(labelText);
         } else {
@@ -416,12 +420,17 @@ export default (canvas, IController, data) => {
             if (!labelText)
                 labelText = " ";
             dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
+            scene.add(dataPoint.textMesh);
             labels.push(labelText);
             return dataPoint;
         }
     }
 
-
+    function removeFromScene(dataPoint) {
+        scene.remove(dataPoint.object.mesh);
+        scene.remove(dataPoint.shadow.mesh);
+        scene.remove(dataPoint.textMesh);
+    }
 
     function addArrow() {
         let arrows = data.arrows;
@@ -455,7 +464,7 @@ export default (canvas, IController, data) => {
 
     function deleteDataPoint() {
         if (dataPointToDelete > -1) {
-            data.dataPoints[dataPointToDelete].delete();
+            removeFromScene(data.dataPoints[dataPointToDelete]);
             data.dataPoints.splice(dataPointToDelete, 1);
             data.labels.splice(dataPointToDelete, 1);
         }
