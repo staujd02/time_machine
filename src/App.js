@@ -18,9 +18,9 @@ class App extends Component {
       onLoad: function() {},
       onFluxLoad: function() {}
     };
-    this.plots = (new LocalStorage()).loadFromStorage(this.ThreeController);
-    this.currentPlot = this.plots[0].versions[this.plots[0].versions.length - 1].plot;
-    this.currentContext = new DataContext(this.currentPlot);
+    this.saves = (new LocalStorage()).loadFromStorage(this.ThreeController);
+    let currentPlot = this.saves[0].versions[this.saves[0].versions.length - 1].plot;
+    this.currentContext = new DataContext(currentPlot);
   }
 
   render() {
@@ -58,7 +58,7 @@ class App extends Component {
                     <br/>
                   </Row>
                   <Row sm={2} md={2}>
-                    <StorageList dataContext={this.currentContext} plots={this.plots}></StorageList>
+                    <StorageList dataContext={this.currentContext} saves={this.saves}></StorageList>
                   </Row>
                 </Col>
               </Row>

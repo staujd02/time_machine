@@ -9,6 +9,7 @@ export default class LocalStorage {
         let plots = this.loadPlotsFromDefaultContainer();
         plots.push(object);
         window.localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify(plots));
+        return object;
     }
 
     //  item must have name of plot

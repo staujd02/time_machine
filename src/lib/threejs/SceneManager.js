@@ -475,28 +475,28 @@ export default (canvas, IController, data) => {
         }
     }
 
-    function addStartStopText() {
-        var startText = document.createElement('div');
-        startText.id = "startText";
-        startText.style.position = 'absolute';
-        startText.innerHTML = "Start";
-        startText.style.top = 75 + 445 + 'px'; //75 is navbar height
-        startText.style.left = 200 + 'px';
-        var stopText = document.createElement('div');
-        stopText.id = "stopText";
-        stopText.style.position = 'absolute';
-        stopText.innerHTML = "Stop";
-        stopText.style.top = 75 + 490 + 'px'; //75 is navbar height
-        stopText.style.left = 200 + 'px';
-        removeTextSelection(startText);
-        removeTextSelection(stopText);
-        document.body.appendChild(startText);
-        document.body.appendChild(stopText);
-    }
+    // function addStartStopText() {
+    //     var startText = document.createElement('div');
+    //     startText.id = "startText";
+    //     startText.style.position = 'absolute';
+    //     startText.innerHTML = "Start";
+    //     startText.style.top = 75 + 445 + 'px'; //75 is navbar height
+    //     startText.style.left = 200 + 'px';
+    //     var stopText = document.createElement('div');
+    //     stopText.id = "stopText";
+    //     stopText.style.position = 'absolute';
+    //     stopText.innerHTML = "Stop";
+    //     stopText.style.top = 75 + 490 + 'px'; //75 is navbar height
+    //     stopText.style.left = 200 + 'px';
+    //     removeTextSelection(startText);
+    //     removeTextSelection(stopText);
+    //     document.body.appendChild(startText);
+    //     document.body.appendChild(stopText);
+    // }
 
-    function removeTextSelection(text) {
-        text.style.MozUserSelect = "none";
-    }
+    // function removeTextSelection(text) {
+    //     text.style.MozUserSelect = "none";
+    // }
 
     function update() {
         renderer.render(scene, camera);

@@ -1,19 +1,32 @@
 export default (PlotData) => {
 
-    this.animationData = PlotData.animationData; //Holds imported data. Column 1 is time info
-    this.fluxData = PlotData.fluxData; //Holds imported data. Column 1 is time info
     this.dataPoints = PlotData.dataPoints;
     this.labels = PlotData.labels;
-    this.arrows = [];
+    this.arrows = PlotData.arrows;
     this.step = PlotData.step;
 
-    this.currentPlot = PlotData;
+    this.plot_id = PlotData.id;
+
+    this.currentPlot = () => {
+        return {
+            id: this.plot_id,
+            dataPoints: this.dataPoints,
+            labels: this.labels,
+            arrows: this.arrows,
+            step: this.step
+        }
+    };
+    this.currentPlot.bind(this);
 
     this.labelMode = false;
     this.onLoad = null;
+    this.animationData = null; //Holds imported data. Column 1 is time info
+    this.fluxData = null; //Holds imported data. Column 1 is time info
 
     this.injectDataPointList = json => loadPointData(json, this);
     this.injectFluxList = json => loadFluxData(json, this);
+
+    this.loadPlot = loadPlot.bind(this);
 
     this.dataLoaded = function dataLoaded() {
         return this.animationData != null;
@@ -38,6 +51,14 @@ export default (PlotData) => {
         instance.animationData = xlsxData;
         if (instance.onLoad && typeof instance.onLoad === "function")
             instance.onLoad();
+    }
+
+    function loadPlot(plot) {
+        this.dataPoints = PlotData.dataPoints;
+        this.labels = PlotData.labels;
+        this.arrows = PlotData.arrows;
+        this.step = PlotData.step;
+        return plot;
     }
 
 }
