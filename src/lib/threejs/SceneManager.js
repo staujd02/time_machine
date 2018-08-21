@@ -107,7 +107,7 @@ export default (canvas, IController, data) => {
         buildProgressBar();
         let hydratedPoints = [];
         data.dataPoints.forEach(oldPoint => {
-            hydratedPoints.push(addDataPoint(oldPoint));
+            hydratedPoints.push(restoreDataPoint(oldPoint));
         });
         data.dataPoints = hydratedPoints;
     }
@@ -384,46 +384,48 @@ export default (canvas, IController, data) => {
         }
     }
 
-    function addDataPoint(reinstate = null) {
+    function restoreDataPoint(savedData) {
         let labels = data.labels;
+        let dataPoint = new DataPoint(savedData);
+        scene.add(dataPoint.object.mesh);
+        scene.add(dataPoint.shadow.mesh);
+        let labelText = savedData.textMesh ? savedData.textMesh.geometries[0].text : " ";
+        if (!labelText)
+            labelText = " ";
+        dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
+        scene.add(dataPoint.textMesh);
+        labels.push(labelText);
+        return dataPoint;
+    }
 
-        if (reinstate == null) {
-            let dataPoint = new DataPoint();
-            scene.add(dataPoint.object.mesh);
-            scene.add(dataPoint.shadow.mesh);
+    function addDataPoint() {
+        let labels = data.labels;
+        let dataPoint = new DataPoint();
+        scene.add(dataPoint.object.mesh);
+        scene.add(dataPoint.shadow.mesh);
 
-            let dataPoints = data.dataPoints;
-            let labelMode = data.labelMode;
+        let dataPoints = data.dataPoints;
+        let labelMode = data.labelMode;
 
-            dataPoint.changeColor(baseColor);
-            dataPoint.adjustScale(radius / origRadius);
-            var labelText;
-            if (labelMode && labels.length > dataPoints.length + 1) {
-                labelText = labels[dataPoints.length + 1]
-            } else {
-                if (labelMode && labels.length <= dataPoints.length) {
-                    labelText = window.prompt("Imported data does not contain a column #" + dataPoints.length + ".\nPlease label your data point: ");
-
-                } else {
-                    labelText = window.prompt("Label your data point: ");
-                }
-            }
-            if (!labelText)
-                labelText = " ";
-            dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
-            scene.add(dataPoint.textMesh);
-            dataPoints.push(dataPoint);
-            labels.push(labelText);
+        dataPoint.changeColor(baseColor);
+        dataPoint.adjustScale(radius);
+        var labelText;
+        if (labelMode && labels.length > dataPoints.length + 1) {
+            labelText = labels[dataPoints.length + 1]
         } else {
-            let dataPoint = new DataPoint(scene, reinstate);
-            let labelText = reinstate.textMesh ? reinstate.textMesh.geometries[0].text : " ";
-            if (!labelText)
-                labelText = " ";
-            dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
-            scene.add(dataPoint.textMesh);
-            labels.push(labelText);
-            return dataPoint;
+            if (labelMode && labels.length <= dataPoints.length) {
+                labelText = window.prompt("Imported data does not contain a column #" + dataPoints.length + ".\nPlease label your data point: ");
+
+            } else {
+                labelText = window.prompt("Label your data point: ");
+            }
         }
+        if (!labelText)
+            labelText = " ";
+        dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
+        scene.add(dataPoint.textMesh);
+        dataPoints.push(dataPoint);
+        labels.push(labelText);
     }
 
     function removeFromScene(dataPoint) {
@@ -479,8 +481,8 @@ export default (canvas, IController, data) => {
 
     function changeAllRadius() {
         for (var i = 0; i < data.dataPoints.length; i++) {
-            data.dataPoints[i].adjustScale(radius / origRadius);
-            data.dataPoints[i].changeTextSize(radius / origRadius)
+            data.dataPoints[i].adjustScale(radius);
+            data.dataPoints[i].changeTextSize(radius)
         }
     }
 

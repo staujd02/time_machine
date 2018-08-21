@@ -5,11 +5,14 @@ class DataPoint {
 
     constructor(previousState = null) {
         var tinycolor = require('tinycolor2');
+        const origRadius = 40;
 
         let isState = !!previousState;
 
         this.baseColor = isState ? previousState.baseColor : "#aa00ff";
-        this.radius = isState ? previousState.radius : 40;
+        // this.radius = isState ? previousState.radius : origRadius;
+        this.radius = origRadius;
+        this.shadowMargin = 7;
         this.shadowMargin = isState ? previousState.shadowMargin : 7;
         this.shadowPushBack = 1;
         this.textPullForward = -5;
@@ -39,22 +42,15 @@ class DataPoint {
         this.object.scale = this.object.mesh.scale;
         this.shadow.scale = this.shadow.mesh.scale;
 
-        if (isState) {
-            // this.object.scale.set(previousState.object.scale);
-            // this.shadow.scale.set(previousState.shadow.scale);
-            // this.object.mesh.material.color.set(previousState.object.mesh.materials[0].color.toString());
-            // this.shadow.mesh.material.color.set(previousState.shadow.mesh.materials[0].color.toString());
-            // this.object.mesh.position.set(previousState.position);
-            // this.shadow.mesh.position.set(previousState.shadow.position);
-        }
         this.withinCircle = function (x, y) {
             let pos = this.object.mesh.position;
             let distance = Math.sqrt((x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y));
             return !(distance > this.radius);
         };
 
-
-        this.adjustScale = function (newScale) {
+        this.adjustScale = function (newRadius) {
+            this.radius = newRadius;
+            let newScale = this.radius / origRadius;
             this.object.scale.set(newScale, newScale, newScale);
             this.shadow.scale.set(newScale, newScale, newScale);
         };
@@ -76,6 +72,7 @@ class DataPoint {
             this.textMesh = new THREE.Mesh(geometry, material);
             this.moveText(xpos, ypos);
             this.textMesh.rotation.set(0, 0, Math.PI);
+            this.changeTextSize(this.radius);
         };
 
         this.moveText = function (newX, newY) {
@@ -88,7 +85,8 @@ class DataPoint {
             this.shadow.position.set(x, y, this.shadowPushBack);
         }
 
-        this.changeTextSize = function (scale) {
+        this.changeTextSize = function (newScale) {
+            let scale = newScale / origRadius;
             this.textMesh.scale.set(scale, scale, scale + this.textPullForward);
         }
 
@@ -113,45 +111,11 @@ class DataPoint {
             this.object.mesh.material.color.set(tinycolor(this.baseColor).darken(percent).toString());
         };
 
-        this.toDataObject = function () {
-            let dp = this;
-            return {
-                color: dp.object.mesh.material.color,
-                text: dp.textMesh ? dp.textMesh.geometry.parameters.text : null,
-                object: {
-                    scale: dp.object.mesh.scale,
-                    position: dp.object.mesh.position
-                },
-                shadow: {
-                    scale: dp.shadow.mesh.scale,
-                    position: dp.shadow.mesh.position
-                }
-            };
-        };
-
-        this.fromDataObject = (options, font) => {
-            this.object.mesh.material.color = options.color;
-
-            this.object.mesh.position.set(
-                options.object.position.x,
-                options.object.position.y,
-                options.object.position.z
-            );
-            let s = options.object.scale;
-            this.object.scale.set(s, s, s);
-
-            this.shadow.mesh.position.set(
-                options.shadow.position.x,
-                options.shadow.position.y,
-                options.shadow.position.z
-            );
-
-            s = options.shadow.scale;
-            this.shadow.scale.set(s, s, s);
-
-            this.appendText(font, options.text, options.object.position.x,
-                options.object.position.y);
-        };
+        if (isState) {
+            this.adjustScale(previousState.radius);
+            this.object.mesh.position.set(previousState.position.x, previousState.position.y, previousState.position.z);
+            this.shadow.mesh.position.set(previousState.shadow.position.x, previousState.shadow.position.y, previousState.shadow.position.z);
+        }
 
         this.update = function () {
 
