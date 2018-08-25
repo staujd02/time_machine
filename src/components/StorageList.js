@@ -7,14 +7,10 @@ export default class StorageList extends Component {
 
   constructor(param){
     super(param);
-    this.entries = [];
     this.handleClick = this.handleClick.bind(this);
     this.addToLocal = this.addToLocal.bind(this);
     var parent = this;
     this.state = {dataContext: parent.props.dataContext};
-    this.props.saves.forEach(s => {
-      this.entries.push(this.createEntry(s));
-    });
   }
 
   isActive(capsule){
@@ -50,7 +46,16 @@ export default class StorageList extends Component {
     }
   }
 
+  loadSaves(){
+    return (new LocalStorage()).loadFromStorage(this.ThreeController);
+  }
+
   render() {
+    this.entries = [];
+    this.loadSaves().forEach(s => {
+      this.entries.push(this.createEntry(s));
+    });
+
     return ( 
         <div>
           <ul>

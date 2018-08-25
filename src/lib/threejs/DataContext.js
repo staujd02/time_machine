@@ -19,7 +19,7 @@ export default (PlotData) => {
     };
     this.currentPlot = (plot = null) => {
         if(plot){
-            return this.loadPlot(plot);
+            return this.loadPlot(plot.versions[plot.versions.length - 1].plot);
         } else{
             return {
                 id: this.plot_id,
@@ -32,10 +32,11 @@ export default (PlotData) => {
     };
 
     this.loadPlot = (plot) => {
-        this.dataPoints = PlotData.dataPoints;
-        this.labels = PlotData.labels;
-        this.arrows = PlotData.arrows;
-        this.step = PlotData.step;
+        this.plot_id = plot.id;
+        this.dataPoints = plot.dataPoints;
+        this.labels = plot.labels;
+        this.arrows = plot.arrows;
+        this.step = plot.step;
         this.callObservers();
         return plot;
     };
