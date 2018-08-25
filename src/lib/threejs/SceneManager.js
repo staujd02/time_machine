@@ -400,14 +400,14 @@ export default (canvas, IController, data) => {
                     //Darken
                     diff = data.fluxData[data.step][i + 1] - halfFlux;
                     changePercent = diff / halfFlux;
-                    scene.remove(data.arrow[i].object);
+                    scene.remove(data.arrows[i].object);
                     data.arrows[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
                     scene.add(data.arrows[i].object) //Add newly colored arrow
                 } else {
                     //Lighten
                     diff = halfFlux - data.fluxData[data.step][i + 1];
                     changePercent = diff / halfFlux;
-                    scene.remove(data.arrow[i].object);
+                    scene.remove(data.arrows[i].object);
                     data.arrows[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
                     scene.add(data.arrows[i].object) //Add newly colored arrow
                 }
