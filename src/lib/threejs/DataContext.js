@@ -5,19 +5,40 @@ export default (PlotData) => {
     this.arrows = PlotData.arrows;
     this.step = PlotData.step;
 
+    this.callbacks = [];
+
     this.plot_id = PlotData.id;
 
-    this.currentPlot = () => {
-        return {
-            id: this.plot_id,
-            dataPoints: this.dataPoints,
-            labels: this.labels,
-            arrows: this.arrows,
-            step: this.step
+    this.callObservers = () => {
+        this.callbacks.forEach(call => {
+           call(); 
+        });
+    };
+    this.registerCallback = (call) => {
+        this.callbacks.push(call);
+    };
+    this.currentPlot = (plot = null) => {
+        if(plot){
+            return this.loadPlot(plot);
+        } else{
+            return {
+                id: this.plot_id,
+                dataPoints: this.dataPoints,
+                labels: this.labels,
+                arrows: this.arrows,
+                step: this.step
+            }
         }
     };
-    this.currentPlot.bind(this);
 
+    this.loadPlot = (plot) => {
+        this.dataPoints = PlotData.dataPoints;
+        this.labels = PlotData.labels;
+        this.arrows = PlotData.arrows;
+        this.step = PlotData.step;
+        this.callObservers();
+        return plot;
+    };
     this.labelMode = false;
     this.onLoad = null;
     this.animationData = null; //Holds imported data. Column 1 is time info
@@ -25,8 +46,6 @@ export default (PlotData) => {
 
     this.injectDataPointList = json => loadPointData(json, this);
     this.injectFluxList = json => loadFluxData(json, this);
-
-    this.loadPlot = loadPlot.bind(this);
 
     this.dataLoaded = function dataLoaded() {
         return this.animationData != null;
@@ -53,12 +72,6 @@ export default (PlotData) => {
             instance.onLoad();
     }
 
-    function loadPlot(plot) {
-        this.dataPoints = PlotData.dataPoints;
-        this.labels = PlotData.labels;
-        this.arrows = PlotData.arrows;
-        this.step = PlotData.step;
-        return plot;
-    }
+    
 
 }

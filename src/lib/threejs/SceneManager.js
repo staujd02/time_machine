@@ -38,7 +38,6 @@ export default (canvas, IController, data) => {
 
     var fontResource;
 
-
     const controls = {
         size: origRadius,
         maxValue: maxQuantity,
@@ -83,16 +82,14 @@ export default (canvas, IController, data) => {
         }
     };
 
-    data.onFluxLoad = () => {
-
-    }
-
+    data.onFluxLoad = () => {}
     data.onLoad = () => {
         if (data.animationData != null) {
             progressBar.appendText(data.animationData[0][0]);
             progressBar.setSteps(data.animationData.length);
         }
     }
+    data.registerCallback(reloadScene);
 
     function loadFont() {
         var loader = new THREE.FontLoader();
@@ -104,7 +101,28 @@ export default (canvas, IController, data) => {
 
     function fontLoadingComplete(font) {
         fontResource = font;
+        reloadScene();
+    }
+
+    function reloadScene() {
+        reloadDataPoints();
         buildProgressBar();
+    }
+
+    function clearScene() {
+        let remove = [];
+        scene.traverse((child) =>  {
+            if (child instanceof THREE.Mesh) {
+                remove.push(child);
+            }
+        });
+        for (let i = 0; i < remove.length; i++) {
+            scene.remove(remove[i]);
+        }
+    }
+
+    function reloadDataPoints() {
+        clearScene();
         let hydratedPoints = [];
         data.dataPoints.forEach(oldPoint => {
             hydratedPoints.push(restoreDataPoint(oldPoint));

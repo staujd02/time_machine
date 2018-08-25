@@ -10,7 +10,6 @@ class DataPoint {
         let isState = !!previousState;
 
         this.baseColor = isState ? previousState.baseColor : "#aa00ff";
-        // this.radius = isState ? previousState.radius : origRadius;
         this.radius = origRadius;
         this.shadowMargin = 7;
         this.shadowMargin = isState ? previousState.shadowMargin : 7;
@@ -76,7 +75,7 @@ class DataPoint {
         };
 
         this.moveText = function (newX, newY) {
-            var box = new THREE.Box3().setFromObject(this.textMesh); //To center text horizontally
+            var box = new THREE.Box3().setFromObject(this.textMesh); // To center text horizontally
             this.textMesh.position.set(newX + .5 * (box.max.x - box.min.x), newY, this.textPullForward);
         }
 

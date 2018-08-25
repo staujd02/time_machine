@@ -18,30 +18,36 @@ export default class StorageList extends Component {
   }
 
   isActive(capsule){
-    return this.state.dataContext.currentPlot().id === capsule.versions[capsule.versions.length - 1].plot.id ? "Save" : "Load";
+    return this.state.dataContext.currentPlot().id === capsule.versions[capsule.versions.length - 1].plot.id;
   }
+
+  applyName(capsule){
+    return this.isActive(capsule) ? "Save" : "Load";
+  }  
 
   createEntry(save){
       let plotEntry = <SavedPlot dataCapsule={save}/>;
-      let button = <Button onClick={() => this.handleClick(save)}>{this.isActive(save)}</Button>;
+      let button = <Button onClick={() => this.handleClick(save)}>{this.applyName(save)}</Button>;
       let container = <li key={this.entries.length}> {plotEntry} {button}</li>
       return container;
   }
 
   addToLocal(){
-    let resp = prompt('Name of File');
+    let resp = window.prompt('Name of Storage');
     if(!!resp){
       let s = (new LocalStorage()).addNewToLocal(resp);
       this.entries.push(this.createEntry(s));
+      this.forceUpdate();
     }
   }
 
   handleClick(s) {
     if(this.isActive(s)){
       (new LocalStorage()).updateStorage(s.name, this.state.dataContext.currentPlot());
+    } else {
+      this.state.dataContext.currentPlot(s);
+      this.forceUpdate();
     }
-    
-    // Load the latest s plot here 
   }
 
   render() {

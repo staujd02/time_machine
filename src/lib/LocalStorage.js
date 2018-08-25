@@ -20,7 +20,7 @@ export default class LocalStorage {
             if (plots.hasOwnProperty(plotId) && plots[plotId].name === name) {
                 const element = plots[plotId];
                 let id = element.versions.length + 1;
-                addition.id = id;
+                addition.id = name + id;
                 element.versions.push(this.newVersion(addition));
             }
         }

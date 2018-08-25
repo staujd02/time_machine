@@ -3,29 +3,31 @@ import FormGroup from 'react-bootstrap/lib/FormGroup';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
+import LocalStorage from '../lib/LocalStorage';
 
 class Save extends Component {
 
   constructor(props){
     super(props);
-    this.onClick = () => {this.save(this.props.context)}
+    this.onClick = this.save.bind(this); 
   }
 
   download(contents, name) {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(contents));
-    var dlAnchorElem = document.getElementById('downloadAnchorElem');
+    var dlAnchorElem = this.inputElement;
     dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute("download", name + '.json');
     dlAnchorElem.click(); 
   }
 
-  save(dataHook){
+  save(){
       toast("Saving...", { 
         position: toast.POSITION.TOP_LEFT
       });
       let name = window.prompt("Name of the File: ");
-      if(name)
-        this.download(dataHook.getDataToSave(), name);
+      if(name){
+        this.download((new LocalStorage()).loadPlotsFromDefaultContainer(), name);
+      }
   }
   
   render() {
@@ -33,7 +35,7 @@ class Save extends Component {
         <FormGroup>
             <ControlLabel htmlFor="saveFile" onClick={this.onClick} style={{ cursor: "pointer" }}> Download Backup </ControlLabel>
             <ToastContainer autoClose={1500} />
-            <label id="downloadAnchorElem" style={{ display: "none"}}>Invisible DOM hook </label>
+            <link ref={input => this.inputElement = input} style={{ display: "none"}} />
         </FormGroup>
     );
   }
