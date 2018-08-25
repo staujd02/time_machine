@@ -105,14 +105,16 @@ export default (canvas, IController, data) => {
     }
 
     function reloadScene() {
+        clearScene();
         reloadDataPoints();
+        reloadArrows();
         buildProgressBar();
     }
 
     function clearScene() {
         let remove = [];
-        scene.traverse((child) =>  {
-            if (child instanceof THREE.Mesh) {
+        scene.traverse((child) => {
+            if (child instanceof THREE.Mesh || child instanceof THREE.ArrowHelper) {
                 remove.push(child);
             }
         });
@@ -121,8 +123,15 @@ export default (canvas, IController, data) => {
         }
     }
 
+    function reloadArrows() {
+        let hydratedArrows = [];
+        data.arrows.forEach(oldArrow => {
+            hydratedArrows.push(restoreArrow(oldArrow));
+        });
+        data.arrows = hydratedArrows;
+    }
+
     function reloadDataPoints() {
-        clearScene();
         let hydratedPoints = [];
         data.dataPoints.forEach(oldPoint => {
             hydratedPoints.push(restoreDataPoint(oldPoint));
@@ -391,15 +400,25 @@ export default (canvas, IController, data) => {
                     //Darken
                     diff = data.fluxData[data.step][i + 1] - halfFlux;
                     changePercent = diff / halfFlux;
+                    scene.remove(data.arrow[i].object);
                     data.arrows[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
+                    scene.add(data.arrows[i].object) //Add newly colored arrow
                 } else {
                     //Lighten
                     diff = halfFlux - data.fluxData[data.step][i + 1];
                     changePercent = diff / halfFlux;
+                    scene.remove(data.arrow[i].object);
                     data.arrows[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
+                    scene.add(data.arrows[i].object) //Add newly colored arrow
                 }
             }
         }
+    }
+
+    function restoreArrow(savedData) {
+        let arrow = new FluxArrow(savedData.arrowInfo);
+        scene.add(arrow.object);
+        return arrow;
     }
 
     function restoreDataPoint(savedData) {
@@ -462,7 +481,8 @@ export default (canvas, IController, data) => {
             point2: data.dataPoints[arrowPoints[1]].position,
             dataPointRadius: radius,
         }
-        let arrow = new FluxArrow(scene, arrowInfo);
+        let arrow = new FluxArrow(arrowInfo);
+        scene.add(arrow.object);
         arrowMode = 0;
         arrows.push(arrow);
     }
