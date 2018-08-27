@@ -57,7 +57,7 @@ class DataPoint {
         this.appendText = function (font, text, xpos, ypos) {
             var geometry = new THREE.TextGeometry(text, {
                 font: font,
-                size: 10,
+                size: 13,
                 height: 5,
                 curveSegments: 12,
                 bevelEnabled: false,

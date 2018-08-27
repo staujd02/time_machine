@@ -234,7 +234,7 @@ export default (canvas, IController, data) => {
                 dataPointToMove = -1; //No current selected dataPoint
             }
             if (data.arrows.length > 0) {
-                updateArrows();
+                updateArrows(-1);
             }
         });
         canvas.addEventListener("mousemove", function (evt) {
@@ -437,15 +437,6 @@ export default (canvas, IController, data) => {
 
     function addDataPoint() {
         let labels = data.labels;
-        let dataPoint = new DataPoint();
-        scene.add(dataPoint.object.mesh);
-        scene.add(dataPoint.shadow.mesh);
-
-        let dataPoints = data.dataPoints;
-        let labelMode = data.labelMode;
-
-        dataPoint.changeColor(baseColor);
-        dataPoint.adjustScale(radius);
         var labelText;
         if (labelMode && labels.length > dataPoints.length + 1) {
             labelText = labels[dataPoints.length + 1]
@@ -457,8 +448,19 @@ export default (canvas, IController, data) => {
                 labelText = window.prompt("Label your data point: ");
             }
         }
-        if (!labelText)
-            labelText = " ";
+        if ((!labelText) || (labelText == "")){
+            alert("No label entered");
+            return;
+        }
+        let dataPoint = new DataPoint();
+        scene.add(dataPoint.object.mesh);
+        scene.add(dataPoint.shadow.mesh);
+
+        let dataPoints = data.dataPoints;
+        let labelMode = data.labelMode;
+
+        dataPoint.changeColor(baseColor);
+        dataPoint.adjustScale(radius);
         dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
         scene.add(dataPoint.textMesh);
         dataPoints.push(dataPoint);
@@ -473,7 +475,20 @@ export default (canvas, IController, data) => {
 
     function addArrow() {
         let arrows = data.arrows;
+        var shift = false;
+        //Check if new arrow is between an already arrowed combination
+        for (var i = 0; i < arrows.length; i++){
+            if (arrows[i].arrowInfo.pointIndex1 == arrowPoints[0] && arrows[i].arrowInfo.pointIndex2 == arrowPoints[1]){
+                //Arrow already exists in that direction-- do nothing
+                return
+            }
+            if (arrows[i].arrowInfo.pointIndex1 == arrowPoints[1] && arrows[i].arrowInfo.pointIndex2 == arrowPoints[0]){
+                //Arrow exists in opposite direction-- shift new arrow
+                shift = true;
+            }
+        }
         var arrowInfo = {
+            shift: shift,
             len: 200,
             pointIndex1: arrowPoints[0],
             pointIndex2: arrowPoints[1],
@@ -487,16 +502,24 @@ export default (canvas, IController, data) => {
         arrows.push(arrow);
     }
 
-    function updateArrows() {
+    function updateArrows(deletedDataPoint) {
         let arrows = data.arrows;
         for (var i = 0; i < arrows.length; i++) {
             var index1 = arrows[i].arrowInfo.pointIndex1;
             var index2 = arrows[i].arrowInfo.pointIndex2;
-            if ((data.dataPoints[index1] == null) || (data.dataPoints[index2] == null)) {
-                arrows[i].delete();
+            if ((index1 == deletedDataPoint) || (index2 == deletedDataPoint)) {
+                scene.remove(arrows[i].object)
                 arrows.splice(i, 1);
                 i--; //To go back and check arrow that just moved into i'th position
             } else {
+                if ((index1 > deletedDataPoint) && (deletedDataPoint != -1)) {
+                    index1--;
+                    arrows[i].arrowInfo.pointIndex1--;
+                } 
+                if ((index2 > deletedDataPoint) && (deletedDataPoint != -1)){
+                    index2--;
+                    arrows[i].arrowInfo.pointIndex2--;
+                }
                 arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
             }
         }
@@ -508,7 +531,7 @@ export default (canvas, IController, data) => {
             data.dataPoints.splice(dataPointToDelete, 1);
             data.labels.splice(dataPointToDelete, 1);
         }
-        updateArrows();
+        updateArrows(dataPointToDelete);
     }
 
     function changeColor(newColor) {
@@ -521,6 +544,9 @@ export default (canvas, IController, data) => {
         for (var i = 0; i < data.dataPoints.length; i++) {
             data.dataPoints[i].adjustScale(radius);
             data.dataPoints[i].changeTextSize(radius)
+        }
+        for (var i = 0; i < data.arrows.length; i++){
+            data.arrows[i].adjustScale(radius);
         }
     }
 
