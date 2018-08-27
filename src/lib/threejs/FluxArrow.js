@@ -4,8 +4,8 @@ class FluxArrow {
     constructor(arrowInfo) {
         var tinycolor = require('tinycolor2');
         this.arrowInfo = arrowInfo;
-        const arrowLength = 22 * (arrowInfo.dataPointRadius/40);
-        const arrowWidth = 15 * (arrowInfo.dataPointRadius/40); //Keep relative proportions liked with data points of radius 40 
+        var arrowLength = 22 * (arrowInfo.dataPointRadius/40);
+        var arrowWidth = 15 * (arrowInfo.dataPointRadius/40); //Keep relative proportions liked with data points of radius 40 
 
         this.calculateLength = function () {
             //Length from center to center
@@ -79,6 +79,13 @@ class FluxArrow {
 
         this.delete = function () {
             this.scene.remove(this.object);
+        };
+
+        this.adjustScale = function (newRadius) {
+            arrowInfo.dataPointRadius = newRadius
+            arrowLength = 22 * (arrowInfo.dataPointRadius/40);
+            arrowWidth = 15 * (arrowInfo.dataPointRadius/40);
+            this.updatePos(this.arrowInfo.point1, this.arrowInfo.point2);
         };
     };
 }
