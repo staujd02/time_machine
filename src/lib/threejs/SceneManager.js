@@ -437,6 +437,8 @@ export default (canvas, IController, data) => {
 
     function addDataPoint() {
         let labels = data.labels;
+        let labelMode = data.labelMode;
+        let dataPoints = data.dataPoints;
         var labelText;
         if (labelMode && labels.length > dataPoints.length + 1) {
             labelText = labels[dataPoints.length + 1]
@@ -448,16 +450,13 @@ export default (canvas, IController, data) => {
                 labelText = window.prompt("Label your data point: ");
             }
         }
-        if ((!labelText) || (labelText == "")){
+        if ((!labelText) || (labelText === "")){
             alert("No label entered");
             return;
         }
         let dataPoint = new DataPoint();
         scene.add(dataPoint.object.mesh);
         scene.add(dataPoint.shadow.mesh);
-
-        let dataPoints = data.dataPoints;
-        let labelMode = data.labelMode;
 
         dataPoint.changeColor(baseColor);
         dataPoint.adjustScale(radius);
@@ -478,11 +477,11 @@ export default (canvas, IController, data) => {
         var shift = false;
         //Check if new arrow is between an already arrowed combination
         for (var i = 0; i < arrows.length; i++){
-            if (arrows[i].arrowInfo.pointIndex1 == arrowPoints[0] && arrows[i].arrowInfo.pointIndex2 == arrowPoints[1]){
+            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[0] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[1]){
                 //Arrow already exists in that direction-- do nothing
                 return
             }
-            if (arrows[i].arrowInfo.pointIndex1 == arrowPoints[1] && arrows[i].arrowInfo.pointIndex2 == arrowPoints[0]){
+            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[1] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[0]){
                 //Arrow exists in opposite direction-- shift new arrow
                 shift = true;
             }
@@ -507,16 +506,16 @@ export default (canvas, IController, data) => {
         for (var i = 0; i < arrows.length; i++) {
             var index1 = arrows[i].arrowInfo.pointIndex1;
             var index2 = arrows[i].arrowInfo.pointIndex2;
-            if ((index1 == deletedDataPoint) || (index2 == deletedDataPoint)) {
+            if ((index1 === deletedDataPoint) || (index2 === deletedDataPoint)) {
                 scene.remove(arrows[i].object)
                 arrows.splice(i, 1);
                 i--; //To go back and check arrow that just moved into i'th position
             } else {
-                if ((index1 > deletedDataPoint) && (deletedDataPoint != -1)) {
+                if ((index1 > deletedDataPoint) && (deletedDataPoint !== -1)) {
                     index1--;
                     arrows[i].arrowInfo.pointIndex1--;
                 } 
-                if ((index2 > deletedDataPoint) && (deletedDataPoint != -1)){
+                if ((index2 > deletedDataPoint) && (deletedDataPoint !== -1)){
                     index2--;
                     arrows[i].arrowInfo.pointIndex2--;
                 }
@@ -541,37 +540,14 @@ export default (canvas, IController, data) => {
     }
 
     function changeAllRadius() {
-        for (var i = 0; i < data.dataPoints.length; i++) {
+        for (let i = 0; i < data.dataPoints.length; i++) {
             data.dataPoints[i].adjustScale(radius);
             data.dataPoints[i].changeTextSize(radius)
         }
-        for (var i = 0; i < data.arrows.length; i++){
+        for (let i = 0; i < data.arrows.length; i++){
             data.arrows[i].adjustScale(radius);
         }
     }
-
-    // function addStartStopText() {
-    //     var startText = document.createElement('div');
-    //     startText.id = "startText";
-    //     startText.style.position = 'absolute';
-    //     startText.innerHTML = "Start";
-    //     startText.style.top = 75 + 445 + 'px'; //75 is navbar height
-    //     startText.style.left = 200 + 'px';
-    //     var stopText = document.createElement('div');
-    //     stopText.id = "stopText";
-    //     stopText.style.position = 'absolute';
-    //     stopText.innerHTML = "Stop";
-    //     stopText.style.top = 75 + 490 + 'px'; //75 is navbar height
-    //     stopText.style.left = 200 + 'px';
-    //     removeTextSelection(startText);
-    //     removeTextSelection(stopText);
-    //     document.body.appendChild(startText);
-    //     document.body.appendChild(stopText);
-    // }
-
-    // function removeTextSelection(text) {
-    //     text.style.MozUserSelect = "none";
-    // }
 
     function update() {
         renderer.render(scene, camera);
