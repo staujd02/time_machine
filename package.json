@@ -2,6 +2,7 @@
   "name": "visualizer",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://staujd02.github.io/time_machine",
   "dependencies": {
     "ajv": "^6.0.0",
     "dat.gui": "^0.7.2",
@@ -19,6 +20,8 @@
     "xlsx": "^0.13.1"
   },
   "scripts": {
+    "predeploy": "npm run build && mv build/* ./* && rmdir build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
