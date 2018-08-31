@@ -19,7 +19,8 @@ class Navigation extends Component {
     this.reset = this.reset.bind(this);
   }
 
-  reset(){
+  reset(e){
+    e.preventDefault();
     toast("Resetting Animation", { 
       position: toast.POSITION.TOP_LEFT
     });
@@ -50,25 +51,29 @@ class Navigation extends Component {
       IController.id = selectedKey;
     }
 
+    let preventRedirect = e => {
+      e.preventDefault();
+    }
+
     return (
         <Navbar inverse style={s}>
           <Navbar.Header>
             <Navbar.Brand>
-              <a href="/#">Time Machine</a>
+              <a href="/">Time Machine</a>
             </Navbar.Brand>
           </Navbar.Header>
           <Nav activeKey={1} onSelect={k => handleSelect(k, this.IController)}>
-            <NavItem eventKey={2} href="/#/Reset" onClick={this.reset}>Reset
+            <NavItem eventKey={2} href="/#" onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
             </NavItem>
-            <NavItem eventKey={3} href="/#/Save"> 
-                <Save context={this.dataContext} /> 
+            <NavItem eventKey={3} href="/#"> 
+                <Save context={this.dataContext} onClick={preventRedirect} /> 
             </NavItem>
-            <NavItem eventKey={4} href="/#/LoadPoint">
-                <FileInput onDone={this.uploadPoints} title={"Upload Point Data"}/>
+            <NavItem eventKey={4} href="/#">
+                <FileInput onDone={this.uploadPoints} onClick={preventRedirect} title={"Upload Point Data"}/>
              </NavItem>
-            <NavItem eventKey={5} href="/#/LoadFlux">
-                <FileInput onDone={this.uploadFlux} title={"Upload Flux Data"}/>
+            <NavItem eventKey={5} href="/#">
+                <FileInput onDone={this.uploadFlux} onClick={preventRedirect} title={"Upload Flux Data"}/>
             </NavItem>
           </Nav>
         </Navbar>
