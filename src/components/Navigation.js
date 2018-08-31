@@ -66,9 +66,9 @@ class Navigation extends Component {
             <NavItem eventKey={2} href="/#" onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
             </NavItem>
-            <NavItem eventKey={3} href="/#"> 
+            {/* <NavItem eventKey={3} href="/#"> 
                 <Save context={this.dataContext} onClick={preventRedirect} /> 
-            </NavItem>
+            </NavItem> */}
             <NavItem eventKey={4} href="/#">
                 <FileInput onDone={this.uploadPoints} onClick={preventRedirect} title={"Upload Point Data"}/>
              </NavItem>
