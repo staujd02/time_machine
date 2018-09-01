@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import Navbar from 'react-bootstrap/lib/Navbar';
-import Nav from 'react-bootstrap/lib/Nav';
-import NavItem from 'react-bootstrap/lib/NavItem';
+import Button from 'react-bootstrap/lib/Button';
+import Form from 'react-bootstrap/lib/Form';
 import FileInput from './FileInput';
-import Save from './Save';
+import '../css/nav.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -43,39 +43,28 @@ class Navigation extends Component {
 
   render() {
 
-    var s = {
-      margin: 0
-    }
-
-    function handleSelect(selectedKey, IController) {
-      IController.id = selectedKey;
-    }
-
     let preventRedirect = e => {
       e.preventDefault();
     }
 
+    let nav = {
+      margin: 10
+    };
+
     return (
-        <Navbar inverse style={s}>
+        <Navbar inverse id='nomargin'>
           <Navbar.Header>
             <Navbar.Brand>
               <a href="/">Time Machine</a>
             </Navbar.Brand>
           </Navbar.Header>
-          <Nav activeKey={1} onSelect={k => handleSelect(k, this.IController)}>
-            <NavItem eventKey={2} href="/#" onClick={this.reset}>Reset
+          <Form inline>
+            <FileInput style={nav} onDone={this.uploadPoints} onClick={preventRedirect} title={"Upload Point Data"}/>
+            <FileInput className={'nav'} onDone={this.uploadFlux} onClick={preventRedirect} title={"Upload Flux Data"}/>
+            <Button id='reset' onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
-            </NavItem>
-            {/* <NavItem eventKey={3} href="/#"> 
-                <Save context={this.dataContext} onClick={preventRedirect} /> 
-            </NavItem> */}
-            <NavItem eventKey={4} href="/#">
-                <FileInput onDone={this.uploadPoints} onClick={preventRedirect} title={"Upload Point Data"}/>
-             </NavItem>
-            <NavItem eventKey={5} href="/#">
-                <FileInput onDone={this.uploadFlux} onClick={preventRedirect} title={"Upload Flux Data"}/>
-            </NavItem>
-          </Nav>
+            </Button>
+          </Form>
         </Navbar>
     );
   }

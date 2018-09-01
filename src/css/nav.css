@@ -1,0 +1,18 @@
+.form-group{
+    margin-left: 20px;
+    margin-top: 5px;
+    color: whitesmoke
+}
+
+.form-group:hover{
+    color: gray
+}
+
+#nomargin{
+    margin: 0px
+}
+
+#reset{
+    margin-top: 10px;
+    margin-left: 20px;
+}
