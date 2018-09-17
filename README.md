@@ -32,7 +32,7 @@ To create a new model click on `Edit`.  Then click on `Edit Mode` to activate th
 The input for compartment data is a single page Excel file with time in the first column and compartment masses to the right.  Row 1 contains labels.  The first compartment created on the screen will be associated with the data in column 2; the next compartment with column 3, etc.  
 <br>
 ## Labeling your Compartments
-Compartment labels may be entered manually or by checking the `Import Labels` box.  If no data file has been imported, click `Upload Point Data” to provide an Excel file with the label information in row 1 as noted above.  
+Compartment labels may be entered manually or by checking the `Import Labels` box.  If no data file has been imported, click `Upload Point Data` to provide an Excel file with the label information in row 1 as noted above.  
 <br>
 ## Adjusting the Model
 The compartments can be dragged to any location in the white space.  The size of the compartments can be adjusted using the slider labeled `Size`.  The color of the compartments ranges from white when empty to black when at the maximum value.  The hue and intensity of the intermediate color can be set by holding the cursor over the bar to the right of `color` moving the circle to get the desired result.  The color shown in the compartments represents 50% of the maximum value.  
