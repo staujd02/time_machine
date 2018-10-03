@@ -1,13 +1,13 @@
 export default (PlotData) => {
 
-    this.dataPoints = PlotData.dataPoints;
-    this.labels = PlotData.labels;
-    this.arrows = PlotData.arrows;
-    this.step = PlotData.step;
+    Object.assign(this, PlotData);
+    this.plot_id = PlotData.id;
 
     this.callbacks = [];
-
-    this.plot_id = PlotData.id;
+    this.labelMode = false;
+    this.onLoad = null;
+    this.animationData = null;
+    this.fluxData = null;
 
     this.callObservers = () => {
         this.callbacks.forEach(call => {
@@ -32,18 +32,11 @@ export default (PlotData) => {
     };
 
     this.loadPlot = (plot) => {
+        Object.assign(this, plot);
         this.plot_id = plot.id;
-        this.dataPoints = plot.dataPoints;
-        this.labels = plot.labels;
-        this.arrows = plot.arrows;
-        this.step = plot.step;
         this.callObservers();
         return plot;
     };
-    this.labelMode = false;
-    this.onLoad = null;
-    this.animationData = null; //Holds imported data. Column 1 is time info
-    this.fluxData = null; //Holds imported data. Column 1 is time info
 
     this.injectDataPointList = json => loadPointData(json, this);
     this.injectFluxList = json => loadFluxData(json, this);
