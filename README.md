@@ -1,9 +1,9 @@
-# A Program for Animation of Compartmental Models
+# Visual Interface Designed for the Animation of Compartment Models
 
 The program is available [here](https://staujd02.github.io/time_machine/).  It will run in Edge, Internet Explorer or Firefox.  Once the program is activated all operations and file storage are on the local computer.
 <br>
 
-### Authors: Kimberley Grobien, Joel Stauffer, Beomjim Kim, Douglas Townsend, Stephen Coburn
+### Authors: Kimberley Grobien, Joel Stauffer, Beomjin Kim, Douglas Townsend, Stephen Coburn
 
 ```
   Deparment of Computer Science,
