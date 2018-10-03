@@ -464,6 +464,9 @@ export default (canvas, IController, data) => {
         scene.add(dataPoint.textMesh);
         dataPoints.push(dataPoint);
         labels.push(labelText);
+
+        dataPoint.setPosition( 0, 0, 0);
+        dataPoint.moveText( 0, 0);
     }
 
     function removeFromScene(dataPoint) {
