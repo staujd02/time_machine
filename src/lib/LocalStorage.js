@@ -43,6 +43,14 @@ export default class LocalStorage {
         }
         return plots;
     }
+    
+    writeToLocalStorage(plots){
+        if (!plots || !plots.length) {
+            plots = [];
+        }
+        let data = JSON.stringify(plots);
+        window.localStorage.setItem(WEB_STORAGE_KEY, data);
+    }
 
     newTemplate(name = "Default Storage") {
        return {
