@@ -9,6 +9,15 @@ export default class FileUtilities {
     }
   }
 
+  processPlotsData(file, onComplete){
+    var reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = () => {
+      let text = reader.result;
+      onComplete(JSON.parse(text));
+    }
+  }
+
   transformXLXSIntoCsvStrings(binaryContents) {
     const XLSX = require('xlsx')
     const binaryType = {

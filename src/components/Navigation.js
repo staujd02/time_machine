@@ -4,6 +4,9 @@ import Button from 'react-bootstrap/lib/Button';
 import Form from 'react-bootstrap/lib/Form';
 import FileInput from './FileInput';
 import localStorage from '../lib/LocalStorage';
+import FileUtilities from '../lib/FileUtilities';
+import FormControl from 'react-bootstrap/lib/FormControl';
+import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import '../css/nav.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -18,13 +21,14 @@ class Navigation extends Component {
     this.uploadPoints = this.uploadDataPoints.bind(this);
     this.uploadFlux = this.uploadFluxData.bind(this);
     this.reset = this.reset.bind(this);
+    this.processUpload = this.processUpload.bind(this);
   }
 
-  displayLocalStorage(){
+  downloadLocalStorage(){
     let data = JSON.stringify((new localStorage()).loadPlotsFromDefaultContainer());
-    var downloadAnchorNode = document.createElement('a');
     var blobData = new Blob([data], {type: 'text/plain'});
     let textFile = window.URL.createObjectURL(blobData);
+    let downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", textFile);
     downloadAnchorNode.setAttribute("download", "plots.json");
     document.body.appendChild(downloadAnchorNode);
@@ -35,10 +39,18 @@ class Navigation extends Component {
     }
   }
 
-  writeLocalStorage(){
-    let input = prompt("Please Input JSON data");
-    if(input)
-      (new localStorage()).writeToLocalStorage(input);
+  processUpload(e){
+    this.readPlots(e.target.files);
+  }
+
+  readPlots(files){
+    let fileUtil = new FileUtilities();
+    if(files.length === 0)
+      return;
+    fileUtil.processPlotsData(files[0], function(dataString){
+       if(dataString)
+          (new localStorage()).writeToLocalStorage(dataString);
+    });
   }
 
   reset(e){
@@ -73,6 +85,11 @@ class Navigation extends Component {
       margin: 10
     };
 
+    let navPointer = {
+      margin: 10,
+      cursor: "pointer"
+    };
+
     return (
         <Navbar inverse id='nomargin'>
           <Navbar.Header>
@@ -86,12 +103,18 @@ class Navigation extends Component {
             <Button id='reset' onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
             </Button>
-            <Button onClick={this.displayLocalStorage}>Export Data
+            <Button onClick={this.downloadLocalStorage}>Export Models
               <ToastContainer autoClose={1500} />
             </Button>
-            <Button onClick={this.writeLocalStorage}>Upload Data
-              <ToastContainer autoClose={1500} />
-            </Button>
+            <ControlLabel style={navPointer} htmlFor={"Upload Compartment Models"}>
+                  Upload Compartment Models
+                  <FormControl id={"Upload Compartment Models"}
+                              type="file" 
+                              accept=".json" 
+                              onChange={this.processUpload} 
+                              ref={input => {this.fileInput = input;}} 
+                              style={{ display: "none" }} />
+              </ControlLabel>
           </Form>
         </Navbar>
     );
