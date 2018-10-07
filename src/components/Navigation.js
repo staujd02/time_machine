@@ -34,9 +34,6 @@ class Navigation extends Component {
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
-    if (textFile !== null) {
-      window.URL.revokeObjectURL(textFile);
-    }
   }
 
   processUpload(e){
@@ -83,10 +80,6 @@ class Navigation extends Component {
 
     let nav = {
       margin: 10
-    };
-
-    let button = {
-      margin: '20px'
     };
 
     return (
