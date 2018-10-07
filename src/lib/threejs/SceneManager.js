@@ -134,7 +134,9 @@ export default (canvas, IController, data) => {
     function reloadDataPoints() {
         let hydratedPoints = [];
         data.dataPoints.forEach(oldPoint => {
-            hydratedPoints.push(restoreDataPoint(oldPoint));
+            let point = restoreDataPoint(oldPoint);
+            hydratedPoints.push(point);
+            point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
         });
         data.dataPoints = hydratedPoints;
     }
