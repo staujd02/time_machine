@@ -194,7 +194,7 @@ export default (canvas, IController, data) => {
         //Calculate positions for start/stop buttons
         var startPos = {
             x: (canvas.width / 5),
-            y: (canvas.height / 4) * 3,
+            y: (canvas.height / 4) * 2.75,
         }
         startPos = canvasToThreePos(startPos);
         var stopPos = {
@@ -300,9 +300,10 @@ export default (canvas, IController, data) => {
     }
 
     function canvasToThreePos(mousePos) {
+        var rect = canvas.getBoundingClientRect();
         var newX, newY;
-        newX = (canvas.width / 2) - mousePos.x;
-        newY = mousePos.y - (canvas.height / 2);
+        newX = (rect.width / 2) - mousePos.x;
+        newY = mousePos.y - (rect.height / 2);
         return {
             x: newX,
             y: newY

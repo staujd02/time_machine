@@ -11,7 +11,7 @@ export default class FileInput extends NavItem {
     super(props);
     this.title = this.props.title || "Upload file";
     this.processUpload = this.processUpload.bind(this);
-    this.state = { callback: this.props.onDone };
+    this.state = { callback: this.props.onDone, accept: this.props.accept, plot: this.props.isPlot };
   }
 
   hasNoFiles(files){
@@ -19,7 +19,20 @@ export default class FileInput extends NavItem {
   }
 
   processUpload(e){
-    this.readXLSX(e.target.files, this.state.callback);
+    if(this.state.plot)
+      this.readPlots(e.target.files, this.state.callback);
+    else
+      this.readXLSX(e.target.files, this.state.callback);
+  }
+
+  readPlots(files, callback){
+    const call = callback;
+    let fileUtil = new FileUtilities();
+    if(files.length === 0)
+      return;
+    fileUtil.processPlotsData(files[0], function(dataString){
+       call(dataString);
+    });
   }
 
   readXLSX(files, callback){
@@ -39,7 +52,7 @@ export default class FileInput extends NavItem {
               {this.title}
               <FormControl id={this.title}
                            type="file" 
-                           accept=".xlsx" 
+                           accept={this.accept}
                            onChange={this.processUpload} 
                            ref={input => {this.fileInput = input;}} 
                            style={{ display: "none" }} />
