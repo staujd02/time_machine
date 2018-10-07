@@ -66,9 +66,6 @@ class Navigation extends Component {
     if(data && window.confirm("Warning! This will replace all of your models with the uploaded models. Continue?")){
       (new localStorage()).writeToLocalStorage(data);
       window.location.reload();
-      toast("Upload Model Complete", {
-        position: toast.POSITION.TOP_LEFT
-      });
       return;
     }
     toast("No Models Uploaded", { 

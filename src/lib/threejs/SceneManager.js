@@ -18,12 +18,14 @@ export default (canvas, IController, data) => {
     const origRadius = 40;
 
     var paused = true;
-    var timeStep = 300;
     var stepInc = 1;
-    var maxQuantity = 1;
-    var maxFlux = 1;
-    var halfQuantity = maxQuantity / 2.0;
-    var halfFlux = maxFlux / 2.0;
+    data.color = data.color || [70, 156, 150, 1];
+    data.stepDelay = data.stepDelay || 300;
+    data.valueMax = data.valueMax || 1;
+    data.fluxMax = data.fluxMax || 1;
+    data.skipSteps = data.skipSteps || 1;
+    var halfQuantity = data.valueMax / 2.0;
+    var halfFlux = data.fluxMax / 2.0;
     var baseColor = [170, 0, 255, 1];
     var radius = origRadius;
 
@@ -40,10 +42,11 @@ export default (canvas, IController, data) => {
 
     const controls = {
         size: origRadius,
-        maxValue: maxQuantity,
-        maxFlux: maxFlux,
-        timeValue: timeStep,
-        color: [170, 0, 255, 1],
+        valueMax: data.valueMax,
+        fluxMax: data.fluxMax,
+        stepDelay: data.stepDelay,
+        color: data.color,
+        skipSteps: data.skipSteps,
         changeStep: function () {
             startStepping();
         },
@@ -62,7 +65,6 @@ export default (canvas, IController, data) => {
                 deleteDataPoint();
             }
         },
-        incrementStep: stepInc,
         editMode: false,
         labelMode: false
     }
@@ -71,7 +73,7 @@ export default (canvas, IController, data) => {
     const scene = buildScene();
     const renderer = buildRender(screenDimensions);
     const camera = buildCamera(screenDimensions);
-    buildGUI();
+    var datGui = buildGUI();
 
     IController.resetDataAnimation = function () {
         if (data.animationData) {
@@ -109,6 +111,23 @@ export default (canvas, IController, data) => {
         reloadDataPoints();
         reloadArrows();
         buildProgressBar();
+        updatePanel();
+    }
+
+    function updatePanel() {
+        data.skipSteps = data.skipSteps || 1;
+        data.stepDelay = data.stepDelay || 300;
+        data.valueMax = data.valueMax || 1;
+        data.fluxMax = data.fluxMax || 1;
+        data.color = data.color || [70, 156, 150, 1];
+        halfQuantity = data.valueMax / 2.0;
+        halfFlux = data.fluxMax / 2.0;
+        controls.skipSteps = data.skipSteps;
+        controls.valueMax = data.valueMax;
+        controls.fluxMax = data.fluxMax;
+        controls.stepDelay = data.stepDelay;
+        controls.color = data.color;
+        datGui.updateDisplay();
     }
 
     function clearScene() {
@@ -155,19 +174,19 @@ export default (canvas, IController, data) => {
             radius = newValue; //Ratio of original size
             changeAllRadius();
         });
-        var timeController = gui.add(controls, 'timeValue').name("Delay (in ms)").min(0).max(500).step(10)
+        var timeController = gui.add(controls, 'stepDelay').name("Delay (in ms)").min(0).max(500).step(10)
         timeController.onChange(function (newValue) {
-            timeStep = newValue;
+            data.stepDelay = newValue;
         })
-        var maxController = gui.add(controls, 'maxValue').name("Max Value");
+        var maxController = gui.add(controls, 'valueMax').name("Max Value");
         maxController.onChange(function (newValue) {
-            maxQuantity = newValue;
-            halfQuantity = maxQuantity / 2.0;
+            data.valueMax = newValue;
+            halfQuantity = data.valueMax / 2.0;
         });
-        var maxFluxController = gui.add(controls, 'maxFlux').name("Max Flux");
+        var maxFluxController = gui.add(controls, 'fluxMax').name("Max Flux");
         maxFluxController.onChange(function (newValue) {
-            maxFlux = newValue;
-            halfFlux = maxFlux / 2.0;
+            data.fluxMax = newValue;
+            halfFlux = data.fluxMax / 2.0;
         });
         var colorController = gui.addColor(controls, 'color');
         colorController.onChange(function (newValue) {
@@ -187,9 +206,10 @@ export default (canvas, IController, data) => {
         editFolder.add(controls, 'deletePoint').name("Delete Data Point");
 
         var incFolder = gui.addFolder("Adjust Increment")
-        incFolder.add(controls, 'incrementStep').name("Skip Steps").onChange(function (newValue) {
-            stepInc = newValue;
-        })
+        incFolder.add(controls, 'skipSteps').name("Skip Steps").onChange(function (newValue) {
+            data.skipSteps = newValue;
+        });
+        return gui;
     }
 
     function buildProgressBar() {
@@ -367,7 +387,7 @@ export default (canvas, IController, data) => {
             if (!paused) {
                 applyStep();
                 data.step += stepInc;
-                await actionUtil.sleep(timeStep);
+                await actionUtil.sleep(data.stepDelay);
                 stepForward();
             }
         }
@@ -540,6 +560,7 @@ export default (canvas, IController, data) => {
     }
 
     function changeColor(newColor) {
+        data.color = newColor;
         for (var i = 0; i < data.dataPoints.length; i++) {
             data.dataPoints[i].changeColor(newColor);
         }

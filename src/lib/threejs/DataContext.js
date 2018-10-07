@@ -26,7 +26,12 @@ export default (PlotData) => {
                 dataPoints: this.dataPoints,
                 labels: this.labels,
                 arrows: this.arrows,
-                step: this.step
+                step: this.step,
+                valueMax: this.valueMax,
+                fluxMax: this.fluxMax,
+                stepDelay: this.stepDelay,
+                color: this.color,
+                skipSteps: this.skipSteps
             }
         }
     };
