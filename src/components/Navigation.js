@@ -3,7 +3,7 @@ import Navbar from 'react-bootstrap/lib/Navbar';
 import Button from 'react-bootstrap/lib/Button';
 import Form from 'react-bootstrap/lib/Form';
 import FileInput from './FileInput';
-import localStorage from '../lib/LocalStorage';
+import Storage from '../lib/Storage';
 import '../css/nav.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
@@ -21,11 +21,11 @@ class Navigation extends Component {
     this.processUpload = this.processUpload.bind(this);
   }
 
-  downloadLocalStorage(){
+  downloadStorage(){
     toast("Prepping Download", { 
       position: toast.POSITION.TOP_LEFT
     });
-    let data = JSON.stringify((new localStorage()).loadPlotsFromDefaultContainer());
+    let data = JSON.stringify((new Storage()).loadModelsFromDefaultContainer());
     var blobData = new Blob([data], {type: 'text/plain'});
     let textFile = window.URL.createObjectURL(blobData);
     let downloadAnchorNode = document.createElement('a');
@@ -64,7 +64,7 @@ class Navigation extends Component {
 
   uploadModels(data) {
     if(data && window.confirm("Warning! This will replace all of your models with the uploaded models. Continue?")){
-      (new localStorage()).writeToLocalStorage(data);
+      (new Storage()).writeToLocalStorage(data);
       window.location.reload();
       return;
     }
@@ -96,7 +96,7 @@ class Navigation extends Component {
             <Button id='reset' onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
             </Button>
-            <Button id='export' onClick={this.downloadLocalStorage}>Export Models
+            <Button id='export' onClick={this.downloadStorage}>Export Models
               <ToastContainer autoClose={1500} />
             </Button>
             <FileInput onDone={this.uploadModels} isPlot={true} accept=".json" onClick={preventRedirect} title={"Upload Compartment Models"}/>

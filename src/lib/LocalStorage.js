@@ -6,49 +6,49 @@ export default class LocalStorage {
 
     addNewToLocal(name){
         let object = this.newTemplate(name);
-        let plots = this.loadPlotsFromDefaultContainer();
-        plots.push(object);
-        window.localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify(plots));
+        let models = this.loadModelsFromDefaultContainer();
+        models.push(object);
+        window.localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify(models));
         return object;
     }
 
     //  item must have name of plot
     //  addition must be PlotData
     updateStorage(name, addition){
-        let plots = this.loadPlotsFromDefaultContainer();
-        for (const plotId in plots) {
-            if (plots.hasOwnProperty(plotId) && plots[plotId].name === name) {
-                const element = plots[plotId];
+        let models = this.loadModelsFromDefaultContainer();
+        for (const plotId in models) {
+            if (models.hasOwnProperty(plotId) && models[plotId].name === name) {
+                const element = models[plotId];
                 let id = element.versions.length + 1;
                 addition.id = name + id;
                 element.versions.push(this.newVersion(addition));
             }
         }
-        window.localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify(plots));
+        window.localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify(models));
     }
 
     loadFromStorage() {
-        let plots = this.loadPlotsFromDefaultContainer();
-        if(plots.length === 0){
-            plots.push(this.newTemplate());
-            window.localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify(plots));
+        let models = this.loadModelsFromDefaultContainer();
+        if(models.length === 0){
+            models.push(this.newTemplate());
+            window.localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify(models));
         }
-        return plots;
+        return models;
     }
 
-    loadPlotsFromDefaultContainer(){
-        let plots = JSON.parse(window.localStorage.getItem(WEB_STORAGE_KEY));
-        if (!plots || !plots.length) {
-            plots = [];
+    loadModelsFromDefaultContainer(){
+        let models = JSON.parse(window.localStorage.getItem(WEB_STORAGE_KEY));
+        if (!models || !models.length) {
+            models = [];
         }
-        return plots;
+        return models;
     }
     
-    writeToLocalStorage(plots){
-        if (!plots || !plots.length) {
-            plots = [];
+    writeToLocalStorage(models){
+        if (!models || !models.length) {
+            models = [];
         }
-        let data = JSON.stringify(plots);
+        let data = JSON.stringify(models);
         window.localStorage.setItem(WEB_STORAGE_KEY, data);
     }
 

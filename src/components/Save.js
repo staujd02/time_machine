@@ -3,7 +3,7 @@ import FormGroup from 'react-bootstrap/lib/FormGroup';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
-import LocalStorage from '../lib/LocalStorage';
+import Storage from '../lib/Storage';
 
 class Save extends Component {
 
@@ -26,7 +26,7 @@ class Save extends Component {
       });
       let name = window.prompt("Name of the File: ");
       if(name){
-        this.download((new LocalStorage()).loadPlotsFromDefaultContainer(), name);
+        this.download((new Storage()).loadModelsFromDefaultContainer(), name);
       }
   }
   

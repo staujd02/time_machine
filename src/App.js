@@ -3,7 +3,7 @@ import './css/App.css';
 import ThreeContainer from './components/ThreeContainer';
 import Navigation from './components/Navigation';
 import StorageList from './components/StorageList.js';
-import LocalStorage from './lib/LocalStorage.js';
+import Storage from './lib/Storage.js';
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
@@ -18,7 +18,7 @@ class App extends Component {
       onLoad: function() {},
       onFluxLoad: function() {}
     };
-    this.saves = (new LocalStorage()).loadFromStorage(this.ThreeController);
+    this.saves = (new Storage()).loadFromStorage(this.ThreeController);
     let currentPlot = this.saves[0].versions[this.saves[0].versions.length - 1].plot;
     this.currentContext = new DataContext(currentPlot);
   }

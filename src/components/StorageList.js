@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import SavedPlot from './SavedPlot';
 import Button from 'react-bootstrap/lib/Button';
-import LocalStorage from '../lib/LocalStorage';
+import Storage from '../lib/Storage';
 
 export default class StorageList extends Component {
 
@@ -31,7 +31,7 @@ export default class StorageList extends Component {
   addToLocal(){
     let resp = window.prompt('Name of Storage');
     if(!!resp){
-      let s = (new LocalStorage()).addNewToLocal(resp);
+      let s = (new Storage()).addNewToLocal(resp);
       this.entries.push(this.createEntry(s));
       this.forceUpdate();
     }
@@ -39,7 +39,7 @@ export default class StorageList extends Component {
 
   handleClick(s) {
     if(this.isActive(s)){
-      (new LocalStorage()).updateStorage(s.name, this.state.dataContext.currentPlot());
+      (new Storage()).updateStorage(s.name, this.state.dataContext.currentPlot());
     } else {
       this.state.dataContext.currentPlot(s);
       this.forceUpdate();
@@ -47,7 +47,7 @@ export default class StorageList extends Component {
   }
 
   loadSaves(){
-    return (new LocalStorage()).loadFromStorage(this.ThreeController);
+    return (new Storage()).loadFromStorage(this.ThreeController);
   }
 
   render() {
