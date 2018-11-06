@@ -21,7 +21,7 @@ export default class LocalStorage {
                 const element = plots[plotId];
                 let id = element.versions.length + 1;
                 addition.id = name + id;
-                element.versions.push(this.newVersion(addition));
+                element.versions = [this.newVersion(addition)];
             }
         }
         window.localStorage.setItem(WEB_STORAGE_KEY, JSON.stringify(plots));
