@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import SavedPlot from './SavedPlot';
 import Button from 'react-bootstrap/lib/Button';
 import LocalStorage from '../lib/LocalStorage';
+import { toast } from 'react-toastify';
 
 export default class StorageList extends Component {
 
@@ -9,8 +10,11 @@ export default class StorageList extends Component {
     super(param);
     this.handleClick = this.handleClick.bind(this);
     this.addToLocal = this.addToLocal.bind(this);
+    this.loadSaves = this.loadSaves.bind(this);
     var parent = this;
     this.state = {dataContext: parent.props.dataContext};
+    this.entries = [];
+    this.loadSaves();
   }
 
   isActive(capsule){
@@ -28,34 +32,35 @@ export default class StorageList extends Component {
       return container;
   }
 
-  addToLocal(){
+  async addToLocal(){
     let resp = window.prompt('Name of Storage');
     if(!!resp){
-      let s = (new LocalStorage()).addNewToLocal(resp);
+      let s = await (new LocalStorage()).addNewToLocal(resp);
       this.entries.push(this.createEntry(s));
       this.forceUpdate();
     }
   }
 
-  handleClick(s) {
+  async handleClick(s) {
     if(this.isActive(s)){
-      (new LocalStorage()).updateStorage(s.name, this.state.dataContext.currentPlot());
+      await (new LocalStorage()).updateStorage(s.name, this.state.dataContext.currentPlot());
+      toast.success("Model Saved");
     } else {
       this.state.dataContext.currentPlot(s);
       this.forceUpdate();
     }
   }
 
-  loadSaves(){
-    return (new LocalStorage()).loadFromStorage(this.ThreeController);
+  async loadSaves(){
+    this.entries = [];
+    let results = await (new LocalStorage()).loadFromStorage(this.ThreeController);
+    results.forEach(s => {
+      this.entries.push(this.createEntry(s));
+    });
+    this.forceUpdate();
   }
 
   render() {
-    this.entries = [];
-    this.loadSaves().forEach(s => {
-      this.entries.push(this.createEntry(s));
-    });
-
     return ( 
         <div>
           <ul>

@@ -18,13 +18,22 @@ class App extends Component {
       onLoad: function() {},
       onFluxLoad: function() {}
     };
-    this.saves = (new LocalStorage()).loadFromStorage(this.ThreeController);
-    let currentPlot = this.saves[0].versions[this.saves[0].versions.length - 1].plot;
-    this.currentContext = new DataContext(currentPlot);
+    this.fetchSaves()
+  }
+
+  async fetchSaves(){
+    let saves = await ((new LocalStorage()).loadFromStorage(this.ThreeController));
+    console.log(saves);
+    let currentPlot = saves[0].versions[saves[0].versions.length - 1].plot;
+    let currentContext = new DataContext(currentPlot);
+    this.setState({
+      saves: saves,
+      currentPlot: currentPlot,
+      currentContext: currentContext
+    });
   }
 
   render() {
-
     var styleFill = {
       height: '100%',
     };
@@ -39,15 +48,18 @@ class App extends Component {
       height: '100%'
     }
 
+    if(!this.state || !this.state.currentContext)
+      return (<div>Loading From Storage</div>);
+
     return (
       <div className="App" style={styleFill}>
             <Grid fluid={true} style={styleFill}>
               <Row>
-                  <Navigation dataContext={this.currentContext} IController={this.ThreeController} />
+                  <Navigation dataContext={this.state.currentContext} IController={this.ThreeController} />
               </Row>
               <Row style={styleFill}>
                 <Col sm={10} md={10} style={col}> 
-                  <ThreeContainer dataContext={this.currentContext} IController={this.ThreeController}/> 
+                  <ThreeContainer dataContext={this.state.currentContext} IController={this.ThreeController}/> 
                 </Col>
                 <Col sm={2} md={2}>
                   <Row sm={2} md={2}>
@@ -58,7 +70,7 @@ class App extends Component {
                     <br/>
                   </Row>
                   <Row sm={2} md={2}>
-                    <StorageList dataContext={this.currentContext} saves={this.saves}></StorageList>
+                    <StorageList dataContext={this.state.currentContext} saves={this.saves}></StorageList>
                   </Row>
                 </Col>
               </Row>

@@ -26,7 +26,7 @@ class Save extends Component {
       });
       let name = window.prompt("Name of the File: ");
       if(name){
-        this.download((new LocalStorage()).loadPlotsFromDefaultContainer(), name);
+        this.download(await (new LocalStorage()).loadPlotsFromDefaultContainer(), name);
       }
   }
   

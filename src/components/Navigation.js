@@ -21,11 +21,11 @@ class Navigation extends Component {
     this.processUpload = this.processUpload.bind(this);
   }
 
-  downloadLocalStorage(){
+  async downloadLocalStorage(){
     toast("Prepping Download", { 
       position: toast.POSITION.TOP_LEFT
     });
-    let data = JSON.stringify((new localStorage()).loadPlotsFromDefaultContainer());
+    let data = JSON.stringify(await (new localStorage()).loadPlotsFromDefaultContainer());
     var blobData = new Blob([data], {type: 'text/plain'});
     let textFile = window.URL.createObjectURL(blobData);
     let downloadAnchorNode = document.createElement('a');
@@ -62,9 +62,9 @@ class Navigation extends Component {
     this.dataContext.injectFluxList(data);
   }
 
-  uploadModels(data) {
+  async  uploadModels(data) {
     if(data && window.confirm("Warning! This will replace all of your models with the uploaded models. Continue?")){
-      (new localStorage()).writeToLocalStorage(data);
+      await (new localStorage()).writeToLocalStorage(data);
       window.location.reload();
       return;
     }
