@@ -41,7 +41,8 @@ export default class StorageList extends Component {
     let resp = this.solictStorageName('you would like to add.');
     if(!!resp){
       await (new LocalStorage()).addNewModelToLocal(resp);
-      window.location.reload();
+      await this.loadSaves();
+      this.forceUpdate();
     }
   }
   
@@ -49,7 +50,7 @@ export default class StorageList extends Component {
     let resp = this.solictStorageName('you would like to permanently delete.');
     if(!!resp){
       await (new LocalStorage()).removeFromStorage(resp);
-      window.location.reload();
+      this.forceUpdate();
     }
   }
 
@@ -60,8 +61,8 @@ export default class StorageList extends Component {
   async handleClick(s) {
     if(this.isActive(s)){
       let plot = this.state.dataContext.currentPlot();
+      // this.state.dataContext.currentPlot(plot);
       await (new LocalStorage()).updateStorage(s.name, plot);
-      this.state.dataContext.currentPlot(plot);
       toast.success("Model Saved");
     } else {
       this.state.dataContext.currentPlot(s);
