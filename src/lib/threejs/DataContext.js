@@ -17,9 +17,11 @@ export default (PlotData) => {
            call(); 
         });
     };
+
     context.registerCallback = (call) => {
         context.callbacks.push(call);
     };
+
     context.currentPlot = (plot = null) => {
         if(plot){
             return context.loadPlot(plot.versions[plot.versions.length - 1].plot);
@@ -73,7 +75,5 @@ export default (PlotData) => {
         if (instance.onLoad && typeof instance.onLoad === "function")
             instance.onLoad();
     }
-
-    
 
 }

@@ -25,7 +25,7 @@ class Navigation extends Component {
     toast("Prepping Download", { 
       position: toast.POSITION.TOP_LEFT
     });
-    let data = JSON.stringify(await (new localStorage()).loadPlotsFromDefaultContainer());
+    let data = JSON.stringify(await (new localStorage()).loadModelsFromDefaultContainer());
     var blobData = new Blob([data], {type: 'text/plain'});
     let textFile = window.URL.createObjectURL(blobData);
     let downloadAnchorNode = document.createElement('a');
@@ -87,7 +87,7 @@ class Navigation extends Component {
         <Navbar inverse id='nomargin'>
           <Navbar.Header>
             <Navbar.Brand>
-              <a href="/">Time Machine</a>
+              <a href="/">Compartmental Visualizer</a>
             </Navbar.Brand>
           </Navbar.Header>
           <Form inline>

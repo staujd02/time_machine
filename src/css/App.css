@@ -1,3 +1,38 @@
 body, html, #root{
     height: 100%;
 }
+
+ul {
+    list-style-type: upper-roman
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.grid-container > button{
+   size: 60px;
+}
+
+.grid-container > div{
+   padding-top: 5px;
+}
+
+.grid-item {
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    margin-top: 5px;
+    text-align: center
+}
+
+#new-plot, #delete-plot{
+   padding: 5px;
+   margin-top: 45px;
+}
+
+#delete-plot{
+    color: red;
+    margin-left: 20px;
+}

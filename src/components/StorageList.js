@@ -8,12 +8,16 @@ export default class StorageList extends Component {
 
   constructor(param){
     super(param);
+    const parent = this;
+    this.entries = [];
     this.handleClick = this.handleClick.bind(this);
     this.addToLocal = this.addToLocal.bind(this);
+    this.removeFromLocal = this.removeFromLocal.bind(this);
     this.loadSaves = this.loadSaves.bind(this);
-    var parent = this;
+    this.createButtonEntry = this.createButtonEntry.bind(this);
+    this.createEntryName = this.createEntryName.bind(this);
+    this.createGrid = this.createGrid.bind(this);
     this.state = {dataContext: parent.props.dataContext};
-    this.entries = [];
     this.loadSaves();
   }
 
@@ -23,27 +27,41 @@ export default class StorageList extends Component {
 
   applyName(capsule){
     return this.isActive(capsule) ? "Save" : "Load";
-  }  
+  }
 
-  createEntry(save){
-      let plotEntry = <SavedPlot dataCapsule={save}/>;
-      let button = <Button onClick={() => this.handleClick(save)}>{this.applyName(save)}</Button>;
-      let container = <li key={this.entries.length}> {plotEntry} {button}</li>
-      return container;
+  createButtonEntry(save){
+      return <Button key={this.entries.length} className="grid-item" onClick={() => this.handleClick(save)}>{this.applyName(save)}</Button>;
+  }
+
+  createEntryName(save){
+      return <SavedPlot key={this.entries.length} className="grid-item" dataCapsule={save}/>;
   }
 
   async addToLocal(){
-    let resp = window.prompt('Name of Storage');
+    let resp = this.solictStorageName('you would like to add.');
     if(!!resp){
-      let s = await (new LocalStorage()).addNewToLocal(resp);
-      this.entries.push(this.createEntry(s));
-      this.forceUpdate();
+      await (new LocalStorage()).addNewModelToLocal(resp);
+      window.location.reload();
     }
+  }
+  
+  async removeFromLocal(){
+    let resp = this.solictStorageName('you would like to permanently delete.');
+    if(!!resp){
+      await (new LocalStorage()).removeFromStorage(resp);
+      window.location.reload();
+    }
+  }
+
+  solictStorageName(extension) {
+    return window.prompt('Please enter the name of Model ' + extension);
   }
 
   async handleClick(s) {
     if(this.isActive(s)){
-      await (new LocalStorage()).updateStorage(s.name, this.state.dataContext.currentPlot());
+      let plot = this.state.dataContext.currentPlot();
+      await (new LocalStorage()).updateStorage(s.name, plot);
+      this.state.dataContext.currentPlot(plot);
       toast.success("Model Saved");
     } else {
       this.state.dataContext.currentPlot(s);
@@ -53,20 +71,37 @@ export default class StorageList extends Component {
 
   async loadSaves(){
     this.entries = [];
-    let results = await (new LocalStorage()).loadFromStorage(this.ThreeController);
-    results.forEach(s => {
-      this.entries.push(this.createEntry(s));
+    let models = await (new LocalStorage()).loadFromStorage(this.ThreeController);
+    let dataContext = this.state.dataContext;
+    this.setState({
+        dataContext: dataContext,
+        models: models
     });
-    this.forceUpdate();
+  }
+
+  createGrid(){
+    if(this.state.models){
+      this.entries = [];
+      this.state.models.forEach(s => {
+        this.entries.push(this.createEntryName(s));
+        this.entries.push(this.createButtonEntry(s));
+      });
+    }
   }
 
   render() {
+
+    this.createGrid();
+
     return ( 
         <div>
-          <ul>
+          <div className="grid-container">
             {this.entries}
-          </ul>
-          <Button onClick={this.addToLocal}>New Plot</Button>
+          </div>
+          <div className="grid-container">
+            <Button id="new-plot" onClick={this.addToLocal}>New Plot</Button>
+            <Button id="delete-plot" onClick={this.removeFromLocal}>Delete Plot</Button>
+          </div>
         </div>
     );
   }

@@ -5,12 +5,12 @@ const WEB_STORAGE_KEY = "plots";
 
 export default class LocalStorage {
 
-    async addNewToLocal(name){
-        let object = this.newTemplate(name);
-        let plots = await this.loadPlotsFromDefaultContainer();
-        plots.push(object);
-        await this.saveToStore(WEB_STORAGE_KEY, plots, "Failed to add a new model").catch(() => {return object}); 
-        return object;
+    async addNewModelToLocal(modelName){
+        let model = this.newModelTemplate(modelName);
+        let models = await this.loadModelsFromDefaultContainer();
+        models.push(model);
+        await this.saveToStore(WEB_STORAGE_KEY, models, "Failed to add a new model").catch(() => {return model}); 
+        return model;
     }
 
     async saveToStore(key, value, failureMsg = "Failed to write to storage"){
@@ -35,52 +35,65 @@ export default class LocalStorage {
     //  item must have name of plot
     //  addition must be PlotData
     async updateStorage(name, addition){
-        let plots = await this.loadPlotsFromDefaultContainer();
-        for (const plotId in plots) {
-            if (plots.hasOwnProperty(plotId) && plots[plotId].name === name) {
-                const element = plots[plotId];
+        let models = await this.loadModelsFromDefaultContainer();
+        for (const modelId in models) {
+            if (models.hasOwnProperty(modelId) && models[modelId].name === name) {
+                const element = models[modelId];
                 let id = element.versions.length + 1;
                 addition.id = name + id;
-                element.versions = [this.newVersion(addition)];
+                element.versions = [this.newModelVersion(addition)];
             }
         }
-        this.saveToStore(WEB_STORAGE_KEY, plots, "Failed to save the models");
+        this.saveToStore(WEB_STORAGE_KEY, models, "Failed to save the models");
+    }
+    
+    async removeFromStorage(name){
+        let models = await this.loadModelsFromDefaultContainer();
+        let reducedList = [];
+        for (const modelId in models) {
+            if (models.hasOwnProperty(modelId)) {
+                if(models[modelId].name !== name){
+                    reducedList.push(models[modelId]);
+                }
+            }
+        }
+        this.saveToStore(WEB_STORAGE_KEY, reducedList, "Failed to save the models");
     }
 
     async loadFromStorage() {
-        let plots = await this.loadPlotsFromDefaultContainer();
-        if(plots.length === 0){
-            plots.push(this.newTemplate());
-            this.saveToStore(WEB_STORAGE_KEY, plots, "Failed to save the models");
+        let models = await this.loadModelsFromDefaultContainer();
+        if(models.length === 0){
+            models.push(this.newModelTemplate());
+            this.saveToStore(WEB_STORAGE_KEY, models, "Failed to save the models");
         }
-        return plots;
+        return models;
     }
 
-    async loadPlotsFromDefaultContainer(){
-        let plots = await this.fetchFromStore(WEB_STORAGE_KEY, "Failed to Access Memory").catch();
-        if (!plots || !plots.length) {
-            plots = [];
+    async loadModelsFromDefaultContainer(){
+        let models = await this.fetchFromStore(WEB_STORAGE_KEY, "Failed to Access Memory").catch();
+        if (!models || !models.length) {
+            models = [];
         }
-        return plots;
+        return models;
     }
     
-    async writeToLocalStorage(plots){
-        if (!plots || !plots.length) {
-            plots = [];
+    async writeToLocalStorage(dataArray){
+        if (!dataArray || !dataArray.length) {
+            dataArray = [];
         }
-        await this.saveToStore(WEB_STORAGE_KEY, plots);
+        await this.saveToStore(WEB_STORAGE_KEY, dataArray);
     }
 
-    newTemplate(name = "Default Storage") {
+    newModelTemplate(name = "Default Storage") {
        return {
                 name: name,
-                versions: [this.newVersion(new PlotData(name + "." + 1))]
+                versions: [this.newModelVersion(new PlotData(name + "." + 1))]
             };
     }
 
-    newVersion(plot){
+    newModelVersion(model){
         return {
-            plot: plot
+            plot: model
         }
     }
 

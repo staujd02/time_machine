@@ -5,11 +5,12 @@ export default class SavedPlot extends Component {
     super(param);
     this.dataCapsule = this.props.dataCapsule;
     this.name = this.dataCapsule.name;
+    this.className = this.props.className;
   }
 
   render() {
     return ( 
-        <span>{this.name}</span>
+        <div className={this.className}>{this.name}</div>
     );
   }
 }
