@@ -3,6 +3,7 @@ import SavedPlot from './SavedPlot';
 import Button from 'react-bootstrap/lib/Button';
 import LocalStorage from '../lib/LocalStorage';
 import { toast } from 'react-toastify';
+import { AsyncSeriesWaterfallHook } from 'tapable';
 
 export default class StorageList extends Component {
 
@@ -61,10 +62,10 @@ export default class StorageList extends Component {
   async handleClick(s) {
     if(this.isActive(s)){
       let plot = this.state.dataContext.currentPlot();
-      // this.state.dataContext.currentPlot(plot);
       await (new LocalStorage()).updateStorage(s.name, plot);
       toast.success("Model Saved");
     } else {
+      await this.loadSaves();
       this.state.dataContext.currentPlot(s);
       this.forceUpdate();
     }
