@@ -6,7 +6,7 @@ The program is available [here](https://staujd02.github.io/time_machine/).  It w
 ### Authors: Kimberley Grobien, Joel Stauffer, Beomjin Kim, Douglas Townsend, Stephen Coburn
 
 ```
-  Deparment of Computer Science,
+  Department of Computer Science,
   Department of Mathematical Sciences,
   Department of Chemistry, 
   Purdue University Fort Wayne, Fort Wayne, IN.  
