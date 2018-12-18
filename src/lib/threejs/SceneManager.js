@@ -201,9 +201,9 @@ export default (canvas, IController, data) => {
         editFolder.add(controls, 'labelMode').name("Import Labels").onChange(function (newValue) {
             data.labelMode = newValue;
         });
-        editFolder.add(controls, 'addPoint').name("Add Data Point");
+        editFolder.add(controls, 'addPoint').name("Add Compartment");
         editFolder.add(controls, 'addArrow').name("Add Arrow");
-        editFolder.add(controls, 'deletePoint').name("Delete Data Point");
+        editFolder.add(controls, 'deletePoint').name("Delete Compartment");
 
         var incFolder = gui.addFolder("Adjust Increment")
         incFolder.add(controls, 'skipSteps').name("Skip Steps").onChange(function (newValue) {

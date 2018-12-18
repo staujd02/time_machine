@@ -91,7 +91,7 @@ class Navigation extends Component {
             </Navbar.Brand>
           </Navbar.Header>
           <Form inline>
-            <FileInput style={nav} onDone={this.uploadPoints} isPlot={false} accept=".xlsx" onClick={preventRedirect} title={"Upload Point Data"}/>
+            <FileInput style={nav} onDone={this.uploadPoints} isPlot={false} accept=".xlsx" onClick={preventRedirect} title={"Upload Compartment Data"}/>
             <FileInput style={nav} onDone={this.uploadFlux} isPlot={false} accept=".xlsx" onClick={preventRedirect} title={"Upload Flux Data"}/>
             <Button id='reset' onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
@@ -99,7 +99,7 @@ class Navigation extends Component {
             <Button id='export' onClick={this.downloadLocalStorage}>Export Models
               <ToastContainer autoClose={1500} />
             </Button>
-            <FileInput onDone={this.uploadModels} isPlot={true} accept=".json" onClick={preventRedirect} title={"Upload Compartment Models"}/>
+            <FileInput onDone={this.uploadModels} isPlot={true} accept=".json" onClick={preventRedirect} title={"Upload Models"}/>
           </Form>
         </Navbar>
     );
