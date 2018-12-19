@@ -1,6 +1,6 @@
 # Visual Interface Designed for the Animation of Compartment Models
 
-The program is available [here](https://staujd02.github.io/time_machine/).  It will run in Chrome, Edge, Internet Explorer or Firefox.  Once the program is activated all operations and file storage are on the local computer.
+The program is available [here](https://staujd02.github.io/time_machine/).  It will run in Chrome, Edge, Internet Explorer or Firefox.  Once the program is activated all operations and file storage are on the local computer. It will animate compartment mass and flux data provided by you.  It does not compute or predict data beyond what you provided.
 <br>
 
 ### Authors: Kimberley Grobien, Joel Stauffer, Beomjin Kim, Douglas Townsend, Stephen Coburn
@@ -23,7 +23,9 @@ The program is available [here](https://staujd02.github.io/time_machine/).  It w
 - [Flux Arrows](#flux-arrows)
 - [Controlling the Animation](#controlling-the-animation)
 - [Saving the Model](#saving-the-model)
-- [Important Note](#notes)
+- [Exporting Models](#exporting-models)
+- [Importing Models](#importing-models)
+- [Important Notes](#important-notes)
 
 ## Creating a new Model
 To create a new model click on `Edit`.  Then click on `Edit Mode` to activate the edit process.  Nothing in the white space can be changed unless `Edit Mode` is checked.  Compartments are created by clicking on `Add Data Point` and then clicking on the white space.  You must click on `Add Data Point` every time you want to add a compartment.  
@@ -35,7 +37,7 @@ The input for compartment data is a single page Excel file with time in the firs
 Compartment labels may be entered manually or by checking the `Import Labels` box.  If no data file has been imported, click `Upload Point Data` to provide an Excel file with the label information in row 1 as noted above.  
 <br>
 ## Adjusting the Model
-The compartments can be dragged to any location in the white space.  The size of the compartments can be adjusted using the slider labeled `Size`.  The color of the compartments ranges from white when empty to black when at the maximum value.  The hue and intensity of the intermediate color can be set by holding the cursor over the bar to the right of `color` moving the circle to get the desired result.  The color shown in the compartments represents 50% of the maximum value.  
+The compartments can be dragged to any location in the white space.  The size of the compartments can be adjusted using the slider labeled `Size`.  The color of the compartments ranges from white when empty to black when at the maximum value.  The hue and intensity of the intermediate color can be set by holding the cursor over the bar to the right of `color` moving the circle to get the desired result.  The inital color shown in the compartments and the color chooser box represents 50% of the maximum value.  
 <br>
 ## How to Specify Model Animation Values
 The user must set the maximum value for compartment mass in the box to the right of `Max Value`.  The compartment color at any given time will be based on its percentage of the maximum value.  Therefore, the maximum value does not have to be the exact maximum value of the compartments.  The chosen maximum value applies to all compartments.  If there is a wide variation in compartment masses, the animation could be repeated with different maximum values to visualize large and small compartments.
@@ -44,11 +46,16 @@ The user must set the maximum value for compartment mass in the box to the right
 Arrows can be added by clicking on `Add Arrow`.  Then click on the From compartment and drag to the To compartment.  Arrows can be added without any flux data.  This will not affect the animation of the compartment circles.  The only effect of omitting the flux data is that the arrows will not change color.  The arrows change in gray scale from lighter to darker as the flux increases.  The input for flux data is an Excel file with time in the first column and data in the columns to the right.  As with the compartments, the first arrow created on the screen will be associated with column 2; the next arrow with column 3, etc.  A maximum flux value must be entered in the box to the right of `Max Flux`.
 <br>
 ## Controlling the Animation
-To start the animation click on the green Start button in the white space.  The speed can be adjusted by moving the slider labeled `Delay`.  Increasing the delay will slow the animation.  Individual steps can be shown by clicking the appropriate time value on the gray bar in the white space.  If there is a very large number of data points, the animation could also be shortened by skipping some data points.  Click on `Adjust increment` and then enter the number of points to skip.  An entry of 5, would result in every 5th data point being utilized.  
-The `reset` button sets the time index of the animation back to 1.
+To start the animation click on the green Start button in the white space. If the animation does not start, click the `Reset` button.  The speed can be adjusted by moving the slider labeled `Delay`.  Increasing the delay will slow the animation.  Individual steps can be shown by clicking the appropriate time value on the gray bar in the white space.  If there is a very large number of data points, the animation could also be shortened by skipping some data points.  Click on `Adjust increment` and then enter the number of points to skip.  An entry of 5, would result in every 5th data point (excel row) being utilized.  
+The `reset` button sets the time index of the animation back to start time.
 <br>
 ## Saving the Model
 Clicking `Save` by Default Storage saves the current model diagram in the browser.  Clicking that Save button after changing the model will over-write the previous file.  Clicking `New Plot` allows you to name the model which will be stored in the browser.  The name will be listed below `Default Storage`.  Only the diagram is stored. The data is not stored and must be uploaded each time the program is opened.
+## Exporting Models
+Clicking on the `Export Models` button will save all models to an external file in your local `Downloads` folder.
+## Importing Models
+Clicking on `Upload Compartment Models` opens a file explorer so that you can import a saved file.  Importing overwrites all current models so be sure to save and export current work before importing new files.  Uploading the model does not upload the associated data.  The mass and flux data must also be uploaded.  If the animation does not start when clicking the Start button after an upload, click on Reset.
 <br>
-## Notes
-If the browser shows a window asking `Prevent page from creating additional dialogue?` click No,  Activating that command will prevent proper functioning of the program.
+## Important Notes
+If the browser shows a window asking `Prevent page from creating additional dialogue?` close the window. Activating that command will prevent proper functioning of the program.
+As indicated above, the first compartment created on the screen is associated with the second column of data in the spread sheet.  Subsequent compartments are associated with the third, fourth columns, etc. Similarly, the first arrow is associated with the second column of flux data, etc. At this time, removing and replacing compartments or arrows may upset that relationship. Therefore, it is essential that the compartments and arrows be added in the same sequence as the data columns. In the current state of affairs, corrections cannot be made. A new model diagram must be created. 
