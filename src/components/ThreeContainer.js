@@ -17,14 +17,6 @@ export default class ThreeContainer extends Component {
   }
 
   render() {
-    var threeStyle = {
-      width: '100%',
-      height: '100%',
-      borderStyle: 'solid',
-      borderWidth: '3px',
-      borderColor: 'gray'
-    };
-
-    return ( <div title={"THREE"} style={threeStyle} ref={element => this.threeRootElement = element} > </div>);
+    return ( <div  className='canvas' ref={element => this.threeRootElement = element} > </div>);
   }
 }

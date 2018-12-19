@@ -50,6 +50,7 @@ export default (canvas, IController, data) => {
         changeStep: function () {
             startStepping();
         },
+        resetAnimation: reset,
         addPoint: function () {
             if (editMode) {
                 addDataPoint();
@@ -75,14 +76,14 @@ export default (canvas, IController, data) => {
     const camera = buildCamera(screenDimensions);
     var datGui = buildGUI();
 
-    IController.resetDataAnimation = function () {
+    function reset() {
         if (data.animationData) {
             data.step = 0;
             paused = true;
             progressBar.updateProgress(0, data.animationData[0][0]);
             applyStep();
         }
-    };
+    }
 
     data.onFluxLoad = () => {}
     data.onLoad = () => {
@@ -169,6 +170,7 @@ export default (canvas, IController, data) => {
         gui.domElement.id = 'datGuiAnchor';
 
         gui.add(controls, 'changeStep').name("Step Forward");
+        gui.add(controls, 'resetAnimation').name("Reset");
         var sizeController = gui.add(controls, 'size').name("Size").min(10).max(100).step(1);
         sizeController.onChange(function (newValue) {
             radius = newValue; //Ratio of original size

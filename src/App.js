@@ -44,10 +44,7 @@ class App extends Component {
                   <Navigation dataContext={this.state.currentContext} IController={this.ThreeController} />
               </Row>
               <Row className='fill'>
-                <Col sm={10} md={10} className='sidebar'> 
-                  <ThreeContainer dataContext={this.state.currentContext} IController={this.ThreeController}/> 
-                </Col>
-                <Col sm={2} md={2}>
+                <Col sm={2} md={2} className='sidebar'>
                   <Row sm={2} md={2}>
                     <div className='dat-style' id="datGuiAnchor"></div>
                   </Row>
@@ -58,6 +55,9 @@ class App extends Component {
                   <Row sm={2} md={2}>
                     <StorageList dataContext={this.state.currentContext} saves={this.saves}></StorageList>
                   </Row>
+                </Col>
+                <Col sm={10} md={10} className='threeContainer'> 
+                  <ThreeContainer dataContext={this.state.currentContext} IController={this.ThreeController}/> 
                 </Col>
               </Row>
             </Grid>

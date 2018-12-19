@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Navbar from 'react-bootstrap/lib/Navbar';
-import Button from 'react-bootstrap/lib/Button';
+import FormGroup from 'react-bootstrap/lib/FormGroup';
+import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import Form from 'react-bootstrap/lib/Form';
 import FileInput from './FileInput';
 import localStorage from '../lib/LocalStorage';
@@ -16,7 +17,6 @@ class Navigation extends Component {
 
     this.uploadPoints = this.uploadDataPoints.bind(this);
     this.uploadFlux = this.uploadFluxData.bind(this);
-    this.reset = this.reset.bind(this);
     this.processUpload = this.processUpload.bind(this);
   }
 
@@ -37,14 +37,6 @@ class Navigation extends Component {
 
   processUpload(e){
     this.readPlots(e.target.files);
-  }
-
-  reset(e){
-    e.preventDefault();
-    toast("Resetting Animation", { 
-      position: toast.POSITION.TOP_LEFT
-    });
-    this.IController.resetDataAnimation();
   }
 
   uploadDataPoints(data){
@@ -88,13 +80,13 @@ class Navigation extends Component {
           <Form inline>
             <FileInput className='nav-item' onDone={this.uploadPoints} isPlot={false} accept=".xlsx" onClick={preventRedirect} title={"Upload Compartment Data"}/>
             <FileInput className='nav-item' onDone={this.uploadFlux} isPlot={false} accept=".xlsx" onClick={preventRedirect} title={"Upload Flux Data"}/>
-            <Button id='reset' onClick={this.reset}>Reset
-              <ToastContainer autoClose={1500} />
-            </Button>
-            <Button id='export' onClick={this.downloadLocalStorage}>Export Models
-              <ToastContainer autoClose={1500} />
-            </Button>
-            <FileInput onDone={this.uploadModels} isPlot={true} accept=".json" onClick={preventRedirect} title={"Upload Models"}/>
+            <FileInput className='nav-item' onDone={this.uploadModels} isPlot={true} accept=".json" onClick={preventRedirect} title={"Upload Models"}/>
+            <FormGroup className='nav-item'>
+              <ControlLabel htmlFor="Export Models" style={{ cursor: "pointer" }} onClick={this.downloadLocalStorage}>
+                    {"Export Models"}
+                    <ToastContainer autoClose={1500} />
+              </ControlLabel>
+            </FormGroup>
           </Form>
         </Navbar>
     );
