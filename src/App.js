@@ -34,36 +34,22 @@ class App extends Component {
   }
 
   render() {
-    var styleFill = {
-      height: '100%',
-    };
-
-    var datStyle = {
-      backgroundColor: 'grey',
-      height: '100%'
-    }
-
-    var col = {
-      padding: 0,
-      height: '100%'
-    }
-
     if(!this.state || !this.state.currentContext)
       return (<div>Loading From Storage</div>);
 
     return (
-      <div className="App" style={styleFill}>
-            <Grid fluid={true} style={styleFill}>
+      <div className="app">
+            <Grid fluid={true} className='fill'>
               <Row>
                   <Navigation dataContext={this.state.currentContext} IController={this.ThreeController} />
               </Row>
-              <Row style={styleFill}>
-                <Col sm={10} md={10} style={col}> 
+              <Row className='fill'>
+                <Col sm={10} md={10} className='sidebar'> 
                   <ThreeContainer dataContext={this.state.currentContext} IController={this.ThreeController}/> 
                 </Col>
                 <Col sm={2} md={2}>
                   <Row sm={2} md={2}>
-                    <div style={datStyle} id="datGuiAnchor"></div>
+                    <div className='dat-style' id="datGuiAnchor"></div>
                   </Row>
                   <Row sm={2} md={2}>
                     <br/>

@@ -4,7 +4,6 @@ import Button from 'react-bootstrap/lib/Button';
 import Form from 'react-bootstrap/lib/Form';
 import FileInput from './FileInput';
 import localStorage from '../lib/LocalStorage';
-import '../css/nav.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -79,20 +78,16 @@ class Navigation extends Component {
       e.preventDefault();
     };
 
-    let nav = {
-      margin: 10
-    };
-
     return (
-        <Navbar inverse id='nomargin'>
+        <Navbar inverse id='mainNav'>
           <Navbar.Header>
-            <Navbar.Brand>
-              <a href="/">Compartmental Visualizer</a>
+            <Navbar.Brand className='nav-brand'>
+              <a href="https://github.com/staujd02/time_machine">Compartmental Visualizer</a>
             </Navbar.Brand>
           </Navbar.Header>
           <Form inline>
-            <FileInput style={nav} onDone={this.uploadPoints} isPlot={false} accept=".xlsx" onClick={preventRedirect} title={"Upload Compartment Data"}/>
-            <FileInput style={nav} onDone={this.uploadFlux} isPlot={false} accept=".xlsx" onClick={preventRedirect} title={"Upload Flux Data"}/>
+            <FileInput className='nav-item' onDone={this.uploadPoints} isPlot={false} accept=".xlsx" onClick={preventRedirect} title={"Upload Compartment Data"}/>
+            <FileInput className='nav-item' onDone={this.uploadFlux} isPlot={false} accept=".xlsx" onClick={preventRedirect} title={"Upload Flux Data"}/>
             <Button id='reset' onClick={this.reset}>Reset
               <ToastContainer autoClose={1500} />
             </Button>
