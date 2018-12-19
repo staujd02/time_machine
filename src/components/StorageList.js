@@ -3,7 +3,6 @@ import SavedPlot from './SavedPlot';
 import Button from 'react-bootstrap/lib/Button';
 import LocalStorage from '../lib/LocalStorage';
 import { toast } from 'react-toastify';
-import { AsyncSeriesWaterfallHook } from 'tapable';
 
 export default class StorageList extends Component {
 
