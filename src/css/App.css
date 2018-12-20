@@ -43,7 +43,13 @@ ul {
 #delete-plot:hover,
 .grid-container>button:hover
  {
-     background-color: aqua
+     background-color: gray;
+     color: whitesmoke;
+}
+
+#delete-plot:hover{
+     background-color: gray;
+     color: red;
 }
 
 #new-plot{
