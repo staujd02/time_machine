@@ -600,9 +600,12 @@ export default (canvas, data) => {
     }
 
     function changeAllRadius() {
+        let point;
         for (let i = 0; i < data.dataPoints.length; i++) {
-            data.dataPoints[i].adjustScale(radius);
-            data.dataPoints[i].changeTextSize(radius)
+            point = data.dataPoints[i];
+            point.adjustScale(radius);
+            point.changeTextSize(radius)
+            point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
         }
         for (let i = 0; i < data.arrows.length; i++){
             data.arrows[i].adjustScale(radius);
