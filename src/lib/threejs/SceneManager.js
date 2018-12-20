@@ -47,6 +47,9 @@ export default (canvas, IController, data) => {
         stepDelay: data.stepDelay,
         color: data.color,
         skipSteps: data.skipSteps,
+        seekHelp: function () {
+            window.open('/help.html','_blank'); 
+        },
         changeStep: function () {
             startStepping(true);
         },
@@ -174,7 +177,7 @@ export default (canvas, IController, data) => {
         var customContainer = document.getElementById('datGuiAnchor');
         customContainer.appendChild(gui.domElement);
         gui.domElement.id = 'datGuiAnchor';
-
+        gui.add(controls, 'seekHelp').name("Help");
         gui.add(controls, 'changeStep').name("Step Forward");
         gui.add(controls, 'startAnimation').name("Start Animation");
         gui.add(controls, 'pauseAnimation').name("Pause Animation");
