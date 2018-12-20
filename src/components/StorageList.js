@@ -96,12 +96,13 @@ export default class StorageList extends Component {
 
     return ( 
         <div>
+          <h4 className="model-list-banner">Models</h4>
           <div className="grid-container">
             {this.entries}
           </div>
           <div className="grid-container">
-            <Button id="new-plot" onClick={this.addToLocal}>New Plot</Button>
-            <Button id="delete-plot" onClick={this.removeFromLocal}>Delete Plot</Button>
+            <Button id="new-plot" onClick={this.addToLocal}>New Model</Button>
+            <Button id="delete-plot" onClick={this.removeFromLocal}>Delete Model</Button>
           </div>
         </div>
     );

@@ -109,6 +109,11 @@ ul {
     color: aqua
 }
 
+.model-list-banner{
+    margin-top: 20px;
+    color: whitesmoke;
+    text-align: center;
+}
 
 #mainNav {
     margin: 0px

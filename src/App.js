@@ -49,10 +49,6 @@ class App extends Component {
                     <div className='dat-style' id="datGuiAnchor"></div>
                   </Row>
                   <Row sm={2} md={2}>
-                    <br/>
-                    <br/>
-                  </Row>
-                  <Row sm={2} md={2}>
                     <StorageList dataContext={this.state.currentContext} saves={this.saves}></StorageList>
                   </Row>
                 </Col>
