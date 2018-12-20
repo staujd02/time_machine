@@ -2,10 +2,9 @@
 import SceneManager from './SceneManager';
 // import DataContext from './DataContext';
 
-export default (container, dataContext, IController) => {
+export default (container, dataContext) => {
     const canvas = createCanvas(document, container);
-    // const dataContext = new DataContext(IController);
-    const sceneManager = new SceneManager(canvas, IController, dataContext);
+    const sceneManager = new SceneManager(canvas, dataContext);
 
     render();
 

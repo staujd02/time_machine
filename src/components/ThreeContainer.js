@@ -8,12 +8,11 @@ export default class ThreeContainer extends Component {
 
   constructor(props) {
     super(props);
-    this.IController = this.props.IController;
     this.dataContext = this.props.dataContext;
   }
 
   componentDidMount() {
-    threeEntryPoint(this.threeRootElement, this.dataContext, this.IController);
+    threeEntryPoint(this.threeRootElement, this.dataContext);
   }
 
   render() {

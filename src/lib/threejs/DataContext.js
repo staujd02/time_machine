@@ -36,7 +36,8 @@ export default (PlotData) => {
                 fluxMax: context.fluxMax,
                 stepDelay: context.stepDelay,
                 color: context.color,
-                skipSteps: context.skipSteps
+                skipSteps: context.skipSteps,
+                radius: context.radius
             }
         }
     };

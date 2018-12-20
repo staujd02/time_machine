@@ -6,7 +6,7 @@ import ActionUtilities from '../ActionUtilities';
 import ProgressBar from './ProgressBar';
 import FluxArrow from './FluxArrow';
 
-export default (canvas, IController, data) => {
+export default (canvas, data) => {
 
     const actionUtil = new ActionUtilities();
 
@@ -24,10 +24,11 @@ export default (canvas, IController, data) => {
     data.valueMax = data.valueMax || 1;
     data.fluxMax = data.fluxMax || 1;
     data.skipSteps = data.skipSteps || 1;
+    data.radius = data.radius || origRadius;
     var halfQuantity = data.valueMax / 2.0;
     var halfFlux = data.fluxMax / 2.0;
     var baseColor = [170, 0, 255, 1];
-    var radius = origRadius;
+    var radius = data.radius || origRadius;
 
     var mouseDown = false;
     var dataPointToMove = -1;
@@ -41,7 +42,7 @@ export default (canvas, IController, data) => {
     var fontResource;
 
     const controls = {
-        size: origRadius,
+        size: radius,
         valueMax: data.valueMax,
         fluxMax: data.fluxMax,
         stepDelay: data.stepDelay,
@@ -130,8 +131,11 @@ export default (canvas, IController, data) => {
         data.valueMax = data.valueMax || 1;
         data.fluxMax = data.fluxMax || 1;
         data.color = data.color || [70, 156, 150, 1];
+        data.radius = data.radius || origRadius;
+        radius = data.radius;
         halfQuantity = data.valueMax / 2.0;
         halfFlux = data.fluxMax / 2.0;
+        controls.size = data.radius;
         controls.skipSteps = data.skipSteps;
         controls.valueMax = data.valueMax;
         controls.fluxMax = data.fluxMax;
@@ -215,6 +219,7 @@ export default (canvas, IController, data) => {
         var sizeController = editFolder.add(controls, 'size').name("Size").min(10).max(100).step(1);
         sizeController.onChange(function (newValue) {
             radius = newValue; //Ratio of original size
+            data.radius = radius;
             changeAllRadius();
         });
         return editFolder;

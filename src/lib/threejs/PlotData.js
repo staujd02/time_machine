@@ -8,6 +8,7 @@ export class PlotData {
         this.fluxMax = 1;
         this.valueMax = 1;
         this.stepDelay = 300;
+        this.radius = 40;
         this.color = [70, 156, 150, 1];
         this.skipSteps = 1;
     }
