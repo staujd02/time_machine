@@ -102,11 +102,11 @@ ul {
 .form-group {
     margin-left: 20px;
     margin-top: 15px;
-    color: whitesmoke
+    color: whitesmoke;
 }
 
 .form-group:hover {
-    color: aqua
+    color: aquamarine;
 }
 
 .model-list-banner{

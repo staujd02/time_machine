@@ -50,7 +50,9 @@ export default class StorageList extends Component {
     let resp = this.solictStorageName('you would like to permanently delete.');
     if(!!resp){
       await (new LocalStorage()).removeFromStorage(resp);
+      await this.loadSaves();
       this.forceUpdate();
+      toast.success("Model Removed");
     }
   }
 
