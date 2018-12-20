@@ -178,36 +178,31 @@ export default (canvas, IController, data) => {
         customContainer.appendChild(gui.domElement);
         gui.domElement.id = 'datGuiAnchor';
         gui.add(controls, 'seekHelp').name("Help");
-        gui.add(controls, 'changeStep').name("Step Forward");
-        gui.add(controls, 'startAnimation').name("Start Animation");
-        gui.add(controls, 'pauseAnimation').name("Pause Animation");
-        gui.add(controls, 'resetAnimation').name("Reset");
-        var sizeController = gui.add(controls, 'size').name("Size").min(10).max(100).step(1);
-        sizeController.onChange(function (newValue) {
-            radius = newValue; //Ratio of original size
-            changeAllRadius();
-        });
-        var timeController = gui.add(controls, 'stepDelay').name("Delay (in ms)").min(0).max(500).step(10)
+        var animation = gui.addFolder("Animation");
+        buildAnimationFolder(animation);
+        var editing = gui.addFolder("Model Editing");
+        buildEditingFolder(editing);
+        var interpretation = gui.addFolder("Interpretation");
+        buildInterpretationFolder(interpretation);
+        return gui;
+    }
+
+    function buildAnimationFolder(folder) {
+        folder.add(controls, 'changeStep').name("Step Forward");
+        folder.add(controls, 'startAnimation').name("Start");
+        folder.add(controls, 'pauseAnimation').name("Pause");
+        folder.add(controls, 'resetAnimation').name("Reset");
+        var timeController = folder.add(controls, 'stepDelay').name("Delay (in ms)").min(0).max(500).step(10)
         timeController.onChange(function (newValue) {
             data.stepDelay = newValue;
-        })
-        var maxController = gui.add(controls, 'valueMax').name("Max Value");
-        maxController.onChange(function (newValue) {
-            data.valueMax = newValue;
-            halfQuantity = data.valueMax / 2.0;
         });
-        var maxFluxController = gui.add(controls, 'fluxMax').name("Max Flux");
-        maxFluxController.onChange(function (newValue) {
-            data.fluxMax = newValue;
-            halfFlux = data.fluxMax / 2.0;
+        folder.add(controls, 'skipSteps').name("Step Size").onChange(function (newValue) {
+            data.skipSteps = newValue;
         });
-        var colorController = gui.addColor(controls, 'color');
-        colorController.onChange(function (newValue) {
-            baseColor = newValue;
-            changeColor(baseColor);
-        })
+        return folder;
+    }
 
-        var editFolder = gui.addFolder("Edit");
+    function buildEditingFolder(editFolder) {
         editFolder.add(controls, 'editMode').name("Edit Mode").onChange(function (newValue) {
             editMode = newValue;
         });
@@ -217,12 +212,31 @@ export default (canvas, IController, data) => {
         editFolder.add(controls, 'addPoint').name("Add Compartment");
         editFolder.add(controls, 'addArrow').name("Add Arrow");
         editFolder.add(controls, 'deletePoint').name("Delete Compartment");
-
-        var incFolder = gui.addFolder("Adjust Increment")
-        incFolder.add(controls, 'skipSteps').name("Skip Steps").onChange(function (newValue) {
-            data.skipSteps = newValue;
+        var sizeController = editFolder.add(controls, 'size').name("Size").min(10).max(100).step(1);
+        sizeController.onChange(function (newValue) {
+            radius = newValue; //Ratio of original size
+            changeAllRadius();
         });
-        return gui;
+        return editFolder;
+    }
+
+    function buildInterpretationFolder(folder) {
+        var maxController = folder.add(controls, 'valueMax').name("Comp. Maximum");
+        maxController.onChange(function (newValue) {
+            data.valueMax = newValue;
+            halfQuantity = data.valueMax / 2.0;
+        });
+        var maxFluxController = folder.add(controls, 'fluxMax').name("Flux Maximum");
+        maxFluxController.onChange(function (newValue) {
+            data.fluxMax = newValue;
+            halfFlux = data.fluxMax / 2.0;
+        });
+        var colorController = folder.addColor(controls, 'color').name("50% Max Color");
+        colorController.onChange(function (newValue) {
+            baseColor = newValue;
+            changeColor(baseColor);
+        })
+        return folder;
     }
 
     function buildProgressBar() {
