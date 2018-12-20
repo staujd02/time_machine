@@ -48,7 +48,13 @@ export default (canvas, IController, data) => {
         color: data.color,
         skipSteps: data.skipSteps,
         changeStep: function () {
+            startStepping(true);
+        },
+        startAnimation: function () {
             startStepping();
+        },
+        pauseAnimation: function () {
+            paused = true;
         },
         resetAnimation: reset,
         addPoint: function () {
@@ -170,6 +176,8 @@ export default (canvas, IController, data) => {
         gui.domElement.id = 'datGuiAnchor';
 
         gui.add(controls, 'changeStep').name("Step Forward");
+        gui.add(controls, 'startAnimation').name("Start Animation");
+        gui.add(controls, 'pauseAnimation').name("Pause Animation");
         gui.add(controls, 'resetAnimation').name("Reset");
         var sizeController = gui.add(controls, 'size').name("Size").min(10).max(100).step(1);
         sizeController.onChange(function (newValue) {
@@ -377,20 +385,21 @@ export default (canvas, IController, data) => {
         return data.dataLoaded();
     }
 
-    async function startStepping() {
+    async function startStepping(singleStep = false) {
         if (isDataLoaded()) {
             paused = false;
-            stepForward();
+            stepForward(singleStep);
         }
     }
 
-    async function stepForward() {
+    async function stepForward(singleStep = false) {
         if (data.hasNextStep()) {
             if (!paused) {
                 applyStep();
                 data.step += stepInc;
                 await actionUtil.sleep(data.stepDelay);
-                stepForward();
+                if(!singleStep)
+                    stepForward();
             }
         }
     }
