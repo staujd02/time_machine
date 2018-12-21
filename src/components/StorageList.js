@@ -17,6 +17,7 @@ export default class StorageList extends Component {
     this.createButtonEntry = this.createButtonEntry.bind(this);
     this.createEntryName = this.createEntryName.bind(this);
     this.createGrid = this.createGrid.bind(this);
+    this.activeModelName = this.activeModelName.bind(this);
     this.state = {dataContext: parent.props.dataContext};
     this.loadSaves();
   }
@@ -35,6 +36,18 @@ export default class StorageList extends Component {
 
   createEntryName(save){
       return <SavedPlot key={this.entries.length} className="grid-item" dataCapsule={save}/>;
+  }
+
+  activeModelName(){
+    let model = "";
+    if(this.state.models){
+    this.state.models.forEach(s => {
+      if(this.isActive(s)){
+          model = s.name;
+      }
+    });
+    }
+    return " " + model;
   }
 
   async addToLocal(){
@@ -99,6 +112,7 @@ export default class StorageList extends Component {
     return ( 
         <div>
           <h4 className="model-list-banner">Models</h4>
+          <h5 className="active-banner"><span>Loaded Model: </span>{this.activeModelName()}</h5>
           <div className="grid-container">
             {this.entries}
           </div>
