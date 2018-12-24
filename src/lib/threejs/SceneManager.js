@@ -76,6 +76,8 @@ export default (canvas, data) => {
                 deleteDataPoint();
             }
         },
+        showIndices: false,
+        compIndex: "",
         editMode: false,
         labelMode: false
     }
@@ -213,6 +215,19 @@ export default (canvas, data) => {
         editFolder.add(controls, 'labelMode').name("Import Labels").onChange(function (newValue) {
             data.labelMode = newValue;
         });
+        editFolder.add(controls, 'showIndices').name("Show Indices").onChange(function (newValue) {
+            showIndices();
+        });
+        editFolder.add(controls, 'compIndex').name("Comp. Index").listen().onChange(function (newValue) {
+            if (dataPointToDelete != -1) {
+                if ((newValue > data.dataPoints.length) || (newValue < 1)){
+                    alert("Invalid Index");
+                } else {
+                    data.dataPoints[dataPointToDelete].dataIndex = newValue;
+
+                }   
+            }
+        });
         editFolder.add(controls, 'addPoint').name("Add Compartment");
         editFolder.add(controls, 'addArrow').name("Add Arrow");
         editFolder.add(controls, 'deletePoint').name("Delete Compartment");
@@ -308,6 +323,7 @@ export default (canvas, data) => {
     function checkWithinRange(canvas, evt) {
         var mousePos = canvasToThreePos(getMousePos(canvas, evt));
         //Check if click was on data point
+        controls.compIndex = ""; //Clear
         if (editMode) {
             for (var i = 0; i < data.dataPoints.length; i++) {
                 var selected = data.dataPoints[i].withinCircle(mousePos.x, mousePos.y);
@@ -317,6 +333,7 @@ export default (canvas, data) => {
                     arrowPoints[1] = i
                 } else if (selected) {
                     dataPointToMove = i;
+                    controls.compIndex = data.dataPoints[i].dataIndex;
                     dataPointToDelete = i;
                     break;
                 }
@@ -438,30 +455,30 @@ export default (canvas, data) => {
         let changePercent, diff;
 
         for (let i = 0; i < data.dataPoints.length; i++) {
-            if (data.animationData[data.step][i + 1] > halfQuantity) { //i+1 because column 0 holds time info
+            if (data.animationData[data.step][data.dataPoints[i].dataIndex] > halfQuantity) { //i+1 because column 0 holds time info
                 //Darken
-                diff = data.animationData[data.step][i + 1] - halfQuantity;
+                diff = data.animationData[data.step][data.dataPoints[i].dataIndex] - halfQuantity;
                 changePercent = diff / halfQuantity;
                 data.dataPoints[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
             } else {
                 //Lighten
-                diff = halfQuantity - data.animationData[data.step][i + 1];
+                diff = halfQuantity - data.animationData[data.step][data.dataPoints[i].dataIndex];
                 changePercent = diff / halfQuantity;
                 data.dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
             }
         }
         if (data.fluxData != null) {
             for (let i = 0; i < data.arrows.length; i++) {
-                if (data.fluxData[data.step][i + 1] > halfFlux) { //i+1 because column 0 holds time info
+                if (data.fluxData[data.step][data.dataPoints[i].dataIndex] > halfFlux) { //i+1 because column 0 holds time info
                     //Darken
-                    diff = data.fluxData[data.step][i + 1] - halfFlux;
+                    diff = data.fluxData[data.step][data.dataPoints[i].dataIndex] - halfFlux;
                     changePercent = diff / halfFlux;
                     scene.remove(data.arrows[i].object);
                     data.arrows[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
                     scene.add(data.arrows[i].object) //Add newly colored arrow
                 } else {
                     //Lighten
-                    diff = halfFlux - data.fluxData[data.step][i + 1];
+                    diff = halfFlux - data.fluxData[data.step][data.dataPoints[i].dataIndex];
                     changePercent = diff / halfFlux;
                     scene.remove(data.arrows[i].object);
                     data.arrows[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
@@ -479,7 +496,7 @@ export default (canvas, data) => {
 
     function restoreDataPoint(savedData) {
         let labels = data.labels;
-        let dataPoint = new DataPoint(savedData);
+        let dataPoint = new DataPoint(savedData);//TODO index
         scene.add(dataPoint.object.mesh);
         scene.add(dataPoint.shadow.mesh);
         let labelText = savedData.textMesh ? savedData.textMesh.geometries[0].text : " ";
@@ -510,7 +527,7 @@ export default (canvas, data) => {
             alert("No label entered");
             return;
         }
-        let dataPoint = new DataPoint();
+        let dataPoint = new DataPoint(dataPoints.length + 1);
         scene.add(dataPoint.object.mesh);
         scene.add(dataPoint.shadow.mesh);
 
@@ -609,6 +626,16 @@ export default (canvas, data) => {
         }
         for (let i = 0; i < data.arrows.length; i++){
             data.arrows[i].adjustScale(radius);
+        }
+    }
+
+    function showIndices(){
+        //let point;
+        for (let i = 0; i < data.dataPoints.length; i++){
+            data.dataPoints[i].showIndex(fontResource);
+            scene.add(data.dataPoints[i].indexTextMesh);
+           // point = data.dataPoints[i];
+           // point.
         }
     }
 

@@ -3,12 +3,13 @@ import * as THREE from 'three'
 
 class DataPoint {
 
-    constructor(previousState = null) {
+    constructor(index, previousState = null) {
         var tinycolor = require('tinycolor2');
         const origRadius = 40;
 
         let isState = !!previousState;
 
+        this.dataIndex = index; // Holds the index the data point will retrieve data from
         this.baseColor = isState ? previousState.baseColor : "#aa00ff";
         this.radius = origRadius;
         this.shadowMargin = 7;
@@ -79,12 +80,21 @@ class DataPoint {
             this.textMesh.position.set(newX + .5 * (box.max.x - box.min.x), newY, this.textPullForward);
         }
 
+        this.moveIndexText = function (newX, newY) {
+            var box = new THREE.Box3().setFromObject(this.textMesh); // To center text horizontally
+            this.indexTextMesh.position.set(newX + .5 * (box.max.x - box.min.x), newY, this.textPullForward);
+        }
+
         this.setPosition = function (x, y, z) {
             this.position.set(x, y, z);
             this.shadow.position.set(x, y, this.shadowPushBack);
         }
 
         this.changeTextSize = function (newScale) {
+            let scale = newScale / origRadius;
+            this.textMesh.scale.set(scale, scale, scale + this.textPullForward);
+        }
+        this.changeIndexTextSize = function (newScale) {
             let scale = newScale / origRadius;
             this.textMesh.scale.set(scale, scale, scale + this.textPullForward);
         }
@@ -108,6 +118,26 @@ class DataPoint {
 
         this.darkenColor = function (percent) {
             this.object.mesh.material.color.set(tinycolor(this.baseColor).darken(percent).toString());
+        };
+
+        this.showIndex = function (font) {
+            var geometry = new THREE.TextGeometry(this.dataIndex.toString(), {
+                font: font,
+                size: 13,
+                height: 5,
+                curveSegments: 12,
+                bevelEnabled: false,
+                bevelThickness: 1,  
+                bevelSize: 2,
+                bevelSegments: 5
+            });
+            let material = new THREE.MeshBasicMaterial({
+                color: 0x000000
+            });
+            this.indexTextMesh = new THREE.Mesh(geometry, material);
+            this.moveIndexText(this.position.x, this.position.y + 20);
+            this.indexTextMesh.rotation.set(0, 0, Math.PI);
+            this.changeIndexTextSize(this.radius);
         };
 
         if (isState) {
