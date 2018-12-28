@@ -48,6 +48,9 @@ export default (canvas, data) => {
         stepDelay: data.stepDelay,
         color: data.color,
         skipSteps: data.skipSteps,
+        generateCompartments: function () {
+            generateCompartments();
+        },
         seekHelp: function () {
             window.open('/help.html','_blank'); 
         },
@@ -63,7 +66,7 @@ export default (canvas, data) => {
         resetAnimation: reset,
         addPoint: function () {
             if (editMode) {
-                addDataPoint();
+                addPoint();
             }
         },
         addArrow: function () {
@@ -78,6 +81,7 @@ export default (canvas, data) => {
         },
         showIndices: false,
         compIndex: "",
+        label: "",
         editMode: false,
         labelMode: false
     }
@@ -209,6 +213,7 @@ export default (canvas, data) => {
     }
 
     function buildEditingFolder(editFolder) {
+        editFolder.add(controls, 'generateCompartments').name("Generate Comps.");
         editFolder.add(controls, 'editMode').name("Edit Mode").onChange(function (newValue) {
             editMode = newValue;
         });
@@ -225,10 +230,17 @@ export default (canvas, data) => {
                 } else {
                     data.dataPoints[dataPointToDelete].dataIndex = newValue;
                     scene.remove(data.dataPoints[dataPointToDelete].indexTextMesh);
-                    data.dataPoints[dataPointToDelete].showIndex(fontResource);
-                    scene.add(data.dataPoints[dataPointToDelete].indexTextMesh);
+                    if (controls.showIndices) {
+                        data.dataPoints[dataPointToDelete].showIndex(fontResource);
+                        scene.add(data.dataPoints[dataPointToDelete].indexTextMesh);
+                    }
                 }   
             }
+        });
+        editFolder.add(controls, 'label').name("Comp. Label").listen().onFinishChange(function (newValue) {
+            scene.remove(data.dataPoints[dataPointToDelete].textMesh);
+            data.dataPoints[dataPointToDelete].appendText(fontResource, newValue,  data.dataPoints[dataPointToDelete].position.x,  data.dataPoints[dataPointToDelete].position.y);
+            scene.add(data.dataPoints[dataPointToDelete].textMesh);
         });
         editFolder.add(controls, 'addPoint').name("Add Compartment");
         editFolder.add(controls, 'addArrow').name("Add Arrow");
@@ -329,6 +341,7 @@ export default (canvas, data) => {
         var mousePos = canvasToThreePos(getMousePos(canvas, evt));
         //Check if click was on data point
         controls.compIndex = ""; //Clear
+        controls.label = ""; //Clear
         if (editMode) {
             for (var i = 0; i < data.dataPoints.length; i++) {
                 var selected = data.dataPoints[i].withinCircle(mousePos.x, mousePos.y);
@@ -339,6 +352,7 @@ export default (canvas, data) => {
                 } else if (selected) {
                     dataPointToMove = i;
                     controls.compIndex = data.dataPoints[i].dataIndex;
+                    controls.label = data.dataPoints[i].labelText;
                     dataPointToDelete = i;
                     break;
                 }
@@ -513,7 +527,7 @@ export default (canvas, data) => {
         return dataPoint;
     }
 
-    function addDataPoint() {
+    function addPoint() {
         let labels = data.labels;
         let labelMode = data.labelMode;
         let dataPoints = data.dataPoints;
@@ -532,6 +546,12 @@ export default (canvas, data) => {
             alert("No label entered");
             return;
         }
+        addDataPoint(labelText);
+    }
+
+    function addDataPoint(labelText){
+        let labels = data.labels;
+        let dataPoints = data.dataPoints;
         let dataPoint = new DataPoint(dataPoints.length + 1);
         scene.add(dataPoint.object.mesh);
         scene.add(dataPoint.shadow.mesh);
@@ -657,6 +677,20 @@ export default (canvas, data) => {
         for (let i = 0; i < data.arrows.length; i++){
             data.arrows[i].showIndex(fontResource);
             scene.add(data.arrows[i].indexTextMesh);
+        }
+    }
+
+    function generateCompartments(){
+        if (data.animationData == null){
+            alert("Compartment data must be uploaded first");
+            return;
+        }
+        else if (data.dataPoints.length > 0){
+            alert("Compartments already exist");
+            return;
+        }
+        for (var i = 0; i < data.animationData[0].length; i++){
+            addDataPoint((i+1).toString());
         }
     }
 

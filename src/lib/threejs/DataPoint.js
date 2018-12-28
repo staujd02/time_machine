@@ -10,6 +10,7 @@ class DataPoint {
         let isState = !!previousState;
 
         this.dataIndex = index; // Holds the index the data point will retrieve data from
+        this.labelText = "";
         this.baseColor = isState ? previousState.baseColor : "#aa00ff";
         this.radius = origRadius;
         this.shadowMargin = 7;
@@ -56,6 +57,8 @@ class DataPoint {
         };
 
         this.appendText = function (font, text, xpos, ypos) {
+            this.labelText = text;
+            alert(this.labelText);
             var geometry = new THREE.TextGeometry(text, {
                 font: font,
                 size: 13,
