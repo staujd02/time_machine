@@ -81,7 +81,7 @@ class DataPoint {
         }
 
         this.moveIndexText = function (newX, newY) {
-            var box = new THREE.Box3().setFromObject(this.textMesh); // To center text horizontally
+            var box = new THREE.Box3().setFromObject(this.indexTextMesh); // To center text horizontally
             this.indexTextMesh.position.set(newX + .5 * (box.max.x - box.min.x), newY, this.textPullForward);
         }
 
@@ -96,7 +96,7 @@ class DataPoint {
         }
         this.changeIndexTextSize = function (newScale) {
             let scale = newScale / origRadius;
-            this.textMesh.scale.set(scale, scale, scale + this.textPullForward);
+            this.indexTextMesh.scale.set(scale, scale, scale + this.textPullForward);
         }
 
         this.transformColor = function (colorObject) {
@@ -123,7 +123,7 @@ class DataPoint {
         this.showIndex = function (font) {
             var geometry = new THREE.TextGeometry(this.dataIndex.toString(), {
                 font: font,
-                size: 13,
+                size: 10,
                 height: 5,
                 curveSegments: 12,
                 bevelEnabled: false,
@@ -132,10 +132,10 @@ class DataPoint {
                 bevelSegments: 5
             });
             let material = new THREE.MeshBasicMaterial({
-                color: 0x000000
+                color: 0x808080
             });
             this.indexTextMesh = new THREE.Mesh(geometry, material);
-            this.moveIndexText(this.position.x, this.position.y + 20);
+            this.moveIndexText(this.position.x, this.position.y + (3/4)*(this.radius));
             this.indexTextMesh.rotation.set(0, 0, Math.PI);
             this.changeIndexTextSize(this.radius);
         };

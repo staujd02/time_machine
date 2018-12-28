@@ -218,13 +218,15 @@ export default (canvas, data) => {
         editFolder.add(controls, 'showIndices').name("Show Indices").onChange(function (newValue) {
             showIndices();
         });
-        editFolder.add(controls, 'compIndex').name("Comp. Index").listen().onChange(function (newValue) {
+        editFolder.add(controls, 'compIndex').name("Comp. Index").listen().onFinishChange(function (newValue) {
             if (dataPointToDelete != -1) {
                 if ((newValue > data.dataPoints.length) || (newValue < 1)){
                     alert("Invalid Index");
                 } else {
                     data.dataPoints[dataPointToDelete].dataIndex = newValue;
-
+                    scene.remove(data.dataPoints[dataPointToDelete].indexTextMesh);
+                    data.dataPoints[dataPointToDelete].showIndex(fontResource);
+                    scene.add(data.dataPoints[dataPointToDelete].indexTextMesh);
                 }   
             }
         });
@@ -314,6 +316,9 @@ export default (canvas, data) => {
                     if (dataPointToMove > -1) {
                         data.dataPoints[dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
                         data.dataPoints[dataPointToMove].moveText(newMousePos.x, newMousePos.y);
+                        if (controls.showIndices){
+                            data.dataPoints[dataPointToMove].moveIndexText(newMousePos.x, newMousePos.y + (3/4)*(data.dataPoints[dataPointToMove].radius));
+                        }
                     }
                 }
             }
@@ -469,9 +474,9 @@ export default (canvas, data) => {
         }
         if (data.fluxData != null) {
             for (let i = 0; i < data.arrows.length; i++) {
-                if (data.fluxData[data.step][data.dataPoints[i].dataIndex] > halfFlux) { //i+1 because column 0 holds time info
+                if (data.fluxData[data.step][data.arrows[i].dataIndex] > halfFlux) { //i+1 because column 0 holds time info
                     //Darken
-                    diff = data.fluxData[data.step][data.dataPoints[i].dataIndex] - halfFlux;
+                    diff = data.fluxData[data.step][data.arrows[i].dataIndex] - halfFlux;
                     changePercent = diff / halfFlux;
                     scene.remove(data.arrows[i].object);
                     data.arrows[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
@@ -489,7 +494,7 @@ export default (canvas, data) => {
     }
 
     function restoreArrow(savedData) {
-        let arrow = new FluxArrow(savedData.arrowInfo);
+        let arrow = new FluxArrow(savedData.arrowInfo);//TODO index
         scene.add(arrow.object);
         return arrow;
     }
@@ -530,6 +535,10 @@ export default (canvas, data) => {
         let dataPoint = new DataPoint(dataPoints.length + 1);
         scene.add(dataPoint.object.mesh);
         scene.add(dataPoint.shadow.mesh);
+        if (controls.showIndices) {
+            dataPoint.showIndex(fontResource);
+            scene.add(dataPoint.indexTextMesh);
+        }
 
         dataPoint.changeColor(baseColor);
         dataPoint.adjustScale(radius);
@@ -571,8 +580,12 @@ export default (canvas, data) => {
             point2: data.dataPoints[arrowPoints[1]].position,
             dataPointRadius: radius,
         }
-        let arrow = new FluxArrow(arrowInfo);
+        let arrow = new FluxArrow(data.arrows.length + 1, arrowInfo);
         scene.add(arrow.object);
+        if (controls.showIndices) {
+            arrow.showIndex(fontResource);
+            scene.add(arrow.indexTextMesh);
+        }
         arrowMode = 0;
         arrows.push(arrow);
     }
@@ -596,6 +609,9 @@ export default (canvas, data) => {
                     arrows[i].arrowInfo.pointIndex2--;
                 }
                 arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
+                if (controls.showIndices){
+                    arrows[i].moveIndexText(arrows[i].position.x, arrows[i].position.y);
+                }
             }
         }
     }
@@ -634,8 +650,13 @@ export default (canvas, data) => {
         for (let i = 0; i < data.dataPoints.length; i++){
             data.dataPoints[i].showIndex(fontResource);
             scene.add(data.dataPoints[i].indexTextMesh);
+            
            // point = data.dataPoints[i];
            // point.
+        }
+        for (let i = 0; i < data.arrows.length; i++){
+            data.arrows[i].showIndex(fontResource);
+            scene.add(data.arrows[i].indexTextMesh);
         }
     }
 
