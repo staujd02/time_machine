@@ -274,24 +274,8 @@ export default (canvas, data) => {
     }
 
     function buildProgressBar() {
-        //Calculate positions for start/stop buttons
-        var startPos = {
-            x: (canvas.width / 5),
-            y: (canvas.height / 4) * 2.75,
-        }
-        startPos = canvasToThreePos(startPos);
-        var stopPos = {
-            x: startPos.x,
-            y: startPos.y + 50,
-        }
-        var buttonInfo = {
-            startPos: startPos,
-            stopPos: stopPos,
-        }
-        progressBar = new ProgressBar(scene, fontResource, buttonInfo);
+        progressBar = new ProgressBar(scene, fontResource, (-canvas.height/2) + 25);
         progressBar.appendText("0");
-        progressBar.addStart();
-        progressBar.addStop();
     }
 
     function setupEventListeners() {
@@ -372,11 +356,6 @@ export default (canvas, data) => {
                 progressBar.updateProgress(clickedStep, text ? text[0] : "0")
                 data.step = clickedStep - 1;
                 applyStep();
-            } else if (progressBar.withinStop(mousePos.x, mousePos.y)) {
-                paused = true;
-            } else if (progressBar.withinStart(mousePos.x, mousePos.y)) {
-                paused = false;
-                stepForward();
             }
         }
     }
@@ -689,8 +668,17 @@ export default (canvas, data) => {
             alert("Compartments already exist");
             return;
         }
+        var freeSpace = canvas.width - (data.animationData[0].length * (radius*2)) - 2*radius;// - 2*radius allocates for a radius buffer space on each end
+        var spaceBetween = freeSpace / (data.animationData[0].length-1);
         for (var i = 0; i < data.animationData[0].length; i++){
+            let xPos = -((canvas.width/2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius;// + radius gives a radius buffer space on each end
             addDataPoint((i+1).toString());
+            //Move to appropriate location
+            data.dataPoints[i].setPosition(-xPos, -1, 0);
+            data.dataPoints[i].moveText(-xPos, 0);
+            if (controls.showIndices){
+                data.dataPoints[i].moveIndexText(-xPos, (3/4)*(data.dataPoints[dataPointToMove].radius));
+            }
         }
     }
 
