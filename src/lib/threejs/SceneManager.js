@@ -224,7 +224,7 @@ export default (canvas, data) => {
             showIndices();
         });
         editFolder.add(controls, 'compIndex').name("Comp. Index").listen().onFinishChange(function (newValue) {
-            if (dataPointToDelete != -1) {
+            if (dataPointToDelete !== -1) {
                 if ((newValue > data.dataPoints.length) || (newValue < 1)){
                     alert("Invalid Index");
                 } else {

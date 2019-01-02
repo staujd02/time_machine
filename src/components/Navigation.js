@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Navbar from 'react-bootstrap/lib/Navbar';
+import Image from 'react-bootstrap/lib/Image';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import Form from 'react-bootstrap/lib/Form';
@@ -88,6 +89,7 @@ class Navigation extends Component {
               </ControlLabel>
             </FormGroup>
           </Form>
+          <span> <Image className="logo" src="./pfw-white.png"></Image> </span>
         </Navbar>
     );
   }

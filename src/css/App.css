@@ -5,6 +5,14 @@ html,
     background-color: #333
 }
 
+.logo{
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    width: 76px;
+    height: 37px;
+}
+
 ul {
     list-style-type: upper-roman
 }

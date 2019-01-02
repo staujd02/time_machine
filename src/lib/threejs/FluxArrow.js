@@ -4,7 +4,6 @@ class FluxArrow {
     constructor(index, arrowInfo) {
         var tinycolor = require('tinycolor2');
         this.arrowInfo = arrowInfo;
-        const origLength = 22;
         var arrowLength = 22 * (arrowInfo.dataPointRadius/40);
         var arrowWidth = 15 * (arrowInfo.dataPointRadius/40); //Keep relative proportions liked with data points of radius 40 
         this.dataIndex = index; // Holds the index the arrow will retrieve data from
