@@ -198,10 +198,10 @@ export default (canvas, data) => {
     }
 
     function buildAnimationFolder(folder) {
-        folder.add(controls, 'changeStep').name("Step Forward");
-        folder.add(controls, 'startAnimation').name("Start");
-        folder.add(controls, 'pauseAnimation').name("Pause");
-        folder.add(controls, 'resetAnimation').name("Reset");
+        folder.add(controls, 'changeStep').name("\u21E5 Step Forward");
+        folder.add(controls, 'startAnimation').name("\u25B6 Start");
+        folder.add(controls, 'pauseAnimation').name("\u23F8 Pause");
+        folder.add(controls, 'resetAnimation').name("\u21BB Reset");
         var timeController = folder.add(controls, 'stepDelay').name("Delay (in ms)").min(0).max(500).step(10)
         timeController.onChange(function (newValue) {
             data.stepDelay = newValue;
@@ -223,7 +223,7 @@ export default (canvas, data) => {
         editFolder.add(controls, 'showIndices').name("Show Indices").onChange(function (newValue) {
             showIndices();
         });
-        editFolder.add(controls, 'compIndex').name("Comp. Index").listen().onFinishChange(function (newValue) {
+        editFolder.add(controls, 'compIndex').name("Data Index").listen().onFinishChange(function (newValue) {
             if (dataPointToDelete !== -1) {
                 if ((newValue > data.dataPoints.length) || (newValue < 1)){
                     alert("Invalid Index");
