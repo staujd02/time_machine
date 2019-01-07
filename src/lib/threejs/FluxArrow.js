@@ -1,12 +1,11 @@
 import * as THREE from 'three'
 
 class FluxArrow {
-    constructor(index, arrowInfo) {
+    constructor(arrowInfo) {
         var tinycolor = require('tinycolor2');
         this.arrowInfo = arrowInfo;
         var arrowLength = 22 * (arrowInfo.dataPointRadius/40);
         var arrowWidth = 15 * (arrowInfo.dataPointRadius/40); //Keep relative proportions liked with data points of radius 40 
-        this.dataIndex = index; // Holds the index the arrow will retrieve data from
         this.textPullForward = -5;
 
         this.calculateLength = function () {
@@ -92,7 +91,7 @@ class FluxArrow {
         };
 
         this.showIndex = function (font) {
-            var geometry = new THREE.TextGeometry(this.dataIndex.toString(), {
+            var geometry = new THREE.TextGeometry(this.arrowInfo.dataIndex.toString(), {
                 font: font,
                 size: 10,
                 height: 5,

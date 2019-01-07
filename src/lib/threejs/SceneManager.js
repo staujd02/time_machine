@@ -578,8 +578,9 @@ export default (canvas, data) => {
             point1: data.dataPoints[arrowPoints[0]].position,
             point2: data.dataPoints[arrowPoints[1]].position,
             dataPointRadius: radius,
+            dataIndex: data.arrows.length + 1,
         }
-        let arrow = new FluxArrow(data.arrows.length + 1, arrowInfo);
+        let arrow = new FluxArrow(arrowInfo);
         scene.add(arrow.object);
         if (controls.showIndices) {
             arrow.showIndex(fontResource);
