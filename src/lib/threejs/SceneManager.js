@@ -535,7 +535,6 @@ export default (canvas, data) => {
     }
 
     function addDataPoint(labelText) {
-        // let labels = data.labels;
         let dataPoints = data.dataPoints;
         let dataPoint = new DataPoint(dataPoints.length + 1);
         scene.add(dataPoint.object.mesh);
@@ -550,8 +549,6 @@ export default (canvas, data) => {
         dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
         scene.add(dataPoint.textMesh);
         dataPoints.push(dataPoint);
-        // labels.push(labelText);
-
         dataPoint.setPosition(0, 0, 0);
         dataPoint.moveText(0, 0);
     }
@@ -681,11 +678,12 @@ export default (canvas, data) => {
             alert("Compartments already exist");
             return;
         }
-        var freeSpace = canvas.width - (data.animationData[0].length * (radius * 2)) - 2 * radius; // - 2*radius allocates for a radius buffer space on each end
+        var rect = canvas.getBoundingClientRect();
+        var freeSpace = rect.width - (data.animationData[0].length * (radius * 2)) - 2 * radius; // - 2*radius allocates for a radius buffer space on each end
         var spaceBetween = freeSpace / (data.animationData[0].length - 1);
         for (var i = 0; i < data.animationData[0].length; i++) {
-            let xPos = -((canvas.width / 2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius; // + radius gives a radius buffer space on each end
-            let label = !!data.labels[i] ? data.labels[i] : (i + 1).toString();
+            let xPos = -((rect.width / 2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius; // + radius gives a radius buffer space on each end
+            let label = !!data.labels[i+1] ? data.labels[i+1] : (i + 1).toString();
             addDataPoint(label);
             //Move to appropriate location
             data.dataPoints[i].setPosition(-xPos, -1, 0);
