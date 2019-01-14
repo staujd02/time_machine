@@ -1,9 +1,10 @@
 import * as THREE from 'three'
 
 class FluxArrow {
-    constructor(arrowInfo) {
+    constructor(arrowInfo, legacySaveIndex) {
         var tinycolor = require('tinycolor2');
         this.arrowInfo = arrowInfo;
+        this.arrowInfo.dataIndex = !!arrowInfo.dataIndex ? arrowInfo.dataIndex : legacySaveIndex; // Keep a defined value or fallback to legacy index
         var arrowLength = 22 * (arrowInfo.dataPointRadius/40);
         var arrowWidth = 15 * (arrowInfo.dataPointRadius/40); //Keep relative proportions liked with data points of radius 40 
         this.textPullForward = -5;

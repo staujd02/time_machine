@@ -52,7 +52,7 @@ export default (canvas, data) => {
             generateCompartments();
         },
         seekHelp: function () {
-            window.open('/help.html','_blank'); 
+            window.open('/help.html', '_blank');
         },
         changeStep: function () {
             startStepping(true);
@@ -164,15 +164,20 @@ export default (canvas, data) => {
 
     function reloadArrows() {
         let hydratedArrows = [];
+        let legacyArrowIndex = 0;
         data.arrows.forEach(oldArrow => {
-            hydratedArrows.push(restoreArrow(oldArrow));
+            hydratedArrows.push(restoreArrow(oldArrow, legacyArrowIndex++));
         });
         data.arrows = hydratedArrows;
     }
 
     function reloadDataPoints() {
         let hydratedPoints = [];
+        let c = 0;
         data.dataPoints.forEach(oldPoint => {
+            if (!oldPoint.dataIndex) { // For converting legacy saves on the fly
+                oldPoint.dataIndex = c++;
+            }
             let point = restoreDataPoint(oldPoint);
             hydratedPoints.push(point);
             point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
@@ -220,12 +225,12 @@ export default (canvas, data) => {
         editFolder.add(controls, 'labelMode').name("Import Labels").onChange(function (newValue) {
             data.labelMode = newValue;
         });
-        editFolder.add(controls, 'showIndices').name("Show Indices").onChange(function (newValue) {
-            showIndices();
+        editFolder.add(controls, 'showIndices').name("Show Indices").onChange(function (show) {
+            showIndices(show);
         });
         editFolder.add(controls, 'compIndex').name("Data Index").listen().onFinishChange(function (newValue) {
             if (dataPointToDelete !== -1) {
-                if ((newValue > data.dataPoints.length) || (newValue < 1)){
+                if ((newValue > data.dataPoints.length) || (newValue < 1)) {
                     alert("Invalid Index");
                 } else {
                     data.dataPoints[dataPointToDelete].dataIndex = newValue;
@@ -234,12 +239,12 @@ export default (canvas, data) => {
                         data.dataPoints[dataPointToDelete].showIndex(fontResource);
                         scene.add(data.dataPoints[dataPointToDelete].indexTextMesh);
                     }
-                }   
+                }
             }
         });
         editFolder.add(controls, 'label').name("Comp. Label").listen().onFinishChange(function (newValue) {
             scene.remove(data.dataPoints[dataPointToDelete].textMesh);
-            data.dataPoints[dataPointToDelete].appendText(fontResource, newValue,  data.dataPoints[dataPointToDelete].position.x,  data.dataPoints[dataPointToDelete].position.y);
+            data.dataPoints[dataPointToDelete].appendText(fontResource, newValue, data.dataPoints[dataPointToDelete].position.x, data.dataPoints[dataPointToDelete].position.y);
             scene.add(data.dataPoints[dataPointToDelete].textMesh);
         });
         editFolder.add(controls, 'addPoint').name("Add Compartment");
@@ -274,7 +279,7 @@ export default (canvas, data) => {
     }
 
     function buildProgressBar() {
-        progressBar = new ProgressBar(scene, fontResource, (-canvas.height/2) + 25);
+        progressBar = new ProgressBar(scene, fontResource, (-canvas.height / 2) + 25);
         progressBar.appendText("0");
     }
 
@@ -312,8 +317,8 @@ export default (canvas, data) => {
                     if (dataPointToMove > -1) {
                         data.dataPoints[dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
                         data.dataPoints[dataPointToMove].moveText(newMousePos.x, newMousePos.y);
-                        if (controls.showIndices){
-                            data.dataPoints[dataPointToMove].moveIndexText(newMousePos.x, newMousePos.y + (3/4)*(data.dataPoints[dataPointToMove].radius));
+                        if (controls.showIndices) {
+                            data.dataPoints[dataPointToMove].moveIndexText(newMousePos.x, newMousePos.y + (3 / 4) * (data.dataPoints[dataPointToMove].radius));
                         }
                     }
                 }
@@ -435,7 +440,7 @@ export default (canvas, data) => {
                 applyStep();
                 data.step += stepInc;
                 await actionUtil.sleep(data.stepDelay);
-                if(!singleStep)
+                if (!singleStep)
                     stepForward();
             }
         }
@@ -486,15 +491,15 @@ export default (canvas, data) => {
         }
     }
 
-    function restoreArrow(savedData) {
-        let arrow = new FluxArrow(savedData.arrowInfo);//TODO index
+    function restoreArrow(savedData, legacyIndex) {
+        let arrow = new FluxArrow(savedData.arrowInfo, legacyIndex);
         scene.add(arrow.object);
         return arrow;
     }
 
     function restoreDataPoint(savedData) {
-        let labels = data.labels;
-        let dataPoint = new DataPoint(savedData);//TODO index
+        // let labels = data.labels;
+        let dataPoint = new DataPoint(savedData.dataIndex, savedData); //TODO index
         scene.add(dataPoint.object.mesh);
         scene.add(dataPoint.shadow.mesh);
         let labelText = savedData.textMesh ? savedData.textMesh.geometries[0].text : " ";
@@ -502,7 +507,7 @@ export default (canvas, data) => {
             labelText = " ";
         dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
         scene.add(dataPoint.textMesh);
-        labels.push(labelText);
+        // labels.push(labelText);
         return dataPoint;
     }
 
@@ -521,15 +526,15 @@ export default (canvas, data) => {
                 labelText = window.prompt("Label your data point: ");
             }
         }
-        if ((!labelText) || (labelText === "")){
+        if ((!labelText) || (labelText === "")) {
             alert("No label entered");
             return;
         }
         addDataPoint(labelText);
     }
 
-    function addDataPoint(labelText){
-        let labels = data.labels;
+    function addDataPoint(labelText) {
+        // let labels = data.labels;
         let dataPoints = data.dataPoints;
         let dataPoint = new DataPoint(dataPoints.length + 1);
         scene.add(dataPoint.object.mesh);
@@ -544,10 +549,10 @@ export default (canvas, data) => {
         dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
         scene.add(dataPoint.textMesh);
         dataPoints.push(dataPoint);
-        labels.push(labelText);
+        // labels.push(labelText);
 
-        dataPoint.setPosition( 0, 0, 0);
-        dataPoint.moveText( 0, 0);
+        dataPoint.setPosition(0, 0, 0);
+        dataPoint.moveText(0, 0);
     }
 
     function removeFromScene(dataPoint) {
@@ -560,12 +565,12 @@ export default (canvas, data) => {
         let arrows = data.arrows;
         var shift = false;
         //Check if new arrow is between an already arrowed combination
-        for (var i = 0; i < arrows.length; i++){
-            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[0] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[1]){
+        for (var i = 0; i < arrows.length; i++) {
+            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[0] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[1]) {
                 //Arrow already exists in that direction-- do nothing
                 return
             }
-            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[1] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[0]){
+            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[1] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[0]) {
                 //Arrow exists in opposite direction-- shift new arrow
                 shift = true;
             }
@@ -603,13 +608,13 @@ export default (canvas, data) => {
                 if ((index1 > deletedDataPoint) && (deletedDataPoint !== -1)) {
                     index1--;
                     arrows[i].arrowInfo.pointIndex1--;
-                } 
-                if ((index2 > deletedDataPoint) && (deletedDataPoint !== -1)){
+                }
+                if ((index2 > deletedDataPoint) && (deletedDataPoint !== -1)) {
                     index2--;
                     arrows[i].arrowInfo.pointIndex2--;
                 }
                 arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
-                if (controls.showIndices){
+                if (controls.showIndices) {
                     arrows[i].moveIndexText(arrows[i].position.x, arrows[i].position.y);
                 }
             }
@@ -620,7 +625,7 @@ export default (canvas, data) => {
         if (dataPointToDelete > -1) {
             removeFromScene(data.dataPoints[dataPointToDelete]);
             data.dataPoints.splice(dataPointToDelete, 1);
-            data.labels.splice(dataPointToDelete, 1);
+            // data.labels.splice(dataPointToDelete, 1);
         }
         updateArrows(dataPointToDelete);
     }
@@ -640,45 +645,51 @@ export default (canvas, data) => {
             point.changeTextSize(radius)
             point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
         }
-        for (let i = 0; i < data.arrows.length; i++){
+        for (let i = 0; i < data.arrows.length; i++) {
             data.arrows[i].adjustScale(radius);
         }
     }
 
-    function showIndices(){
-        //let point;
-        for (let i = 0; i < data.dataPoints.length; i++){
-            data.dataPoints[i].showIndex(fontResource);
-            scene.add(data.dataPoints[i].indexTextMesh);
-            
-           // point = data.dataPoints[i];
-           // point.
-        }
-        for (let i = 0; i < data.arrows.length; i++){
-            data.arrows[i].showIndex(fontResource);
-            scene.add(data.arrows[i].indexTextMesh);
-        }
-    }
-
-    function generateCompartments(){
-        if (data.animationData == null){
-            alert("Compartment data must be uploaded first");
+    function showIndices(show) {
+        if (show) {
+            for (let i = 0; i < data.dataPoints.length; i++) {
+                data.dataPoints[i].showIndex(fontResource);
+                scene.add(data.dataPoints[i].indexTextMesh);
+            }
+            for (let i = 0; i < data.arrows.length; i++) {
+                data.arrows[i].showIndex(fontResource);
+                scene.add(data.arrows[i].indexTextMesh);
+            }
             return;
         }
-        else if (data.dataPoints.length > 0){
+
+        for (let i = 0; i < data.dataPoints.length; i++) {
+            scene.remove(data.dataPoints[i].indexTextMesh);
+        }
+        for (let i = 0; i < data.arrows.length; i++) {
+            scene.remove(data.arrows[i].indexTextMesh);
+        }
+
+    }
+
+    function generateCompartments() {
+        if (data.animationData == null) {
+            alert("Compartment data must be uploaded first");
+            return;
+        } else if (data.dataPoints.length > 0) {
             alert("Compartments already exist");
             return;
         }
-        var freeSpace = canvas.width - (data.animationData[0].length * (radius*2)) - 2*radius;// - 2*radius allocates for a radius buffer space on each end
-        var spaceBetween = freeSpace / (data.animationData[0].length-1);
-        for (var i = 0; i < data.animationData[0].length; i++){
-            let xPos = -((canvas.width/2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius;// + radius gives a radius buffer space on each end
-            addDataPoint((i+1).toString());
+        var freeSpace = canvas.width - (data.animationData[0].length * (radius * 2)) - 2 * radius; // - 2*radius allocates for a radius buffer space on each end
+        var spaceBetween = freeSpace / (data.animationData[0].length - 1);
+        for (var i = 0; i < data.animationData[0].length; i++) {
+            let xPos = -((canvas.width / 2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius; // + radius gives a radius buffer space on each end
+            addDataPoint((i + 1).toString());
             //Move to appropriate location
             data.dataPoints[i].setPosition(-xPos, -1, 0);
             data.dataPoints[i].moveText(-xPos, 0);
-            if (controls.showIndices){
-                data.dataPoints[i].moveIndexText(-xPos, (3/4)*(data.dataPoints[dataPointToMove].radius));
+            if (controls.showIndices) {
+                data.dataPoints[i].moveIndexText(-xPos, (3 / 4) * (data.dataPoints[dataPointToMove].radius));
             }
         }
     }
