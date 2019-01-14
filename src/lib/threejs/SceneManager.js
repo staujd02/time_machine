@@ -684,7 +684,8 @@ export default (canvas, data) => {
         var spaceBetween = freeSpace / (data.animationData[0].length - 1);
         for (var i = 0; i < data.animationData[0].length; i++) {
             let xPos = -((canvas.width / 2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius; // + radius gives a radius buffer space on each end
-            addDataPoint((i + 1).toString());
+            let label = !!data.labels[i] ? data.labels[i] : (i + 1).toString();
+            addDataPoint(label);
             //Move to appropriate location
             data.dataPoints[i].setPosition(-xPos, -1, 0);
             data.dataPoints[i].moveText(-xPos, 0);
