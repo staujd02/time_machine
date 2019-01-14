@@ -279,7 +279,8 @@ export default (canvas, data) => {
     }
 
     function buildProgressBar() {
-        progressBar = new ProgressBar(scene, fontResource, (-canvas.height / 2) + 25);
+        let rect = canvas.getBoundingClientRect();
+        progressBar = new ProgressBar(scene, fontResource, (-rect.height / 2.0) + 25);
         progressBar.appendText("0");
     }
 
