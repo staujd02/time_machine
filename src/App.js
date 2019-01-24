@@ -7,6 +7,7 @@ import LocalStorage from './lib/LocalStorage.js';
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
+import Image from 'react-bootstrap/lib/Image';
 import DataContext from './lib/threejs/DataContext';
 
 class App extends Component {
@@ -51,6 +52,7 @@ class App extends Component {
                   <Row sm={2} md={2}>
                     <StorageList dataContext={this.state.currentContext} saves={this.saves}></StorageList>
                   </Row>
+                  <Image className="logo" src="./pfw-white.png"></Image>
                 </Col>
                 <Col sm={10} md={10} className='threeContainer'> 
                   <ThreeContainer dataContext={this.state.currentContext} IController={this.ThreeController}/> 

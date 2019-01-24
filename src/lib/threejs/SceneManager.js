@@ -282,6 +282,7 @@ export default (canvas, data) => {
         let rect = canvas.getBoundingClientRect();
         progressBar = new ProgressBar(scene, fontResource, (-rect.height / 2.0) + 25);
         progressBar.appendText("0");
+        progressBar.showTitle();
     }
 
     function setupEventListeners() {
@@ -336,15 +337,20 @@ export default (canvas, data) => {
             for (var i = 0; i < data.dataPoints.length; i++) {
                 var selected = data.dataPoints[i].withinCircle(mousePos.x, mousePos.y);
                 if (selected && arrowMode === 1) {
+                    data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
                     arrowPoints[0] = i
                 } else if (selected && arrowMode === 2) {
+                    data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
                     arrowPoints[1] = i
                 } else if (selected) {
+                    data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
                     dataPointToMove = i;
                     controls.compIndex = data.dataPoints[i].dataIndex;
                     controls.label = data.dataPoints[i].labelText;
                     dataPointToDelete = i;
                     break;
+                }else{
+                    data.dataPoints[i].shadow.mesh.material.color.set("#cccccc");
                 }
             }
         }

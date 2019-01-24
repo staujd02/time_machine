@@ -7,10 +7,8 @@ html,
 
 .logo{
     position: absolute;
-    top: 6px;
-    right: 10px;
-    width: 76px;
-    height: 37px;
+    bottom: 10px;
+    width: 100%;
 }
 
 ul {

@@ -46,7 +46,15 @@ class DataPoint {
         this.withinCircle = function (x, y) {
             let pos = this.object.mesh.position;
             let distance = Math.sqrt((x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y));
-            return !(distance > this.radius);
+            let within = !(distance > this.radius);
+            if (within) {
+                //Add highlight border
+                //this.object.mesh.material.color.set("#000000");
+            }else{
+                //Normal border
+                //this.object.mesh.material.color.set(this.baseColor.toString());
+            }
+            return within;
         };
 
         this.adjustScale = function (newRadius) {

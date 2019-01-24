@@ -55,6 +55,24 @@ class ProgressBar {
             scene.add(this.textMesh);
         };
 
+        this.showTitle = function () {
+            var geometry = new THREE.TextGeometry("Progress Bar:", {
+                font: fontResource,
+                size: 10,
+                height: 5,
+                curveSegments: 12,
+                bevelEnabled: false,
+                bevelThickness: 1,  
+                bevelSize: 2,
+                bevelSegments: 5
+            });
+            let material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            this.titleTextMesh = new THREE.Mesh(geometry, material);
+            this.titleTextMesh.position.set(350, this.yPos + 7, 0);
+            this.titleTextMesh.rotation.set(0, 0, Math.PI);
+            scene.add(this.titleTextMesh);
+        };
+
         this.moveText = function(newX, newY){
             var box = new THREE.Box3().setFromObject( this.textMesh );//To center text horizontally
             this.textMesh.position.set(newX + .5*(box.max.x - box.min.x), newY, 0);
