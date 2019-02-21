@@ -203,10 +203,10 @@ export default (canvas, data) => {
     }
 
     function buildAnimationFolder(folder) {
-        folder.add(controls, 'changeStep').name("\u21E5 Step Forward");
-        folder.add(controls, 'startAnimation').name("\u25B6 Start");
-        folder.add(controls, 'pauseAnimation').name("\u23F8 Pause");
-        folder.add(controls, 'resetAnimation').name("\u21BB Reset");
+        folder.add(controls, 'changeStep').name("Step - -- -- -| \u21E5");
+        folder.add(controls, 'startAnimation').name("Start - -- -- -| \u25B6");
+        folder.add(controls, 'pauseAnimation').name("Pause - -- -| \u23F8");
+        folder.add(controls, 'resetAnimation').name("Reset - --- -| \u21BB");
         var timeController = folder.add(controls, 'stepDelay').name("Delay (in ms)").min(0).max(500).step(10)
         timeController.onChange(function (newValue) {
             data.stepDelay = newValue;
