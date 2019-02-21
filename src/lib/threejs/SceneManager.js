@@ -274,7 +274,7 @@ export default (canvas, data) => {
         colorController.onChange(function (newValue) {
             baseColor = newValue;
             changeColor(baseColor);
-        })
+        });
         return folder;
     }
 
