@@ -481,17 +481,17 @@ export default (canvas, data) => {
             }
         }
         if (data.fluxData != null) {
-            for (let i = 0; i < data.arrows.length; i++) {
-                if (data.fluxData[data.step][data.arrows[i].dataIndex] > halfFlux) { //i+1 because column 0 holds time info
+            for (let i = 0; i < data.arrows.length - 1; i++) {
+                if (data.fluxData[data.step][data.arrows[i].arrowInfo.dataIndex] > halfFlux) { //i+1 because column 0 holds time info
                     //Darken
-                    diff = data.fluxData[data.step][data.arrows[i].dataIndex] - halfFlux;
+                    diff = data.fluxData[data.step][data.arrows[i].arrowInfo.dataIndex] - halfFlux;
                     changePercent = diff / halfFlux;
                     scene.remove(data.arrows[i].object);
                     data.arrows[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
                     scene.add(data.arrows[i].object) //Add newly colored arrow
                 } else {
                     //Lighten
-                    diff = halfFlux - data.fluxData[data.step][data.dataPoints[i].dataIndex];
+                    diff = halfFlux - data.fluxData[data.step][data.arrows[i].arrowInfo.dataIndex];
                     changePercent = diff / halfFlux;
                     scene.remove(data.arrows[i].object);
                     data.arrows[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
