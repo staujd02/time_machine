@@ -343,13 +343,16 @@ export default (canvas, data) => {
                     data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
                     arrowPoints[1] = i
                 } else if (selected) {
+                    if (dataPointToDelete !== -1) {
+                        data.dataPoints[dataPointToDelete].shadow.mesh.material.color.set("#cccccc");
+                    }
                     data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
                     dataPointToMove = i;
                     controls.compIndex = data.dataPoints[i].dataIndex;
                     controls.label = data.dataPoints[i].labelText;
                     dataPointToDelete = i;
                     break;
-                }else{
+                } else {
                     data.dataPoints[i].shadow.mesh.material.color.set("#cccccc");
                 }
             }
@@ -689,7 +692,7 @@ export default (canvas, data) => {
         var spaceBetween = freeSpace / (data.animationData[0].length - 1);
         for (var i = 0; i < data.animationData[0].length; i++) {
             let xPos = -((rect.width / 2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius; // + radius gives a radius buffer space on each end
-            let label = !!data.labels[i+1] ? data.labels[i+1] : (i + 1).toString();
+            let label = !!data.labels[i + 1] ? data.labels[i + 1] : (i + 1).toString();
             addDataPoint(label);
             //Move to appropriate location
             data.dataPoints[i].setPosition(-xPos, -1, 0);

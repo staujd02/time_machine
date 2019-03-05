@@ -113,6 +113,7 @@ class FluxArrow {
 
         this.changeIndexTextSize = function (newScale) {
             let scale = newScale / this.origLength;
+            scale = scale === 0 ? (scale = 0.00010) : scale; 
             this.indexTextMesh.scale.set(scale, scale, scale + this.textPullForward);
         };
 
