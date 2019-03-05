@@ -52,7 +52,7 @@ export default (canvas, data) => {
             generateCompartments();
         },
         seekHelp: function () {
-            window.open('/help.html', '_blank');
+            window.open(window.location.href + 'help.html', '_blank');
         },
         changeStep: function () {
             startStepping(true);
