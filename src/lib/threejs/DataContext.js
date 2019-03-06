@@ -3,7 +3,7 @@ export default (PlotData) => {
     let context = {};
 
     context.plot_id = PlotData.id;
-    
+
     context.callbacks = [];
     context.labelMode = false;
     context.onLoad = null;
@@ -14,7 +14,7 @@ export default (PlotData) => {
 
     context.callObservers = () => {
         context.callbacks.forEach(call => {
-           call(); 
+            call();
         });
     };
 
@@ -23,9 +23,9 @@ export default (PlotData) => {
     };
 
     context.currentPlot = (plot = null) => {
-        if(plot){
+        if (plot) {
             return context.loadPlot(plot.versions[plot.versions.length - 1].plot);
-        } else{
+        } else {
             return {
                 id: context.plot_id,
                 dataPoints: context.dataPoints,
@@ -63,6 +63,13 @@ export default (PlotData) => {
     return context;
 
     function loadFluxData(xlsxData, instance) {
+        if (xlsxData.length > 1 && isNaN(xlsxData[1][1])) {
+            instance.fluxOriginLabels = xlsxData[0];
+            instance.fluxDestinationLabels = xlsxData[1];
+            instance.fluxOriginLabels.splice(0, 1);
+            instance.fluxDestinationLabels.splice(0, 1);
+            xlsxData.splice(0, 1); //Remove extra label column
+        }
         xlsxData.splice(0, 1); //Remove label column
         instance.fluxData = xlsxData;
         if (instance.onLoad && typeof instance.onLoad === "function")

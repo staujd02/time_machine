@@ -32,7 +32,7 @@ export default (canvas, data) => {
 
     var mouseDown = false;
     var dataPointToMove = -1;
-    var dataPointToDelete = -1;
+    var userSelectedDataPoint = -1;
 
     var progressBar;
     var editMode;
@@ -50,6 +50,9 @@ export default (canvas, data) => {
         skipSteps: data.skipSteps,
         generateCompartments: function () {
             generateCompartments();
+        },
+        generateFluxArrows: function () {
+            generateFluxArrows();
         },
         seekHelp: function () {
             window.open(window.location.href + 'help.html', '_blank');
@@ -219,6 +222,7 @@ export default (canvas, data) => {
 
     function buildEditingFolder(editFolder) {
         editFolder.add(controls, 'generateCompartments').name("Generate Comps.");
+        editFolder.add(controls, 'generateFluxArrows').name("Generate Flux.");
         editFolder.add(controls, 'editMode').name("Edit Mode").onChange(function (newValue) {
             editMode = newValue;
         });
@@ -226,26 +230,26 @@ export default (canvas, data) => {
             data.labelMode = newValue;
         });
         editFolder.add(controls, 'showIndices').name("Show Indices").onChange(function (show) {
-            showIndices(show);
+            revealIndices(show);
         });
         editFolder.add(controls, 'compIndex').name("Data Index").listen().onFinishChange(function (newValue) {
-            if (dataPointToDelete !== -1) {
+            if (userSelectedDataPoint !== -1) {
                 if ((newValue > data.dataPoints.length) || (newValue < 1)) {
                     alert("Invalid Index");
                 } else {
-                    data.dataPoints[dataPointToDelete].dataIndex = newValue;
-                    scene.remove(data.dataPoints[dataPointToDelete].indexTextMesh);
+                    data.dataPoints[userSelectedDataPoint].dataIndex = newValue;
+                    scene.remove(data.dataPoints[userSelectedDataPoint].indexTextMesh);
                     if (controls.showIndices) {
-                        data.dataPoints[dataPointToDelete].showIndex(fontResource);
-                        scene.add(data.dataPoints[dataPointToDelete].indexTextMesh);
+                        data.dataPoints[userSelectedDataPoint].showIndex(fontResource);
+                        scene.add(data.dataPoints[userSelectedDataPoint].indexTextMesh);
                     }
                 }
             }
         });
         editFolder.add(controls, 'label').name("Comp. Label").listen().onFinishChange(function (newValue) {
-            scene.remove(data.dataPoints[dataPointToDelete].textMesh);
-            data.dataPoints[dataPointToDelete].appendText(fontResource, newValue, data.dataPoints[dataPointToDelete].position.x, data.dataPoints[dataPointToDelete].position.y);
-            scene.add(data.dataPoints[dataPointToDelete].textMesh);
+            scene.remove(data.dataPoints[userSelectedDataPoint].textMesh);
+            data.dataPoints[userSelectedDataPoint].appendText(fontResource, newValue, data.dataPoints[userSelectedDataPoint].position.x, data.dataPoints[userSelectedDataPoint].position.y);
+            scene.add(data.dataPoints[userSelectedDataPoint].textMesh);
         });
         editFolder.add(controls, 'addPoint').name("Add Compartment");
         editFolder.add(controls, 'addArrow').name("Add Arrow");
@@ -343,14 +347,14 @@ export default (canvas, data) => {
                     data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
                     arrowPoints[1] = i
                 } else if (selected) {
-                    if (dataPointToDelete !== -1) {
-                        data.dataPoints[dataPointToDelete].shadow.mesh.material.color.set("#cccccc");
+                    if (userSelectedDataPoint !== -1) {
+                        data.dataPoints[userSelectedDataPoint].shadow.mesh.material.color.set("#cccccc");
                     }
                     data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
                     dataPointToMove = i;
                     controls.compIndex = data.dataPoints[i].dataIndex;
                     controls.label = data.dataPoints[i].labelText;
-                    dataPointToDelete = i;
+                    userSelectedDataPoint = i;
                     break;
                 } else {
                     data.dataPoints[i].shadow.mesh.material.color.set("#cccccc");
@@ -358,7 +362,7 @@ export default (canvas, data) => {
             }
         }
         if (dataPointToMove === -1 && progressBar) { //Click was not on a datapoint
-            dataPointToDelete = -1; //Deselect previous selection
+            userSelectedDataPoint = -1; //Deselect previous selection
             if (data.animationData && !isDataLoaded()) {
                 alert("Please import data first");
                 return;
@@ -594,10 +598,6 @@ export default (canvas, data) => {
         }
         let arrow = new FluxArrow(arrowInfo);
         scene.add(arrow.object);
-        if (controls.showIndices) {
-            arrow.showIndex(fontResource);
-            scene.add(arrow.indexTextMesh);
-        }
         arrowMode = 0;
         arrows.push(arrow);
     }
@@ -629,12 +629,13 @@ export default (canvas, data) => {
     }
 
     function deleteDataPoint() {
-        if (dataPointToDelete > -1) {
-            removeFromScene(data.dataPoints[dataPointToDelete]);
-            data.dataPoints.splice(dataPointToDelete, 1);
-            // data.labels.splice(dataPointToDelete, 1);
+        if (userSelectedDataPoint > -1) {
+            removeFromScene(data.dataPoints[userSelectedDataPoint]);
+            data.dataPoints.splice(userSelectedDataPoint, 1);
+            // data.labels.splice(userSelectedDataPoint, 1);
+            userSelectedDataPoint = -1;
         }
-        updateArrows(dataPointToDelete);
+        updateArrows(userSelectedDataPoint);
     }
 
     function changeColor(newColor) {
@@ -657,7 +658,7 @@ export default (canvas, data) => {
         }
     }
 
-    function showIndices(show) {
+    function revealIndices(show) {
         if (show) {
             for (let i = 0; i < data.dataPoints.length; i++) {
                 data.dataPoints[i].showIndex(fontResource);
@@ -699,6 +700,50 @@ export default (canvas, data) => {
             data.dataPoints[i].moveText(-xPos, 0);
             if (controls.showIndices) {
                 data.dataPoints[i].moveIndexText(-xPos, (3 / 4) * (data.dataPoints[dataPointToMove].radius));
+            }
+        }
+    }
+
+    function generateFluxArrows() {
+        if (data.arrows.length > 0) {
+            alert("Flux Arrows already exist");
+            return;
+        } else if (!data.fluxData) {
+            alert("Flux data must be uploaded first before automatic generation can take place.");
+            return;
+        } else if (!data.fluxOriginLabels && !data.fluxDestinationLabels) {
+            alert("File Format does not support flux arrows. The first row must be the origin compartment and " +
+                "the second row must be the destination compartment.");
+            return;
+        } else if (data.dataPoints.length <= 0) {
+            alert("Compartments must be created first for this operation to succeed.");
+            return;
+        }
+        for (let i = 0; i < data.fluxData[0].length; i++) {
+            if (data.fluxDestinationLabels.length - 1 < i || data.fluxOriginLabels.length - 1 < i)
+                break;
+            if (!data.fluxDestinationLabels[i] || !data.fluxOriginLabels[i])
+                continue;
+            arrowPoints[0] = null;
+            arrowPoints[1] = null;
+            for (let j = 0; j < data.dataPoints.length; j++) {
+                const element = data.dataPoints[j].labelText.toLowerCase().trim();
+                if (element === data.fluxOriginLabels[i].toLowerCase().trim()) {
+                    arrowPoints[0] = j;
+                    if (arrowPoints[1] !== null) {
+                        addArrow();
+                        break;
+                    }
+                    continue;
+                }
+                if (element === data.fluxDestinationLabels[i].toLowerCase().trim()) {
+                    arrowPoints[1] = j;
+                    if (arrowPoints[0] !== null) {
+                        addArrow();
+                        break;
+                    }
+                    continue;
+                }
             }
         }
     }
