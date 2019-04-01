@@ -4,7 +4,7 @@ import * as THREE from 'three'
 class DataPoint {
 
     constructor(index, previousState = null) {
-        var tinycolor = require('tinycolor2');
+        const tinyColor = require('tinycolor2');
         const origRadius = 40;
 
         let isState = !!previousState;
@@ -47,13 +47,6 @@ class DataPoint {
             let pos = this.object.mesh.position;
             let distance = Math.sqrt((x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y));
             let within = !(distance > this.radius);
-            if (within) {
-                //Add highlight border
-                //this.object.mesh.material.color.set("#000000");
-            }else{
-                //Normal border
-                //this.object.mesh.material.color.set(this.baseColor.toString());
-            }
             return within;
         };
 
@@ -110,7 +103,7 @@ class DataPoint {
         }
 
         this.transformColor = function (colorObject) {
-            return tinycolor({
+            return tinyColor({
                 r: colorObject[0],
                 g: colorObject[1],
                 b: colorObject[2]
@@ -123,11 +116,11 @@ class DataPoint {
         };
 
         this.lightenColor = function (percent) {
-            this.object.mesh.material.color.set(tinycolor(this.baseColor).lighten(percent).toString());
+            this.object.mesh.material.color.set(tinyColor(this.baseColor).lighten(percent).toString());
         };
 
         this.darkenColor = function (percent) {
-            this.object.mesh.material.color.set(tinycolor(this.baseColor).darken(percent).toString());
+            this.object.mesh.material.color.set(tinyColor(this.baseColor).darken(percent).toString());
         };
 
         this.showIndex = function (font) {
