@@ -1,6 +1,6 @@
 /* Imported From: https://itnext.io/how-to-use-plain-three-js-in-your-react-apps-417a79d926e0 */
 import * as THREE from 'three';
-import DataPoint from './DataPoint';
+import Compartment from './Compartment';
 import * as dat from 'dat.gui';
 import ActionUtilities from '../ActionUtilities';
 import ProgressBar from './ProgressBar';
@@ -135,7 +135,7 @@ export default (canvas, data) => {
 
     function reloadScene() {
         clearScene();
-        reloadDataPoints();
+        reloadCompartments();
         reloadArrows();
         buildProgressBar();
         updatePanel();
@@ -181,18 +181,18 @@ export default (canvas, data) => {
         data.arrows = hydratedArrows;
     }
 
-    function reloadDataPoints() {
-        let hydratedPoints = [];
+    function reloadCompartments() {
+        let hydratedCompartments = [];
         let c = 0;
-        data.dataPoints.forEach(oldPoint => {
+        data.compartments.forEach(oldPoint => {
             if (!oldPoint.dataIndex) { // For converting legacy saves on the fly
                 oldPoint.dataIndex = c++;
             }
             let point = restoreDataPoint(oldPoint);
-            hydratedPoints.push(point);
+            hydratedCompartments.push(point);
             point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
         });
-        data.dataPoints = hydratedPoints;
+        data.compartments = hydratedCompartments;
     }
 
     function buildGUI() {
@@ -241,22 +241,22 @@ export default (canvas, data) => {
         });
         editFolder.add(controls, 'compIndex').name("Data Index").listen().onFinishChange(function (newValue) {
             if (userSelectedDataPoint !== -1) {
-                if ((newValue > data.dataPoints.length) || (newValue < 1)) {
+                if ((newValue > data.compartments.length) || (newValue < 1)) {
                     alert("Invalid Index");
                 } else {
-                    data.dataPoints[userSelectedDataPoint].dataIndex = newValue;
-                    scene.remove(data.dataPoints[userSelectedDataPoint].indexTextMesh);
+                    data.compartments[userSelectedDataPoint].dataIndex = newValue;
+                    scene.remove(data.compartments[userSelectedDataPoint].indexTextMesh);
                     if (controls.showIndices) {
-                        data.dataPoints[userSelectedDataPoint].showIndex(fontResource);
-                        scene.add(data.dataPoints[userSelectedDataPoint].indexTextMesh);
+                        data.compartments[userSelectedDataPoint].showIndex(fontResource);
+                        scene.add(data.compartments[userSelectedDataPoint].indexTextMesh);
                     }
                 }
             }
         });
         editFolder.add(controls, 'label').name("Comp. Label").listen().onFinishChange(function (newValue) {
-            scene.remove(data.dataPoints[userSelectedDataPoint].textMesh);
-            data.dataPoints[userSelectedDataPoint].appendText(fontResource, newValue, data.dataPoints[userSelectedDataPoint].position.x, data.dataPoints[userSelectedDataPoint].position.y);
-            scene.add(data.dataPoints[userSelectedDataPoint].textMesh);
+            scene.remove(data.compartments[userSelectedDataPoint].textMesh);
+            data.compartments[userSelectedDataPoint].appendText(fontResource, newValue, data.compartments[userSelectedDataPoint].position.x, data.compartments[userSelectedDataPoint].position.y);
+            scene.add(data.compartments[userSelectedDataPoint].textMesh);
         });
         editFolder.add(controls, 'addPoint').name("Add Compartment");
         editFolder.add(controls, 'addArrow').name("Add Arrow");
@@ -323,7 +323,7 @@ export default (canvas, data) => {
                     arrowPoints[1] = null;
                 }
                 mouseDown = false;
-                dataPointToMove = -1; //No current selected dataPoint
+                dataPointToMove = -1; //No current selected compartment
             }
             if (data.arrows.length > 0) {
                 updateArrows(-1);
@@ -335,10 +335,10 @@ export default (canvas, data) => {
                     var mousePos = getMousePos(canvas, evt);
                     var newMousePos = canvasToThreePos(mousePos);
                     if (dataPointToMove > -1) {
-                        data.dataPoints[dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
-                        data.dataPoints[dataPointToMove].moveText(newMousePos.x, newMousePos.y);
+                        data.compartments[dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
+                        data.compartments[dataPointToMove].moveText(newMousePos.x, newMousePos.y);
                         if (controls.showIndices) {
-                            data.dataPoints[dataPointToMove].moveIndexText(newMousePos.x, newMousePos.y + (3 / 4) * (data.dataPoints[dataPointToMove].radius));
+                            data.compartments[dataPointToMove].moveIndexText(newMousePos.x, newMousePos.y + (3 / 4) * (data.compartments[dataPointToMove].radius));
                         }
                     }
                 }
@@ -352,26 +352,26 @@ export default (canvas, data) => {
         controls.compIndex = ""; //Clear
         controls.label = ""; //Clear
         if (editMode) {
-            for (var i = 0; i < data.dataPoints.length; i++) {
-                var selected = data.dataPoints[i].withinCircle(mousePos.x, mousePos.y);
+            for (var i = 0; i < data.compartments.length; i++) {
+                var selected = data.compartments[i].withinCircle(mousePos.x, mousePos.y);
                 if (selected && arrowMode === 1) {
-                    data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
+                    data.compartments[i].shadow.mesh.material.color.set("#ffff00");
                     arrowPoints[0] = i
                 } else if (selected && arrowMode === 2) {
-                    data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
+                    data.compartments[i].shadow.mesh.material.color.set("#ffff00");
                     arrowPoints[1] = i
                 } else if (selected) {
                     if (userSelectedDataPoint !== -1) {
-                        data.dataPoints[userSelectedDataPoint].shadow.mesh.material.color.set("#cccccc");
+                        data.compartments[userSelectedDataPoint].shadow.mesh.material.color.set("#cccccc");
                     }
-                    data.dataPoints[i].shadow.mesh.material.color.set("#ffff00");
+                    data.compartments[i].shadow.mesh.material.color.set("#ffff00");
                     dataPointToMove = i;
-                    controls.compIndex = data.dataPoints[i].dataIndex;
-                    controls.label = data.dataPoints[i].labelText;
+                    controls.compIndex = data.compartments[i].dataIndex;
+                    controls.label = data.compartments[i].labelText;
                     userSelectedDataPoint = i;
                     break;
-                } else if (!isUndefined(data.dataPoints[i])) {
-                    data.dataPoints[i].shadow.mesh.material.color.set("#cccccc");
+                } else if (!isUndefined(data.compartments[i])) {
+                    data.compartments[i].shadow.mesh.material.color.set("#cccccc");
                 }
             }
         }
@@ -493,17 +493,17 @@ export default (canvas, data) => {
     function colorPoints() {
         let changePercent, diff;
 
-        for (let i = 0; i < data.dataPoints.length; i++) {
-            if (data.animationData[data.step][data.dataPoints[i].dataIndex] > halfQuantity) { //i+1 because column 0 holds time info
+        for (let i = 0; i < data.compartments.length; i++) {
+            if (data.animationData[data.step][data.compartments[i].dataIndex] > halfQuantity) { //i+1 because column 0 holds time info
                 //Darken
-                diff = data.animationData[data.step][data.dataPoints[i].dataIndex] - halfQuantity;
+                diff = data.animationData[data.step][data.compartments[i].dataIndex] - halfQuantity;
                 changePercent = diff / halfQuantity;
-                data.dataPoints[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
+                data.compartments[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
             } else {
                 //Lighten
-                diff = halfQuantity - data.animationData[data.step][data.dataPoints[i].dataIndex];
+                diff = halfQuantity - data.animationData[data.step][data.compartments[i].dataIndex];
                 changePercent = diff / halfQuantity;
-                data.dataPoints[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
+                data.compartments[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
             }
         }
         if (data.fluxData != null) {
@@ -535,28 +535,28 @@ export default (canvas, data) => {
 
     function restoreDataPoint(savedData) {
         // let labels = data.labels;
-        let dataPoint = new DataPoint(savedData.dataIndex, savedData); //TODO index
-        scene.add(dataPoint.object.mesh);
-        scene.add(dataPoint.shadow.mesh);
+        let compartment = new Compartment(savedData.dataIndex, savedData); //TODO index
+        scene.add(compartment.object.mesh);
+        scene.add(compartment.shadow.mesh);
         let labelText = savedData.textMesh ? savedData.textMesh.geometries[0].text : " ";
         if (!labelText)
             labelText = " ";
-        dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
-        scene.add(dataPoint.textMesh);
+        compartment.appendText(fontResource, labelText, compartment.position.x, compartment.position.y);
+        scene.add(compartment.textMesh);
         // labels.push(labelText);
-        return dataPoint;
+        return compartment;
     }
 
     function addPoint() {
         let labels = data.labels;
         let labelMode = data.labelMode;
-        let dataPoints = data.dataPoints;
+        let compartments = data.compartments;
         var labelText;
-        if (labelMode && labels.length > dataPoints.length + 1) {
-            labelText = labels[dataPoints.length + 1]
+        if (labelMode && labels.length > compartments.length + 1) {
+            labelText = labels[compartments.length + 1]
         } else {
-            if (labelMode && labels.length <= dataPoints.length) {
-                labelText = window.prompt("Imported data does not contain a column #" + dataPoints.length + ".\nPlease label your data point: ");
+            if (labelMode && labels.length <= compartments.length) {
+                labelText = window.prompt("Imported data does not contain a column #" + compartments.length + ".\nPlease label your data point: ");
 
             } else {
                 labelText = window.prompt("Label your data point: ");
@@ -570,28 +570,28 @@ export default (canvas, data) => {
     }
 
     function addDataPoint(labelText) {
-        let dataPoints = data.dataPoints;
-        let dataPoint = new DataPoint(dataPoints.length + 1);
-        scene.add(dataPoint.object.mesh);
-        scene.add(dataPoint.shadow.mesh);
+        let compartments = data.compartments;
+        let compartment = new Compartment(compartments.length + 1);
+        scene.add(compartment.object.mesh);
+        scene.add(compartment.shadow.mesh);
         if (controls.showIndices) {
-            dataPoint.showIndex(fontResource);
-            scene.add(dataPoint.indexTextMesh);
+            compartment.showIndex(fontResource);
+            scene.add(compartment.indexTextMesh);
         }
 
-        dataPoint.changeColor(baseColor);
-        dataPoint.adjustScale(radius);
-        dataPoint.appendText(fontResource, labelText, dataPoint.position.x, dataPoint.position.y);
-        scene.add(dataPoint.textMesh);
-        dataPoints.push(dataPoint);
-        dataPoint.setPosition(0, 0, 0);
-        dataPoint.moveText(0, 0);
+        compartment.changeColor(baseColor);
+        compartment.adjustScale(radius);
+        compartment.appendText(fontResource, labelText, compartment.position.x, compartment.position.y);
+        scene.add(compartment.textMesh);
+        compartments.push(compartment);
+        compartment.setPosition(0, 0, 0);
+        compartment.moveText(0, 0);
     }
 
-    function removeFromScene(dataPoint) {
-        scene.remove(dataPoint.object.mesh);
-        scene.remove(dataPoint.shadow.mesh);
-        scene.remove(dataPoint.textMesh);
+    function removeFromScene(compartment) {
+        scene.remove(compartment.object.mesh);
+        scene.remove(compartment.shadow.mesh);
+        scene.remove(compartment.textMesh);
     }
 
     function addArrow() {
@@ -613,8 +613,8 @@ export default (canvas, data) => {
             len: 200,
             pointIndex1: arrowPoints[0],
             pointIndex2: arrowPoints[1],
-            point1: data.dataPoints[arrowPoints[0]].position,
-            point2: data.dataPoints[arrowPoints[1]].position,
+            point1: data.compartments[arrowPoints[0]].position,
+            point2: data.compartments[arrowPoints[1]].position,
             dataPointRadius: radius,
             dataIndex: data.arrows.length + 1,
         }
@@ -642,7 +642,7 @@ export default (canvas, data) => {
                     index2--;
                     arrows[i].arrowInfo.pointIndex2--;
                 }
-                arrows[i].updatePos(data.dataPoints[index1].position, data.dataPoints[index2].position);
+                arrows[i].updatePos(data.compartments[index1].position, data.compartments[index2].position);
                 if (controls.showIndices) {
                     arrows[i].moveIndexText(arrows[i].position.x, arrows[i].position.y);
                 }
@@ -652,8 +652,8 @@ export default (canvas, data) => {
 
     function deleteDataPoint() {
         if (userSelectedDataPoint > -1) {
-            removeFromScene(data.dataPoints[userSelectedDataPoint]);
-            data.dataPoints.splice(userSelectedDataPoint, 1);
+            removeFromScene(data.compartments[userSelectedDataPoint]);
+            data.compartments.splice(userSelectedDataPoint, 1);
             // data.labels.splice(userSelectedDataPoint, 1);
             userSelectedDataPoint = -1;
         }
@@ -662,15 +662,15 @@ export default (canvas, data) => {
 
     function changeColor(newColor) {
         data.color = newColor;
-        for (var i = 0; i < data.dataPoints.length; i++) {
-            data.dataPoints[i].changeColor(newColor);
+        for (var i = 0; i < data.compartments.length; i++) {
+            data.compartments[i].changeColor(newColor);
         }
     }
 
     function changeAllRadius() {
         let point;
-        for (let i = 0; i < data.dataPoints.length; i++) {
-            point = data.dataPoints[i];
+        for (let i = 0; i < data.compartments.length; i++) {
+            point = data.compartments[i];
             point.adjustScale(radius);
             point.changeTextSize(radius)
             point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
@@ -682,9 +682,9 @@ export default (canvas, data) => {
 
     function revealIndices(show) {
         if (show) {
-            for (let i = 0; i < data.dataPoints.length; i++) {
-                data.dataPoints[i].showIndex(fontResource);
-                scene.add(data.dataPoints[i].indexTextMesh);
+            for (let i = 0; i < data.compartments.length; i++) {
+                data.compartments[i].showIndex(fontResource);
+                scene.add(data.compartments[i].indexTextMesh);
             }
             for (let i = 0; i < data.arrows.length; i++) {
                 data.arrows[i].showIndex(fontResource);
@@ -693,8 +693,8 @@ export default (canvas, data) => {
             return;
         }
 
-        for (let i = 0; i < data.dataPoints.length; i++) {
-            scene.remove(data.dataPoints[i].indexTextMesh);
+        for (let i = 0; i < data.compartments.length; i++) {
+            scene.remove(data.compartments[i].indexTextMesh);
         }
         for (let i = 0; i < data.arrows.length; i++) {
             scene.remove(data.arrows[i].indexTextMesh);
@@ -706,7 +706,7 @@ export default (canvas, data) => {
         if (data.animationData == null) {
             alert("Compartment data must be uploaded first");
             return;
-        } else if (data.dataPoints.length > 0) {
+        } else if (data.compartments.length > 0) {
             alert("Compartments already exist");
             return;
         }
@@ -718,10 +718,10 @@ export default (canvas, data) => {
             let label = !!data.labels[i + 1] ? data.labels[i + 1] : (i + 1).toString();
             addDataPoint(label);
             //Move to appropriate location
-            data.dataPoints[i].setPosition(-xPos, -1, 0);
-            data.dataPoints[i].moveText(-xPos, 0);
+            data.compartments[i].setPosition(-xPos, -1, 0);
+            data.compartments[i].moveText(-xPos, 0);
             if (controls.showIndices) {
-                data.dataPoints[i].moveIndexText(-xPos, (3 / 4) * (data.dataPoints[dataPointToMove].radius));
+                data.compartments[i].moveIndexText(-xPos, (3 / 4) * (data.compartments[dataPointToMove].radius));
             }
         }
     }
@@ -737,7 +737,7 @@ export default (canvas, data) => {
             alert("File Format does not support flux arrows. The first row must be the origin compartment and " +
                 "the second row must be the destination compartment.");
             return;
-        } else if (data.dataPoints.length <= 0) {
+        } else if (data.compartments.length <= 0) {
             alert("Compartments must be created first for this operation to succeed.");
             return;
         }
@@ -748,8 +748,8 @@ export default (canvas, data) => {
                 continue;
             arrowPoints[0] = null;
             arrowPoints[1] = null;
-            for (let j = 0; j < data.dataPoints.length; j++) {
-                const element = data.dataPoints[j].labelText.toLowerCase().trim();
+            for (let j = 0; j < data.compartments.length; j++) {
+                const element = data.compartments[j].labelText.toLowerCase().trim();
                 if (element === data.fluxOriginLabels[i].toLowerCase().trim()) {
                     arrowPoints[0] = j;
                     if (arrowPoints[1] !== null) {

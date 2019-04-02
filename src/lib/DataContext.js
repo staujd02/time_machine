@@ -1,21 +1,27 @@
 class DataContext {
 
-    constructor(plotData) {
-        this.plot_id = plotData.id;
+    constructor(model) {
+        this.plot_id = model.id;
         this.callbacks = [];
         this.labelMode = false;
         this.onLoad = null;
         this.animationData = null;
         this.fluxData = null;
 
-        Object.assign(this, plotData);
+        // This is for updating legacy saves
+        if(model.dataPoints){
+            model.compartments = model.dataPoints;
+            model.dataPoints = undefined;
+        }
+
+        Object.assign(this, model);
 
         this.callObservers = this.callObservers.bind(this);
         this.registerCallback = this.registerCallback.bind(this);
         this.currentPlot = this.currentPlot.bind(this);
         this.currentPlotDetails = this.currentPlotDetails.bind(this);
         this.loadPlot = this.loadPlot.bind(this);
-        this.injectDataPointList = this.loadPointData.bind(this);
+        this.injectCompartmentList = this.loadCompartmentData.bind(this);
         this.injectFluxList = this.loadFluxData.bind(this);
         this.dataLoaded = this.dataLoaded.bind(this);
         this.hasNextStep = this.hasNextStep.bind(this);
@@ -42,9 +48,12 @@ class DataContext {
     }
 
     currentPlotDetails() {
+        if(this.dataPoints){
+            this.compartments = this.dataPoints;
+        }
         return {
             id: this.plot_id,
-            dataPoints: this.dataPoints,
+            compartments: this.compartments,
             labels: this.labels,
             arrows: this.arrows,
             step: this.step,
@@ -78,13 +87,16 @@ class DataContext {
     }
 
     loadPlot(plot) {
+        if(plot.dataPoints){
+            plot.compartments = plot.dataPoints;
+        }
         Object.assign(this, plot);
         this.plot_id = plot.id;
         this.callObservers();
         return plot;
     }
 
-    loadPointData(xlsxData) {
+    loadCompartmentData(xlsxData) {
         this.labels = xlsxData[0];
         xlsxData.splice(0, 1); //Remove label column
         this.animationData = xlsxData;

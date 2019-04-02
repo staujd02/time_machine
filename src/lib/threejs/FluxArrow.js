@@ -36,7 +36,6 @@ class FluxArrow {
         this.changeIndexTextSize = this.changeIndexTextSize.bind(this);
         this.moveIndexText = this.moveIndexText.bind(this);
 
-
         this.object = new THREE.ArrowHelper(this.dir, this.position, this.length, this.baseColor, this.arrowLength, this.arrowWidth);
     }
 

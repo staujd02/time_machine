@@ -4,13 +4,13 @@ import * as THREE from 'three'
 const tinyColor = require('tinycolor2');
 const origRadius = 40;
 
-class DataPoint {
+class Compartment {
 
     constructor(index, previousState = null) {
 
         let isState = !!previousState;
 
-        this.dataIndex = index; // Holds the index the data point will retrieve data from
+        this.dataIndex = index; // Holds the index the compartment will retrieve data from
         this.labelText = "";
         this.baseColor = isState ? previousState.baseColor : "#aa00ff";
         this.radius = origRadius;
@@ -173,4 +173,4 @@ class DataPoint {
     }
 }
 
-export default DataPoint;
+export default Compartment;

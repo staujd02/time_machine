@@ -1,4 +1,4 @@
-import PlotData from './threejs/PlotData';
+import Model from './threejs/Model';
 import localforage from 'localforage';
 
 const WEB_STORAGE_KEY = "plots";
@@ -33,7 +33,7 @@ export default class LocalStorage {
     }
 
     //  item must have name of plot
-    //  addition must be PlotData
+    //  addition must be Model
     async updateStorage(name, addition){
         let models = await this.loadModelsFromDefaultContainer();
         for (const modelId in models) {
@@ -87,7 +87,7 @@ export default class LocalStorage {
     newModelTemplate(name = "Default Storage") {
        return {
                 name: name,
-                versions: [this.newModelVersion(new PlotData(name + "." + 1))]
+                versions: [this.newModelVersion(new Model(name + "." + 1))]
             };
     }
 

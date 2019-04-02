@@ -43,7 +43,7 @@ class Navigation extends Component {
       toast("Upload Point Data Complete", { 
         position: toast.POSITION.TOP_LEFT
       });
-      this.dataContext.injectDataPointList(data);
+      this.dataContext.injectCompartmentList(data);
   }
 
   uploadFluxData(data) {

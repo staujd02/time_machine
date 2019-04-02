@@ -1,7 +1,7 @@
-export class PlotData {
+export class Model {
     constructor(id = "untracked") {
         this.id = id;
-        this.dataPoints = [];
+        this.compartments = [];
         this.labels = [];
         this.arrows = [];
         this.step = 0;
@@ -14,4 +14,4 @@ export class PlotData {
     }
 }
 
-export default PlotData;
+export default Model;
