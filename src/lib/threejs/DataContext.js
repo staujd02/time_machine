@@ -1,87 +1,96 @@
-export default (PlotData) => {
+class DataContext {
 
-    let context = {};
+    constructor(plotData) {
+        this.plot_id = plotData.id;
+        this.callbacks = [];
+        this.labelMode = false;
+        this.onLoad = null;
+        this.animationData = null;
+        this.fluxData = null;
 
-    context.plot_id = PlotData.id;
+        Object.assign(this, plotData);
 
-    context.callbacks = [];
-    context.labelMode = false;
-    context.onLoad = null;
-    context.animationData = null;
-    context.fluxData = null;
+        this.callObservers = this.callObservers.bind(this);
+        this.registerCallback = this.registerCallback.bind(this);
+        this.currentPlot = this.currentPlot.bind(this);
+        this.currentPlotDetails = this.currentPlotDetails.bind(this);
+        this.loadPlot = this.loadPlot.bind(this);
+        this.injectDataPointList = this.loadPointData.bind(this);
+        this.injectFluxList = this.loadFluxData.bind(this);
+        this.dataLoaded = this.dataLoaded.bind(this);
+        this.hasNextStep = this.hasNextStep.bind(this);
+    }
 
-    Object.assign(context, PlotData);
+    dataLoaded() {
+        return this.animationData != null;
+    }
 
-    context.callObservers = () => {
-        context.callbacks.forEach(call => {
+    hasNextStep() {
+        return this.dataLoaded() && this.step < this.animationData.length;
+    }
+
+    registerCallback(call) {
+        this.callbacks.push(call);
+    }
+
+    currentPlot(plot = null) {
+        if (plot) {
+            return this.loadPlot(plot.versions[plot.versions.length - 1].plot);
+        } else {
+            return this.currentPlotDetails();
+        }
+    }
+
+    currentPlotDetails() {
+        return {
+            id: this.plot_id,
+            dataPoints: this.dataPoints,
+            labels: this.labels,
+            arrows: this.arrows,
+            step: this.step,
+            valueMax: this.valueMax,
+            fluxMax: this.fluxMax,
+            stepDelay: this.stepDelay,
+            color: this.color,
+            skipSteps: this.skipSteps,
+            radius: this.radius
+        };
+    }
+
+    callObservers() {
+        this.callbacks.forEach(call => {
             call();
         });
-    };
-
-    context.registerCallback = (call) => {
-        context.callbacks.push(call);
-    };
-
-    context.currentPlot = (plot = null) => {
-        if (plot) {
-            return context.loadPlot(plot.versions[plot.versions.length - 1].plot);
-        } else {
-            return {
-                id: context.plot_id,
-                dataPoints: context.dataPoints,
-                labels: context.labels,
-                arrows: context.arrows,
-                step: context.step,
-                valueMax: context.valueMax,
-                fluxMax: context.fluxMax,
-                stepDelay: context.stepDelay,
-                color: context.color,
-                skipSteps: context.skipSteps,
-                radius: context.radius
-            }
-        }
-    };
-
-    context.loadPlot = (plot) => {
-        Object.assign(context, plot);
-        context.plot_id = plot.id;
-        context.callObservers();
-        return plot;
-    };
-
-    context.injectDataPointList = json => loadPointData(json, context);
-    context.injectFluxList = json => loadFluxData(json, context);
-
-    context.dataLoaded = function dataLoaded() {
-        return context.animationData != null;
     }
 
-    context.hasNextStep = function hasNextStep() {
-        return context.dataLoaded() && context.step < context.animationData.length;
-    }
-
-    return context;
-
-    function loadFluxData(xlsxData, instance) {
+    loadFluxData(xlsxData) {
         if (xlsxData.length > 1 && isNaN(xlsxData[1][1])) {
-            instance.fluxOriginLabels = xlsxData[0];
-            instance.fluxDestinationLabels = xlsxData[1];
-            instance.fluxOriginLabels.splice(0, 1);
-            instance.fluxDestinationLabels.splice(0, 1);
+            this.fluxOriginLabels = xlsxData[0];
+            this.fluxDestinationLabels = xlsxData[1];
+            this.fluxOriginLabels.splice(0, 1);
+            this.fluxDestinationLabels.splice(0, 1);
             xlsxData.splice(0, 1); //Remove extra label column
         }
         xlsxData.splice(0, 1); //Remove label column
-        instance.fluxData = xlsxData;
-        if (instance.onLoad && typeof instance.onLoad === "function")
-            instance.onLoad();
+        this.fluxData = xlsxData;
+        if (this.onLoad && typeof this.onLoad === "function")
+            this.onLoad();
     }
 
-    function loadPointData(xlsxData, instance) {
-        instance.labels = xlsxData[0];
+    loadPlot(plot) {
+        Object.assign(this, plot);
+        this.plot_id = plot.id;
+        this.callObservers();
+        return plot;
+    }
+
+    loadPointData(xlsxData) {
+        this.labels = xlsxData[0];
         xlsxData.splice(0, 1); //Remove label column
-        instance.animationData = xlsxData;
-        if (instance.onLoad && typeof instance.onLoad === "function")
-            instance.onLoad();
+        this.animationData = xlsxData;
+        if (this.onLoad && typeof this.onLoad === "function")
+            this.onLoad();
     }
-
 }
+
+export default DataContext;

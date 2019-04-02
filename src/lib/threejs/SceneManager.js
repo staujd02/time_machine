@@ -5,6 +5,9 @@ import * as dat from 'dat.gui';
 import ActionUtilities from '../ActionUtilities';
 import ProgressBar from './ProgressBar';
 import FluxArrow from './FluxArrow';
+import {
+    isUndefined
+} from 'util';
 
 export default (canvas, data) => {
 
@@ -99,7 +102,7 @@ export default (canvas, data) => {
         if (data.animationData) {
             data.step = 0;
             paused = true;
-            progressBar.updateProgress(0, data.animationData[0][0]);
+            updateProgressBar(0, data.animationData[0][0]);
             applyStep();
         }
     }
@@ -107,8 +110,12 @@ export default (canvas, data) => {
     data.onFluxLoad = () => {}
     data.onLoad = () => {
         if (data.animationData != null) {
-            progressBar.appendText(data.animationData[0][0]);
+            if(progressBar.textMesh){
+                scene.remove(progressBar.textMesh);
+            }
+            progressBar.createText(data.animationData[0][0]);
             progressBar.setSteps(data.animationData.length);
+            scene.add(progressBar.textMesh);
         }
     }
     data.registerCallback(reloadScene);
@@ -284,9 +291,16 @@ export default (canvas, data) => {
 
     function buildProgressBar() {
         let rect = canvas.getBoundingClientRect();
-        progressBar = new ProgressBar(scene, fontResource, (-rect.height / 2.0) + 25);
-        progressBar.appendText("0");
-        progressBar.showTitle();
+        progressBar = new ProgressBar(fontResource, (-rect.height / 2.0) + 25);
+        scene.add(progressBar.bar.mesh);
+        scene.add(progressBar.progress.mesh);
+        if (progressBar.textMesh !== null) {
+            scene.remove(progressBar.textMesh)
+        }
+        progressBar.createText("0");
+        scene.add(progressBar.textMesh);
+        progressBar.createTitle();
+        scene.add(progressBar.titleTextMesh);
     }
 
     function setupEventListeners() {
@@ -356,7 +370,7 @@ export default (canvas, data) => {
                     controls.label = data.dataPoints[i].labelText;
                     userSelectedDataPoint = i;
                     break;
-                } else {
+                } else if (!isUndefined(data.dataPoints[i])) {
                     data.dataPoints[i].shadow.mesh.material.color.set("#cccccc");
                 }
             }
@@ -372,11 +386,19 @@ export default (canvas, data) => {
             if (progressBar.withinBar(mousePos.x, mousePos.y) && data.animationData) {
                 var clickedStep = progressBar.getStep(mousePos.x);
                 let text = data.animationData[clickedStep - 1];
-                progressBar.updateProgress(clickedStep, text ? text[0] : "0")
+                updateProgressBar(clickedStep, text ? text[0] : "0");
                 data.step = clickedStep - 1;
                 applyStep();
             }
         }
+    }
+
+    function updateProgressBar(step, text) {
+        if (progressBar.textMesh) {
+            scene.remove(progressBar.textMesh);
+        }
+        progressBar.updateProgress(step, text);
+        scene.add(progressBar.textMesh);
     }
 
     function getMousePos(canvas, evt) {
@@ -465,7 +487,7 @@ export default (canvas, data) => {
         if (data.step >= 0) {
             colorPoints();
         }
-        progressBar.updateProgress(data.step + 1, text);
+        updateProgressBar(data.step + 1, text);
     }
 
     function colorPoints() {
