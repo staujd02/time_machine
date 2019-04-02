@@ -2,7 +2,7 @@ import React from 'react';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
-import FileUtilities from '../lib/FileUtilities';
+import FileUtilities from '../lib/utilities/FileUtilities';
 import NavItem from 'react-bootstrap/lib/NavItem';
 
 export default class FileInput extends NavItem {

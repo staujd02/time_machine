@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import Compartment from './Compartment';
 import * as dat from 'dat.gui';
-import ActionUtilities from '../ActionUtilities';
+import ActionUtilities from '../utilities/ActionUtilities';
 import ProgressBar from './ProgressBar';
 import FluxArrow from './FluxArrow';
 import {
