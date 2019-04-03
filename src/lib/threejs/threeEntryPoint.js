@@ -1,10 +1,14 @@
-/** Imported From:  https://github.com/PierfrancescoSoffritti/pierfrancescosoffritti.com/blob/master/src/components/home/header/threejs/threeEntryPoint.js*/
 import SceneManager from './SceneManager';
-// import DataContext from './DataContext';
+import Interface from '../datGui/Interface';
+import Controller from '../datGui/Controller';
+import MouseHandler from '../MouseHandler';
 
 export default (container, dataContext) => {
     const canvas = createCanvas(document, container);
     const sceneManager = new SceneManager(canvas, dataContext);
+    const mouseHandler = new MouseHandler(canvas, dataContext);
+    const controller = new Controller(dataContext);
+    const menu = new Interface(controller);
 
     render();
 

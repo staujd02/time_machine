@@ -1,436 +1,78 @@
 /* Imported From: https://itnext.io/how-to-use-plain-three-js-in-your-react-apps-417a79d926e0 */
 import * as THREE from 'three';
 import Compartment from './Compartment';
-import * as dat from 'dat.gui';
-import ActionUtilities from '../utilities/ActionUtilities';
 import ProgressBar from './ProgressBar';
 import FluxArrow from './FluxArrow';
-import {
-    isUndefined
-} from 'util';
 
-export default (canvas, data) => {
+class SceneManager {
 
-    const actionUtil = new ActionUtilities();
-
-    const origin = new THREE.Vector3(0, 0, 0);
-    const screenDimensions = {
-        width: canvas.width,
-        height: canvas.height
+    constructor(canvas, dataContext) {
+        this.dataContext = dataContext;
+        this.ensureDefaults(dataContext, canvas);
+        this.loadFont(this.fontLoadingComplete.bind(this));
+        this.scene = buildScene();
+        this.renderer = buildRender(screenDimensions);
+        this.camera = buildCamera(screenDimensions);
+        this.registerCallbacks(dataContext, scene, this.reloadScene);
+        this.update = this.update.bind(this);
+        this.reloadScene = this.reloadScene.bind(this);
+        this.reloadCompartments = this.reloadCompartments.bind(this);
+        this.reloadArrows = this.reloadArrows.bind(this);
+        this.buildProgressBar = this.buildProgressBar.bind(this);
     }
-    const origRadius = 40;
-
-    var paused = true;
-    var stepInc = 1;
-    data.color = data.color || [70, 156, 150, 1];
-    data.stepDelay = data.stepDelay || 300;
-    data.valueMax = data.valueMax || 1;
-    data.fluxMax = data.fluxMax || 1;
-    data.skipSteps = data.skipSteps || 1;
-    data.radius = data.radius || origRadius;
-    var halfQuantity = data.valueMax / 2.0;
-    var halfFlux = data.fluxMax / 2.0;
-    var baseColor = [170, 0, 255, 1];
-    var radius = data.radius || origRadius;
-
-    var mouseDown = false;
-    var dataPointToMove = -1;
-    var userSelectedDataPoint = -1;
-
-    var progressBar;
-    var editMode;
-    var arrowMode = 0; //0 = Off, 1 = Waiting for 1st point, 2 = Waiting for 2nd point
-    var arrowPoints = [] //After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
-
-    var fontResource;
-
-    const controls = {
-        size: radius,
-        valueMax: data.valueMax,
-        fluxMax: data.fluxMax,
-        stepDelay: data.stepDelay,
-        color: data.color,
-        skipSteps: data.skipSteps,
-        generateCompartments: function () {
-            generateCompartments();
-        },
-        generateFluxArrows: function () {
-            generateFluxArrows();
-        },
-        seekHelp: function () {
-            window.open(window.location.href + 'help.html', '_blank');
-        },
-        changeStep: function () {
-            startStepping(true);
-        },
-        startAnimation: function () {
-            startStepping();
-        },
-        pauseAnimation: function () {
-            paused = true;
-        },
-        resetAnimation: reset,
-        addPoint: function () {
-            if (editMode) {
-                addPoint();
-            }
-        },
-        addArrow: function () {
-            if (editMode) {
-                arrowMode = 1;
-            }
-        },
-        deletePoint: function () {
-            if (editMode) {
-                deleteDataPoint();
-            }
-        },
-        showIndices: false,
-        compIndex: "",
-        label: "",
-        editMode: false,
-        labelMode: false
-    }
-
-    loadFont();
-    const scene = buildScene();
-    const renderer = buildRender(screenDimensions);
-    const camera = buildCamera(screenDimensions);
-    var datGui = buildGUI();
-
-    function reset() {
-        if (data.animationData) {
-            data.step = 0;
-            paused = true;
-            updateProgressBar(0, data.animationData[0][0]);
-            applyStep();
+    
+    ensureDefaults(dataContext, canvas){
+        dataContext.origin = new THREE.Vector3(0, 0, 0);
+        dataContext.screenDimensions = {
+            width: canvas.width,
+            height: canvas.height
         }
+        dataContext.origRadius = 40;
+        dataContext.paused = true;
+        dataContext.stepInc = 1;
+        dataContext.color = dataContext.color || [70, 156, 150, 1];
+        dataContext.stepDelay = dataContext.stepDelay || 300;
+        dataContext.valueMax = dataContext.valueMax || 1;
+        dataContext.fluxMax = dataContext.fluxMax || 1;
+        dataContext.skipSteps = dataContext.skipSteps || 1;
+        dataContext.radius = dataContext.radius || origRadius;
+        dataContext.halfQuantity = dataContext.valueMax / 2.0;
+        dataContext.halfFlux = dataContext.fluxMax / 2.0;
+        dataContext.baseColor = [170, 0, 255, 1];
+        dataContext.radius = dataContext.radius || origRadius;
+        dataContext.mouseDown = false;
+        dataContext.dataPointToMove = -1;
+        dataContext.userSelectedDataPoint = -1;
+        dataContext.progressBar = null;
+        dataContext.editMode = false;
+        dataContext.arrowMode = 0; //0 = Off, 1 = Waiting for 1st point, 2 = Waiting for 2nd point
+        dataContext.arrowPoints = []; //After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
+        dataContext.fontResource = null;
     }
 
-    data.onFluxLoad = () => {}
-    data.onLoad = () => {
-        if (data.animationData != null) {
-            if(progressBar.textMesh){
-                scene.remove(progressBar.textMesh);
-            }
-            progressBar.createText(data.animationData[0][0]);
-            progressBar.setSteps(data.animationData.length);
-            scene.add(progressBar.textMesh);
-        }
-    }
-    data.registerCallback(reloadScene);
-
-    function loadFont() {
-        var loader = new THREE.FontLoader();
-        loader.load(
+    loadFont(fontLoadingComplete) {
+        (new THREE.FontLoader()).load(
             'https://threejs.org//examples/fonts/helvetiker_regular.typeface.json',
             fontLoadingComplete
         );
     }
 
-    function fontLoadingComplete(font) {
-        fontResource = font;
-        reloadScene();
+    fontLoadingComplete(font) {
+        this.dataContext.fontResource = font;
+        this.reloadScene();
     }
 
-    function reloadScene() {
-        clearScene();
-        reloadCompartments();
-        reloadArrows();
-        buildProgressBar();
-        updatePanel();
-    }
-
-    function updatePanel() {
-        data.skipSteps = data.skipSteps || 1;
-        data.stepDelay = data.stepDelay || 300;
-        data.valueMax = data.valueMax || 1;
-        data.fluxMax = data.fluxMax || 1;
-        data.color = data.color || [70, 156, 150, 1];
-        data.radius = data.radius || origRadius;
-        radius = data.radius;
-        halfQuantity = data.valueMax / 2.0;
-        halfFlux = data.fluxMax / 2.0;
-        controls.size = data.radius;
-        controls.skipSteps = data.skipSteps;
-        controls.valueMax = data.valueMax;
-        controls.fluxMax = data.fluxMax;
-        controls.stepDelay = data.stepDelay;
-        controls.color = data.color;
-        datGui.updateDisplay();
-    }
-
-    function clearScene() {
-        let remove = [];
-        scene.traverse((child) => {
-            if (child instanceof THREE.Mesh || child instanceof THREE.ArrowHelper) {
-                remove.push(child);
-            }
-        });
-        for (let i = 0; i < remove.length; i++) {
-            scene.remove(remove[i]);
-        }
-    }
-
-    function reloadArrows() {
-        let hydratedArrows = [];
-        let legacyArrowIndex = 0;
-        data.arrows.forEach(oldArrow => {
-            hydratedArrows.push(restoreArrow(oldArrow, legacyArrowIndex++));
-        });
-        data.arrows = hydratedArrows;
-    }
-
-    function reloadCompartments() {
-        let hydratedCompartments = [];
-        let c = 0;
-        data.compartments.forEach(oldPoint => {
-            if (!oldPoint.dataIndex) { // For converting legacy saves on the fly
-                oldPoint.dataIndex = c++;
-            }
-            let point = restoreDataPoint(oldPoint);
-            hydratedCompartments.push(point);
-            point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
-        });
-        data.compartments = hydratedCompartments;
-    }
-
-    function buildGUI() {
-        var gui = new dat.GUI({
-            autoPlace: false
-        });
-        var customContainer = document.getElementById('datGuiAnchor');
-        customContainer.appendChild(gui.domElement);
-        gui.domElement.id = 'datGuiAnchor';
-        gui.add(controls, 'seekHelp').name("Help");
-        var animation = gui.addFolder("Animation");
-        buildAnimationFolder(animation);
-        var editing = gui.addFolder("Model Editing");
-        buildEditingFolder(editing);
-        var interpretation = gui.addFolder("Interpretation");
-        buildInterpretationFolder(interpretation);
-        return gui;
-    }
-
-    function buildAnimationFolder(folder) {
-        folder.add(controls, 'changeStep').name("Step - -- -- -| \u21E5");
-        folder.add(controls, 'startAnimation').name("Start - -- -- -| \u25B6");
-        folder.add(controls, 'pauseAnimation').name("Pause - -- -| \u23F8");
-        folder.add(controls, 'resetAnimation').name("Reset - --- -| \u21BB");
-        var timeController = folder.add(controls, 'stepDelay').name("Delay (in ms)").min(0).max(500).step(10)
-        timeController.onChange(function (newValue) {
-            data.stepDelay = newValue;
-        });
-        folder.add(controls, 'skipSteps').name("Step Size").onChange(function (newValue) {
-            data.skipSteps = newValue;
-        });
-        return folder;
-    }
-
-    function buildEditingFolder(editFolder) {
-        editFolder.add(controls, 'generateCompartments').name("Generate Comps.");
-        editFolder.add(controls, 'generateFluxArrows').name("Generate Flux.");
-        editFolder.add(controls, 'editMode').name("Edit Mode").onChange(function (newValue) {
-            editMode = newValue;
-        });
-        editFolder.add(controls, 'labelMode').name("Import Labels").onChange(function (newValue) {
-            data.labelMode = newValue;
-        });
-        editFolder.add(controls, 'showIndices').name("Show Indices").onChange(function (show) {
-            revealIndices(show);
-        });
-        editFolder.add(controls, 'compIndex').name("Data Index").listen().onFinishChange(function (newValue) {
-            if (userSelectedDataPoint !== -1) {
-                if ((newValue > data.compartments.length) || (newValue < 1)) {
-                    alert("Invalid Index");
-                } else {
-                    data.compartments[userSelectedDataPoint].dataIndex = newValue;
-                    scene.remove(data.compartments[userSelectedDataPoint].indexTextMesh);
-                    if (controls.showIndices) {
-                        data.compartments[userSelectedDataPoint].showIndex(fontResource);
-                        scene.add(data.compartments[userSelectedDataPoint].indexTextMesh);
-                    }
-                }
-            }
-        });
-        editFolder.add(controls, 'label').name("Comp. Label").listen().onFinishChange(function (newValue) {
-            scene.remove(data.compartments[userSelectedDataPoint].textMesh);
-            data.compartments[userSelectedDataPoint].appendText(fontResource, newValue, data.compartments[userSelectedDataPoint].position.x, data.compartments[userSelectedDataPoint].position.y);
-            scene.add(data.compartments[userSelectedDataPoint].textMesh);
-        });
-        editFolder.add(controls, 'addPoint').name("Add Compartment");
-        editFolder.add(controls, 'addArrow').name("Add Arrow");
-        editFolder.add(controls, 'deletePoint').name("Delete Compartment");
-        var sizeController = editFolder.add(controls, 'size').name("Size").min(10).max(100).step(1);
-        sizeController.onChange(function (newValue) {
-            radius = newValue; //Ratio of original size
-            data.radius = radius;
-            changeAllRadius();
-        });
-        return editFolder;
-    }
-
-    function buildInterpretationFolder(folder) {
-        var maxController = folder.add(controls, 'valueMax').name("Comp. Maximum");
-        maxController.onChange(function (newValue) {
-            data.valueMax = newValue;
-            halfQuantity = data.valueMax / 2.0;
-        });
-        var maxFluxController = folder.add(controls, 'fluxMax').name("Flux Maximum");
-        maxFluxController.onChange(function (newValue) {
-            data.fluxMax = newValue;
-            halfFlux = data.fluxMax / 2.0;
-        });
-        var colorController = folder.addColor(controls, 'color').name("50% Max Color");
-        colorController.onChange(function (newValue) {
-            baseColor = newValue;
-            changeColor(baseColor);
-        });
-        return folder;
-    }
-
-    function buildProgressBar() {
-        let rect = canvas.getBoundingClientRect();
-        progressBar = new ProgressBar(fontResource, (-rect.height / 2.0) + 25);
-        scene.add(progressBar.bar.mesh);
-        scene.add(progressBar.progress.mesh);
-        if (progressBar.textMesh !== null) {
-            scene.remove(progressBar.textMesh)
-        }
-        progressBar.createText("0");
-        scene.add(progressBar.textMesh);
-        progressBar.createTitle();
-        scene.add(progressBar.titleTextMesh);
-    }
-
-    function setupEventListeners() {
-        canvas.addEventListener("mousedown", function (evt) {
-            mouseDown = true;
-            checkWithinRange(canvas, evt);
-        });
-        canvas.addEventListener("mouseup", function (evt) {
-            if (editMode) {
-                if (arrowMode === 1) {
-                    arrowMode = 2;
-                    checkWithinRange(canvas, evt);
-                    if ((arrowPoints[0] != null) && (arrowPoints[1] != null)) {
-                        addArrow();
-                    } else {
-                        alert("Dragged line was not between two data points");
-                    }
-                    //Reset arrow points
-                    arrowPoints[0] = null;
-                    arrowPoints[1] = null;
-                }
-                mouseDown = false;
-                dataPointToMove = -1; //No current selected compartment
-            }
-            if (data.arrows.length > 0) {
-                updateArrows(-1);
-            }
-        });
-        canvas.addEventListener("mousemove", function (evt) {
-            if (editMode) {
-                if (mouseDown) {
-                    var mousePos = getMousePos(canvas, evt);
-                    var newMousePos = canvasToThreePos(mousePos);
-                    if (dataPointToMove > -1) {
-                        data.compartments[dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
-                        data.compartments[dataPointToMove].moveText(newMousePos.x, newMousePos.y);
-                        if (controls.showIndices) {
-                            data.compartments[dataPointToMove].moveIndexText(newMousePos.x, newMousePos.y + (3 / 4) * (data.compartments[dataPointToMove].radius));
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function checkWithinRange(canvas, evt) {
-        var mousePos = canvasToThreePos(getMousePos(canvas, evt));
-        //Check if click was on data point
-        controls.compIndex = ""; //Clear
-        controls.label = ""; //Clear
-        if (editMode) {
-            for (var i = 0; i < data.compartments.length; i++) {
-                var selected = data.compartments[i].withinCircle(mousePos.x, mousePos.y);
-                if (selected && arrowMode === 1) {
-                    data.compartments[i].shadow.mesh.material.color.set("#ffff00");
-                    arrowPoints[0] = i
-                } else if (selected && arrowMode === 2) {
-                    data.compartments[i].shadow.mesh.material.color.set("#ffff00");
-                    arrowPoints[1] = i
-                } else if (selected) {
-                    if (userSelectedDataPoint !== -1) {
-                        data.compartments[userSelectedDataPoint].shadow.mesh.material.color.set("#cccccc");
-                    }
-                    data.compartments[i].shadow.mesh.material.color.set("#ffff00");
-                    dataPointToMove = i;
-                    controls.compIndex = data.compartments[i].dataIndex;
-                    controls.label = data.compartments[i].labelText;
-                    userSelectedDataPoint = i;
-                    break;
-                } else if (!isUndefined(data.compartments[i])) {
-                    data.compartments[i].shadow.mesh.material.color.set("#cccccc");
-                }
-            }
-        }
-        if (dataPointToMove === -1 && progressBar) { //Click was not on a datapoint
-            userSelectedDataPoint = -1; //Deselect previous selection
-            if (data.animationData && !isDataLoaded()) {
-                alert("Please import data first");
-                return;
-            }
-
-            //Check if click was on progress bar
-            if (progressBar.withinBar(mousePos.x, mousePos.y) && data.animationData) {
-                var clickedStep = progressBar.getStep(mousePos.x);
-                let text = data.animationData[clickedStep - 1];
-                updateProgressBar(clickedStep, text ? text[0] : "0");
-                data.step = clickedStep - 1;
-                applyStep();
-            }
-        }
-    }
-
-    function updateProgressBar(step, text) {
-        if (progressBar.textMesh) {
-            scene.remove(progressBar.textMesh);
-        }
-        progressBar.updateProgress(step, text);
-        scene.add(progressBar.textMesh);
-    }
-
-    function getMousePos(canvas, evt) {
-        var rect = canvas.getBoundingClientRect();
-        return {
-            x: evt.clientX - rect.left,
-            y: evt.clientY - rect.top
-        };
-    }
-
-    function canvasToThreePos(mousePos) {
-        var rect = canvas.getBoundingClientRect();
-        var newX, newY;
-        newX = (rect.width / 2) - mousePos.x;
-        newY = mousePos.y - (rect.height / 2);
-        return {
-            x: newX,
-            y: newY
-        };
-    }
-
-    function buildScene() {
-        setupEventListeners();
+    buildScene() {
         const scene = new THREE.Scene();
         scene.background = new THREE.Color("#FFF");
         return scene;
     }
 
-    function buildRender({
-        width,
-        height
-    }) {
+    buildRender(screenDimensions) {
+        const {
+            width,
+            height
+        } = screenDimensions;
         const renderer = new THREE.WebGLRenderer({
             canvas: canvas,
             antialias: true,
@@ -446,130 +88,135 @@ export default (canvas, data) => {
         return renderer;
     }
 
-    function buildCamera({
+    buildCamera({
         width,
         height
     }) {
-        var camera = new THREE.OrthographicCamera(width / -2, width / 2, height / -2, height / 2, 1, 1000);
+        let camera = new THREE.OrthographicCamera(width / -2, width / 2, height / -2, height / 2, 1, 1000);
         camera.position.set(0, 0, -10);
-        camera.lookAt(origin)
+        camera.lookAt(origin);
         return (camera);
     }
 
-    function isDataLoaded() {
-        if (data && !data.dataLoaded()) {
-            alert("Please import data first");
-        }
-        return data.dataLoaded();
-    }
-
-    async function startStepping(singleStep = false) {
-        if (isDataLoaded()) {
-            paused = false;
-            stepForward(singleStep);
-        }
-    }
-
-    async function stepForward(singleStep = false) {
-        if (data.hasNextStep()) {
-            if (!paused) {
-                applyStep();
-                data.step += stepInc;
-                await actionUtil.sleep(data.stepDelay);
-                if (!singleStep)
-                    stepForward();
-            }
-        }
-    }
-
-    function applyStep() {
-        let text = data.step < 0 ? '0' : data.animationData[data.step][0];
-        if (data.step >= 0) {
-            colorPoints();
-        }
-        updateProgressBar(data.step + 1, text);
-    }
-
-    function colorPoints() {
-        let changePercent, diff;
-
-        for (let i = 0; i < data.compartments.length; i++) {
-            if (data.animationData[data.step][data.compartments[i].dataIndex] > halfQuantity) { //i+1 because column 0 holds time info
-                //Darken
-                diff = data.animationData[data.step][data.compartments[i].dataIndex] - halfQuantity;
-                changePercent = diff / halfQuantity;
-                data.compartments[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
-            } else {
-                //Lighten
-                diff = halfQuantity - data.animationData[data.step][data.compartments[i].dataIndex];
-                changePercent = diff / halfQuantity;
-                data.compartments[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
-            }
-        }
-        if (data.fluxData != null) {
-            for (let i = 0; i < data.arrows.length - 1; i++) {
-                if (data.fluxData[data.step][data.arrows[i].arrowInfo.dataIndex] > halfFlux) { //i+1 because column 0 holds time info
-                    //Darken
-                    diff = data.fluxData[data.step][data.arrows[i].arrowInfo.dataIndex] - halfFlux;
-                    changePercent = diff / halfFlux;
-                    scene.remove(data.arrows[i].object);
-                    data.arrows[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
-                    scene.add(data.arrows[i].object) //Add newly colored arrow
-                } else {
-                    //Lighten
-                    diff = halfFlux - data.fluxData[data.step][data.arrows[i].arrowInfo.dataIndex];
-                    changePercent = diff / halfFlux;
-                    scene.remove(data.arrows[i].object);
-                    data.arrows[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
-                    scene.add(data.arrows[i].object) //Add newly colored arrow
+    registerCallbacks(dataContext, scene, reloadScene){
+        dataContext.onFluxLoad = () => {};
+        dataContext.onLoad = () => {
+            if (dataContext.animationData != null) {
+                if (dataContext.progressBar.textMesh) {
+                    scene.remove(dataContext.progressBar.textMesh);
                 }
+                dataContext.progressBar.createText(dataContext.animationData[0][0]);
+                dataContext.progressBar.setSteps(dataContext.animationData.length);
+                scene.add(dataContext.progressBar.textMesh);
             }
+        };
+        dataContext.registerCallback(reloadScene);
+    }
+
+    reloadScene() {
+        this.clearScene(this.scene);
+        this.reloadCompartments();
+        this.reloadArrows();
+        this.buildProgressBar();
+        this.updatePanel();
+    }
+
+    /* Come back to this */
+    updatePanel() {
+        data.skipSteps = data.skipSteps || 1;
+        data.stepDelay = data.stepDelay || 300;
+        data.valueMax = data.valueMax || 1;
+        data.fluxMax = data.fluxMax || 1;
+        data.color = data.color || [70, 156, 150, 1];
+        data.radius = data.radius || origRadius;
+        radius = data.radius;
+        halfQuantity = data.valueMax / 2.0;
+        halfFlux = data.fluxMax / 2.0;
+        controls.size = data.radius;
+        controls.skipSteps = data.skipSteps;
+        controls.valueMax = data.valueMax;
+        controls.fluxMax = data.fluxMax;
+        controls.stepDelay = data.stepDelay;
+        controls.color = data.color;
+        interface.updateDisplay();
+    }
+
+    clearScene(scene) {
+        let remove = [];
+        scene.traverse((child) => {
+            if (child instanceof THREE.Mesh || child instanceof THREE.ArrowHelper) {
+                remove.push(child);
+            }
+        });
+        for (let i = 0; i < remove.length; i++) {
+            scene.remove(remove[i]);
         }
     }
 
-    function restoreArrow(savedData, legacyIndex) {
+    reloadArrows() {
+        let hydratedArrows = [];
+        let legacyArrowIndex = 0;
+        this.dataContext.arrows.forEach(oldArrow => {
+            hydratedArrows.push(this.restoreArrow(oldArrow, legacyArrowIndex++, this.scene));
+        });
+        this.dataContext.arrows = hydratedArrows;
+    }
+
+    reloadCompartments() {
+        let hydratedCompartments = [];
+        let c = 0;
+        this.dataContext.compartments.forEach(oldPoint => {
+            if (!oldPoint.dataIndex) { // For converting legacy saves on the fly
+                oldPoint.dataIndex = c++;
+            }
+            let point = this.restoreCompartment(oldPoint, scene, dataContext);
+            hydratedCompartments.push(point);
+            point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
+        });
+        this.dataContext.compartments = hydratedCompartments;
+    }
+
+    buildProgressBar() {
+        let rect = this.canvas.getBoundingClientRect();
+        this.dataContext.progressBar = new ProgressBar(fontResource, (-rect.height / 2.0) + 25);
+        this.scene.add(progressBar.bar.mesh);
+        this.scene.add(progressBar.progress.mesh);
+        if (this.dataContext.progressBar.textMesh !== null) {
+            this.scene.remove(progressBar.textMesh)
+        }
+        this.dataContext.progressBar.createText("0");
+        this.scene.add(this.dataContext.progressBar.textMesh);
+        this.dataContext.progressBar.createTitle();
+        this.scene.add(dataContext.progressBar.titleTextMesh);
+    }
+
+    updateProgressBar(step, text) {
+        if (progressBar.textMesh) {
+            scene.remove(progressBar.textMesh);
+        }
+        progressBar.updateProgress(step, text);
+        scene.add(progressBar.textMesh);
+    }
+
+    restoreArrow(savedData, legacyIndex, scene) {
         let arrow = new FluxArrow(savedData.arrowInfo, legacyIndex);
         scene.add(arrow.object);
         return arrow;
     }
 
-    function restoreDataPoint(savedData) {
-        // let labels = data.labels;
-        let compartment = new Compartment(savedData.dataIndex, savedData); //TODO index
+    restoreCompartment(savedData, scene, dataContext) {
+        let compartment = new Compartment(savedData.dataIndex, savedData);
         scene.add(compartment.object.mesh);
         scene.add(compartment.shadow.mesh);
         let labelText = savedData.textMesh ? savedData.textMesh.geometries[0].text : " ";
         if (!labelText)
             labelText = " ";
-        compartment.appendText(fontResource, labelText, compartment.position.x, compartment.position.y);
+        compartment.appendText(dataContext.fontResource, labelText, compartment.position.x, compartment.position.y);
         scene.add(compartment.textMesh);
-        // labels.push(labelText);
         return compartment;
     }
 
-    function addPoint() {
-        let labels = data.labels;
-        let labelMode = data.labelMode;
-        let compartments = data.compartments;
-        var labelText;
-        if (labelMode && labels.length > compartments.length + 1) {
-            labelText = labels[compartments.length + 1]
-        } else {
-            if (labelMode && labels.length <= compartments.length) {
-                labelText = window.prompt("Imported data does not contain a column #" + compartments.length + ".\nPlease label your data point: ");
-
-            } else {
-                labelText = window.prompt("Label your data point: ");
-            }
-        }
-        if ((!labelText) || (labelText === "")) {
-            alert("No label entered");
-            return;
-        }
-        addDataPoint(labelText);
-    }
-
-    function addDataPoint(labelText) {
+    addCompartment(labelText) {
         let compartments = data.compartments;
         let compartment = new Compartment(compartments.length + 1);
         scene.add(compartment.object.mesh);
@@ -588,13 +235,13 @@ export default (canvas, data) => {
         compartment.moveText(0, 0);
     }
 
-    function removeFromScene(compartment) {
+    removeFromScene(compartment) {
         scene.remove(compartment.object.mesh);
         scene.remove(compartment.shadow.mesh);
         scene.remove(compartment.textMesh);
     }
 
-    function addArrow() {
+    addArrow() {
         let arrows = data.arrows;
         var shift = false;
         //Check if new arrow is between an already arrowed combination
@@ -624,7 +271,7 @@ export default (canvas, data) => {
         arrows.push(arrow);
     }
 
-    function updateArrows(deletedDataPoint) {
+    updateArrows(deletedDataPoint) {
         let arrows = data.arrows;
         for (var i = 0; i < arrows.length; i++) {
             var index1 = arrows[i].arrowInfo.pointIndex1;
@@ -650,24 +297,23 @@ export default (canvas, data) => {
         }
     }
 
-    function deleteDataPoint() {
+    deleteDataPoint() {
         if (userSelectedDataPoint > -1) {
             removeFromScene(data.compartments[userSelectedDataPoint]);
             data.compartments.splice(userSelectedDataPoint, 1);
-            // data.labels.splice(userSelectedDataPoint, 1);
             userSelectedDataPoint = -1;
         }
         updateArrows(userSelectedDataPoint);
     }
 
-    function changeColor(newColor) {
+    changeColor(newColor) {
         data.color = newColor;
         for (var i = 0; i < data.compartments.length; i++) {
             data.compartments[i].changeColor(newColor);
         }
     }
 
-    function changeAllRadius() {
+    changeAllRadius() {
         let point;
         for (let i = 0; i < data.compartments.length; i++) {
             point = data.compartments[i];
@@ -680,7 +326,7 @@ export default (canvas, data) => {
         }
     }
 
-    function revealIndices(show) {
+    revealIndices(show) {
         if (show) {
             for (let i = 0; i < data.compartments.length; i++) {
                 data.compartments[i].showIndex(fontResource);
@@ -699,82 +345,12 @@ export default (canvas, data) => {
         for (let i = 0; i < data.arrows.length; i++) {
             scene.remove(data.arrows[i].indexTextMesh);
         }
-
     }
 
-    function generateCompartments() {
-        if (data.animationData == null) {
-            alert("Compartment data must be uploaded first");
-            return;
-        } else if (data.compartments.length > 0) {
-            alert("Compartments already exist");
-            return;
-        }
-        var rect = canvas.getBoundingClientRect();
-        var freeSpace = rect.width - (data.animationData[0].length * (radius * 2)) - 2 * radius; // - 2*radius allocates for a radius buffer space on each end
-        var spaceBetween = freeSpace / (data.animationData[0].length - 1);
-        for (var i = 0; i < data.animationData[0].length; i++) {
-            let xPos = -((rect.width / 2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius; // + radius gives a radius buffer space on each end
-            let label = !!data.labels[i + 1] ? data.labels[i + 1] : (i + 1).toString();
-            addDataPoint(label);
-            //Move to appropriate location
-            data.compartments[i].setPosition(-xPos, -1, 0);
-            data.compartments[i].moveText(-xPos, 0);
-            if (controls.showIndices) {
-                data.compartments[i].moveIndexText(-xPos, (3 / 4) * (data.compartments[dataPointToMove].radius));
-            }
-        }
+    update() {
+        this.renderer.render(this.scene, this.camera);
     }
 
-    function generateFluxArrows() {
-        if (data.arrows.length > 0) {
-            alert("Flux Arrows already exist");
-            return;
-        } else if (!data.fluxData) {
-            alert("Flux data must be uploaded first before automatic generation can take place.");
-            return;
-        } else if (!data.fluxOriginLabels && !data.fluxDestinationLabels) {
-            alert("File Format does not support flux arrows. The first row must be the origin compartment and " +
-                "the second row must be the destination compartment.");
-            return;
-        } else if (data.compartments.length <= 0) {
-            alert("Compartments must be created first for this operation to succeed.");
-            return;
-        }
-        for (let i = 0; i < data.fluxData[0].length; i++) {
-            if (data.fluxDestinationLabels.length - 1 < i || data.fluxOriginLabels.length - 1 < i)
-                break;
-            if (!data.fluxDestinationLabels[i] || !data.fluxOriginLabels[i])
-                continue;
-            arrowPoints[0] = null;
-            arrowPoints[1] = null;
-            for (let j = 0; j < data.compartments.length; j++) {
-                const element = data.compartments[j].labelText.toLowerCase().trim();
-                if (element === data.fluxOriginLabels[i].toLowerCase().trim()) {
-                    arrowPoints[0] = j;
-                    if (arrowPoints[1] !== null) {
-                        addArrow();
-                        break;
-                    }
-                    continue;
-                }
-                if (element === data.fluxDestinationLabels[i].toLowerCase().trim()) {
-                    arrowPoints[1] = j;
-                    if (arrowPoints[0] !== null) {
-                        addArrow();
-                        break;
-                    }
-                    continue;
-                }
-            }
-        }
-    }
-
-    function update() {
-        renderer.render(scene, camera);
-    }
-
-    return {
-        update
-    }
 }
+
+export default SceneManager;
