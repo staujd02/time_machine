@@ -8,46 +8,71 @@ class SceneManager {
 
     constructor(canvas, dataContext) {
         this.dataContext = dataContext;
-        this.ensureDefaults(dataContext, canvas);
+        this.dataContext.origin = new THREE.Vector3(0, 0, 0);
         this.loadFont(this.fontLoadingComplete.bind(this));
         this.scene = buildScene();
-        this.renderer = buildRender(screenDimensions);
-        this.camera = buildCamera(screenDimensions);
-        this.registerCallbacks(dataContext, scene, this.reloadScene);
+        this.renderer = buildRender(screenDimensions, canvas);
+        this.camera = buildCamera(screenDimensions, this.dataContext);
+        this.registerCallbacks(this.dataContext, this.scene, this.reloadScene);
         this.update = this.update.bind(this);
         this.reloadScene = this.reloadScene.bind(this);
         this.reloadCompartments = this.reloadCompartments.bind(this);
         this.reloadArrows = this.reloadArrows.bind(this);
         this.buildProgressBar = this.buildProgressBar.bind(this);
+        this.changeAllRadius = this.changeAllRadius.bind(this);
+        this.changeColor = this.changeColor.bind(this);
+        this.updateArrows = this.updateArrows.bind(this);
+        this.addFluxArrow = this.addFluxArrow.bind(this);
+        this.removeFromScene = this.removeFromScene.bind(this);
+        this.addCompartment = this.addCompartment.bind(this);
+        this.renameCompartment = this.renameCompartment.bind(this);
+        this.updateCompartmentIndexText = this.updateCompartmentIndexText.bind(this);
+        this.showCompartmentIndexText = this.showCompartmentIndexText.bind(this);
+        this.hideCompartmentIndexText = this.hideCompartmentIndexText.bind(this);
+        this.showFluxIndexText = this.showFluxIndexText.bind(this);
+        this.hideFluxIndexText = this.hideFluxIndexText.bind(this);
+        this.updateProgressBar = this.updateProgressBar.bind(this);
     }
-    
-    ensureDefaults(dataContext, canvas){
-        dataContext.origin = new THREE.Vector3(0, 0, 0);
-        dataContext.screenDimensions = {
-            width: canvas.width,
-            height: canvas.height
+
+    updateProgressBar(step, text){
+        if (this.dataContext.progressBar.textMesh) {
+            this.scene.remove(this.dataContext.progressBar.textMesh);
         }
-        dataContext.origRadius = 40;
-        dataContext.paused = true;
-        dataContext.stepInc = 1;
-        dataContext.color = dataContext.color || [70, 156, 150, 1];
-        dataContext.stepDelay = dataContext.stepDelay || 300;
-        dataContext.valueMax = dataContext.valueMax || 1;
-        dataContext.fluxMax = dataContext.fluxMax || 1;
-        dataContext.skipSteps = dataContext.skipSteps || 1;
-        dataContext.radius = dataContext.radius || origRadius;
-        dataContext.halfQuantity = dataContext.valueMax / 2.0;
-        dataContext.halfFlux = dataContext.fluxMax / 2.0;
-        dataContext.baseColor = [170, 0, 255, 1];
-        dataContext.radius = dataContext.radius || origRadius;
-        dataContext.mouseDown = false;
-        dataContext.dataPointToMove = -1;
-        dataContext.userSelectedDataPoint = -1;
-        dataContext.progressBar = null;
-        dataContext.editMode = false;
-        dataContext.arrowMode = 0; //0 = Off, 1 = Waiting for 1st point, 2 = Waiting for 2nd point
-        dataContext.arrowPoints = []; //After `Add Arrow`, [0] holds FROM data point's index, [1] holds TO data point's index
-        dataContext.fontResource = null;
+        this.dataContext.progressBar.updateProgress(step, text);
+        this.scene.add(this.dataContext.progressBar.textMesh);
+    }
+
+    showCompartmentIndexText(compartment) {
+        compartment.showIndex(this.dataContext.fontResource);
+        this.scene.add(compartment.indexTextMesh);
+    }
+
+    hideCompartmentIndexText(compartment) {
+        this.scene.remove(compartment.indexTextMesh);
+    }
+
+    showFluxIndexText(arrow) {
+        arrow.showIndex(this.dataContext.fontResource);
+        this.scene.add(arrow.indexTextMesh);
+    }
+
+    hideFluxIndexText(arrow) {
+        this.scene.remove(arrow.indexTextMesh);
+    }
+
+
+    renameCompartment(compartment, newName) {
+        this.scene.remove(compartment.textMesh);
+        compartment.appendText(this.dataContext.fontResource, newName, compartment.position.x, compartment.position.y);
+        this.scene.add(compartment.textMesh);
+    }
+
+    updateCompartmentIndexText(compartment, showIndex = false) {
+        scene.remove(compartment.indexTextMesh);
+        if (showIndex) {
+            compartment.showIndex(fontResource);
+            scene.add(compartment.indexTextMesh);
+        }
     }
 
     loadFont(fontLoadingComplete) {
@@ -68,7 +93,7 @@ class SceneManager {
         return scene;
     }
 
-    buildRender(screenDimensions) {
+    buildRender(screenDimensions, canvas) {
         const {
             width,
             height
@@ -91,14 +116,14 @@ class SceneManager {
     buildCamera({
         width,
         height
-    }) {
+    }, dataContext) {
         let camera = new THREE.OrthographicCamera(width / -2, width / 2, height / -2, height / 2, 1, 1000);
         camera.position.set(0, 0, -10);
-        camera.lookAt(origin);
+        camera.lookAt(dataContext.origin);
         return (camera);
     }
 
-    registerCallbacks(dataContext, scene, reloadScene){
+    registerCallbacks(dataContext, scene, reloadScene) {
         dataContext.onFluxLoad = () => {};
         dataContext.onLoad = () => {
             if (dataContext.animationData != null) {
@@ -118,27 +143,6 @@ class SceneManager {
         this.reloadCompartments();
         this.reloadArrows();
         this.buildProgressBar();
-        this.updatePanel();
-    }
-
-    /* Come back to this */
-    updatePanel() {
-        data.skipSteps = data.skipSteps || 1;
-        data.stepDelay = data.stepDelay || 300;
-        data.valueMax = data.valueMax || 1;
-        data.fluxMax = data.fluxMax || 1;
-        data.color = data.color || [70, 156, 150, 1];
-        data.radius = data.radius || origRadius;
-        radius = data.radius;
-        halfQuantity = data.valueMax / 2.0;
-        halfFlux = data.fluxMax / 2.0;
-        controls.size = data.radius;
-        controls.skipSteps = data.skipSteps;
-        controls.valueMax = data.valueMax;
-        controls.fluxMax = data.fluxMax;
-        controls.stepDelay = data.stepDelay;
-        controls.color = data.color;
-        interface.updateDisplay();
     }
 
     clearScene(scene) {
@@ -169,7 +173,7 @@ class SceneManager {
             if (!oldPoint.dataIndex) { // For converting legacy saves on the fly
                 oldPoint.dataIndex = c++;
             }
-            let point = this.restoreCompartment(oldPoint, scene, dataContext);
+            let point = this.restoreCompartment(oldPoint, this.scene, this.dataContext);
             hydratedCompartments.push(point);
             point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
         });
@@ -179,23 +183,15 @@ class SceneManager {
     buildProgressBar() {
         let rect = this.canvas.getBoundingClientRect();
         this.dataContext.progressBar = new ProgressBar(fontResource, (-rect.height / 2.0) + 25);
-        this.scene.add(progressBar.bar.mesh);
-        this.scene.add(progressBar.progress.mesh);
+        this.scene.add(this.dataContext.progressBar.bar.mesh);
+        this.scene.add(this.dataContext.progressBar.progress.mesh);
         if (this.dataContext.progressBar.textMesh !== null) {
-            this.scene.remove(progressBar.textMesh)
+            this.scene.remove(this.dataContext.progressBar.textMesh)
         }
         this.dataContext.progressBar.createText("0");
         this.scene.add(this.dataContext.progressBar.textMesh);
         this.dataContext.progressBar.createTitle();
-        this.scene.add(dataContext.progressBar.titleTextMesh);
-    }
-
-    updateProgressBar(step, text) {
-        if (progressBar.textMesh) {
-            scene.remove(progressBar.textMesh);
-        }
-        progressBar.updateProgress(step, text);
-        scene.add(progressBar.textMesh);
+        this.scene.add(this.dataContext.progressBar.titleTextMesh);
     }
 
     restoreArrow(savedData, legacyIndex, scene) {
@@ -216,68 +212,47 @@ class SceneManager {
         return compartment;
     }
 
-    addCompartment(labelText) {
-        let compartments = data.compartments;
+    addCompartment(labelText, showIndex = false) {
+        let compartments = this.dataContext.compartments;
         let compartment = new Compartment(compartments.length + 1);
-        scene.add(compartment.object.mesh);
-        scene.add(compartment.shadow.mesh);
-        if (controls.showIndices) {
+        this.scene.add(compartment.object.mesh);
+        this.scene.add(compartment.shadow.mesh);
+        if (showIndex) {
             compartment.showIndex(fontResource);
-            scene.add(compartment.indexTextMesh);
+            this.scene.add(compartment.indexTextMesh);
         }
-
-        compartment.changeColor(baseColor);
-        compartment.adjustScale(radius);
-        compartment.appendText(fontResource, labelText, compartment.position.x, compartment.position.y);
-        scene.add(compartment.textMesh);
+        compartment.changeColor(this.dataContext.baseColor);
+        compartment.adjustScale(this.dataContext.radius);
+        compartment.appendText(this.dataContext.fontResource, labelText, compartment.position.x, compartment.position.y);
+        this.scene.add(compartment.textMesh);
         compartments.push(compartment);
         compartment.setPosition(0, 0, 0);
         compartment.moveText(0, 0);
     }
 
     removeFromScene(compartment) {
-        scene.remove(compartment.object.mesh);
-        scene.remove(compartment.shadow.mesh);
-        scene.remove(compartment.textMesh);
+        this.scene.remove(compartment.object.mesh);
+        this.scene.remove(compartment.shadow.mesh);
+        this.scene.remove(compartment.textMesh);
     }
 
-    addArrow() {
-        let arrows = data.arrows;
-        var shift = false;
-        //Check if new arrow is between an already arrowed combination
-        for (var i = 0; i < arrows.length; i++) {
-            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[0] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[1]) {
-                //Arrow already exists in that direction-- do nothing
-                return
-            }
-            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[1] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[0]) {
-                //Arrow exists in opposite direction-- shift new arrow
-                shift = true;
-            }
-        }
-        var arrowInfo = {
-            shift: shift,
-            len: 200,
-            pointIndex1: arrowPoints[0],
-            pointIndex2: arrowPoints[1],
-            point1: data.compartments[arrowPoints[0]].position,
-            point2: data.compartments[arrowPoints[1]].position,
-            dataPointRadius: radius,
-            dataIndex: data.arrows.length + 1,
-        }
+    addFluxArrow(arrowInfo) {
+        let arrows = this.dataContext.arrows;
+
+        this.dataContext.arrowMode = 0;
+
         let arrow = new FluxArrow(arrowInfo);
-        scene.add(arrow.object);
-        arrowMode = 0;
+        this.scene.add(arrow.object);
         arrows.push(arrow);
     }
 
     updateArrows(deletedDataPoint) {
-        let arrows = data.arrows;
+        let arrows = this.dataContext.arrows;
         for (var i = 0; i < arrows.length; i++) {
-            var index1 = arrows[i].arrowInfo.pointIndex1;
-            var index2 = arrows[i].arrowInfo.pointIndex2;
+            let index1 = arrows[i].arrowInfo.pointIndex1;
+            let index2 = arrows[i].arrowInfo.pointIndex2;
             if ((index1 === deletedDataPoint) || (index2 === deletedDataPoint)) {
-                scene.remove(arrows[i].object)
+                this.scene.remove(arrows[i].object)
                 arrows.splice(i, 1);
                 i--; //To go back and check arrow that just moved into i'th position
             } else {
@@ -289,7 +264,7 @@ class SceneManager {
                     index2--;
                     arrows[i].arrowInfo.pointIndex2--;
                 }
-                arrows[i].updatePos(data.compartments[index1].position, data.compartments[index2].position);
+                arrows[i].updatePos(this.dataContext.compartments[index1].position, this.dataContext.compartments[index2].position);
                 if (controls.showIndices) {
                     arrows[i].moveIndexText(arrows[i].position.x, arrows[i].position.y);
                 }
@@ -297,53 +272,24 @@ class SceneManager {
         }
     }
 
-    deleteDataPoint() {
-        if (userSelectedDataPoint > -1) {
-            removeFromScene(data.compartments[userSelectedDataPoint]);
-            data.compartments.splice(userSelectedDataPoint, 1);
-            userSelectedDataPoint = -1;
+    changeColor(newColor) {
+        this.dataContext.color = newColor;
+        for (let i = 0; i < this.dataContext.compartments.length; i++) {
+            this.dataContext.compartments[i].changeColor(newColor);
         }
-        updateArrows(userSelectedDataPoint);
     }
 
-    changeColor(newColor) {
-        data.color = newColor;
-        for (var i = 0; i < data.compartments.length; i++) {
-            data.compartments[i].changeColor(newColor);
-        }
-    }
 
     changeAllRadius() {
         let point;
-        for (let i = 0; i < data.compartments.length; i++) {
-            point = data.compartments[i];
-            point.adjustScale(radius);
-            point.changeTextSize(radius)
+        for (let i = 0; i < this.dataContext.compartments.length; i++) {
+            point = this.dataContext.compartments[i];
+            point.adjustScale(this.dataContext.radius);
+            point.changeTextSize(this.dataContext.radius)
             point.moveText(point.object.mesh.position.x, point.object.mesh.position.y);
         }
         for (let i = 0; i < data.arrows.length; i++) {
-            data.arrows[i].adjustScale(radius);
-        }
-    }
-
-    revealIndices(show) {
-        if (show) {
-            for (let i = 0; i < data.compartments.length; i++) {
-                data.compartments[i].showIndex(fontResource);
-                scene.add(data.compartments[i].indexTextMesh);
-            }
-            for (let i = 0; i < data.arrows.length; i++) {
-                data.arrows[i].showIndex(fontResource);
-                scene.add(data.arrows[i].indexTextMesh);
-            }
-            return;
-        }
-
-        for (let i = 0; i < data.compartments.length; i++) {
-            scene.remove(data.compartments[i].indexTextMesh);
-        }
-        for (let i = 0; i < data.arrows.length; i++) {
-            scene.remove(data.arrows[i].indexTextMesh);
+            this.dataContext.arrows[i].adjustScale(this.dataContext.radius);
         }
     }
 

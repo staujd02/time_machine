@@ -1,13 +1,14 @@
 'use strict';
 
 import ActionUtilities from '../utilities/ActionUtilities';
-    
+
 const actionUtil = new ActionUtilities();
 
 class Controller {
 
-    constructor(dataContext) {
+    constructor(dataContext, sceneManager) {
         this.dataContext = dataContext;
+        this.sceneManager = sceneManager;
         this.controls = createControls(dataContext);
         this.callbacks = createCallbacks(this);
     }
@@ -73,9 +74,7 @@ class Controller {
     }
 
     labelCallback(newValue) {
-        scene.remove(data.compartments[userSelectedDataPoint].textMesh);
-        data.compartments[userSelectedDataPoint].appendText(fontResource, newValue, data.compartments[userSelectedDataPoint].position.x, data.compartments[userSelectedDataPoint].position.y);
-        scene.add(data.compartments[userSelectedDataPoint].textMesh);
+        renameCompartment(data.compartments[userSelectedDataPoint], newValue);
     }
 
     compIndexCallback(newValue) {
@@ -83,12 +82,9 @@ class Controller {
             if ((newValue > data.compartments.length) || (newValue < 1)) {
                 alert("Invalid Index");
             } else {
-                data.compartments[userSelectedDataPoint].dataIndex = newValue;
-                scene.remove(data.compartments[userSelectedDataPoint].indexTextMesh);
-                if (controls.showIndices) {
-                    data.compartments[userSelectedDataPoint].showIndex(fontResource);
-                    scene.add(data.compartments[userSelectedDataPoint].indexTextMesh);
-                }
+                let compartment = data.compartments[userSelectedDataPoint];
+                compartment.dataIndex = newValue;
+                this.sceneManager.updateCompartmentIndexText(compartment, controls.showIndices);
             }
         }
     }
@@ -118,6 +114,61 @@ class Controller {
             alert("Please import data first");
         }
         return data.dataLoaded();
+    }
+
+    revealIndices(show) {
+        if (show) {
+            for (let i = 0; i < data.compartments.length; i++) {
+                this.sceneManager.showCompartmentIndexText(data.compartments[i]);
+            }
+            for (let i = 0; i < data.arrows.length; i++) {
+                this.sceneManager.showFluxIndexText(data.arrows[i]);
+            }
+            return;
+        }
+
+        for (let i = 0; i < data.compartments.length; i++) {
+            this.sceneManager.hideCompartmentIndexText(data.compartments[i]);
+        }
+        for (let i = 0; i < data.arrows.length; i++) {
+            this.sceneManager.hideFluxIndexText(data.arrows[i]);
+        }
+    }
+
+    addArrow() {
+        let arrows = data.arrows;
+        var shift = false;
+        //Check if new arrow is between an already arrowed combination
+        for (var i = 0; i < arrows.length; i++) {
+            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[0] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[1]) {
+                //Arrow already exists in that direction-- do nothing
+                return
+            }
+            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[1] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[0]) {
+                //Arrow exists in opposite direction-- shift new arrow
+                shift = true;
+            }
+        }
+        var arrowInfo = {
+            shift: shift,
+            len: 200,
+            pointIndex1: arrowPoints[0],
+            pointIndex2: arrowPoints[1],
+            point1: data.compartments[arrowPoints[0]].position,
+            point2: data.compartments[arrowPoints[1]].position,
+            dataPointRadius: radius,
+            dataIndex: data.arrows.length + 1,
+        }
+        this.sceneManager.addFluxArrow(arrowInfo);
+    }
+
+    deleteDataPoint() {
+        if (userSelectedDataPoint > -1) {
+            removeFromScene(data.compartments[userSelectedDataPoint]);
+            data.compartments.splice(userSelectedDataPoint, 1);
+            userSelectedDataPoint = -1;
+        }
+        updateArrows(userSelectedDataPoint);
     }
 
     applyStep() {
@@ -173,7 +224,11 @@ class Controller {
             applyStep();
         }
     }
-    
+
+    updateProgressBar(step, text) {
+        this.sceneManager.updateProgressBar(step, text);
+    }
+
     addPoint() {
         let labels = data.labels;
         let labelMode = data.labelMode;
@@ -193,7 +248,7 @@ class Controller {
             alert("No label entered");
             return;
         }
-        addCompartment(labelText);
+        this.sceneManager.addCompartment(labelText, controls.showIndices);
     }
 
 
@@ -233,7 +288,7 @@ class Controller {
             stepForward(singleStep);
         }
     }
-    
+
     async stepForward(singleStep = false) {
         if (data.hasNextStep()) {
             if (!paused) {
@@ -261,7 +316,7 @@ class Controller {
         for (var i = 0; i < data.animationData[0].length; i++) {
             let xPos = -((rect.width / 2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius; // + radius gives a radius buffer space on each end
             let label = !!data.labels[i + 1] ? data.labels[i + 1] : (i + 1).toString();
-            addDataPoint(label);
+            this.sceneManager.addCompartment(label, controls.showIndices);
             //Move to appropriate location
             data.compartments[i].setPosition(-xPos, -1, 0);
             data.compartments[i].moveText(-xPos, 0);

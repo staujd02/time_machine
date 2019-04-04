@@ -59,8 +59,8 @@ class MouseHandler {
 
     setupEventListeners(canvas, handler) {
         canvas.addEventListener("mousedown", handler.mouseDown);
-        canvas.addEventListener("mouseup", function (evt) {});
-        canvas.addEventListener("mousemove", function (evt) {});
+        canvas.addEventListener("mouseup", handler.mouseUp);
+        canvas.addEventListener("mousemove", handler.mouseMove);
     }
 
     getMousePos(canvas, evt) {
