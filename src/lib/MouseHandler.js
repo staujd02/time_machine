@@ -1,56 +1,67 @@
-'use strict';
-
 import {
     isUndefined
 } from 'util';
 
 class MouseHandler {
 
-    constructor(canvas, dataContext) {
+    constructor(canvas, dataContext, sceneManager) {
         this.dataContext = dataContext;
+        this.sceneManager = sceneManager;
+        this.canvas = canvas;
         this.mouseDown = this.mouseDown.bind(this);
         this.mouseUp = this.mouseUp.bind(this);
         this.mouseMove = this.mouseMove.bind(this);
-        setupEventListeners(canvas, this);
+        this.bindLocalFunctions(this);
+        this.setupEventListeners(canvas, this);
+
+    }
+
+    bindLocalFunctions(handler){
+        handler.getMousePos = handler.getMousePos.bind(handler);
+        handler.isDataLoaded = handler.isDataLoaded.bind(handler); 
+        handler.checkWithinRange = handler.checkWithinRange.bind(handler);
+        handler.canvasToThreePos = handler.canvasToThreePos.bind(handler);
     }
 
     mouseDown(evt) {
-        mouseDown = true;
-        checkWithinRange(canvas, evt);
+        this.dataContext.mouseDown = true;
+        this.checkWithinRange(this.canvas, evt);
     }
 
     mouseUp(evt) {
-        if (editMode) {
-            if (arrowMode === 1) {
-                arrowMode = 2;
-                checkWithinRange(canvas, evt);
-                if ((arrowPoints[0] != null) && (arrowPoints[1] != null)) {
-                    addArrow();
+        let data = this.dataContext;
+        if (data.editMode) {
+            if (data.arrowMode === 1) {
+                data.arrowMode = 2;
+                this.checkWithinRange(this.canvas, evt);
+                if ((data.arrowPoints[0] != null) && (data.arrowPoints[1] != null)) {
+                    this.sceneManager.addArrow();
                 } else {
                     alert("Dragged line was not between two data points");
                 }
                 //Reset arrow points
-                arrowPoints[0] = null;
-                arrowPoints[1] = null;
+                data.arrowPoints[0] = null;
+                data.arrowPoints[1] = null;
             }
-            mouseDown = false;
-            dataPointToMove = -1; //No current selected compartment
+            data.mouseDown = false;
+            data.dataPointToMove = -1; //No current selected compartment
         }
         if (data.arrows.length > 0) {
-            updateArrows(-1);
+            this.sceneManager.updateArrows(-1);
         }
     }
 
     mouseMove(evt) {
-        if (editMode) {
-            if (mouseDown) {
-                var mousePos = getMousePos(canvas, evt);
-                var newMousePos = canvasToThreePos(mousePos);
-                if (dataPointToMove > -1) {
-                    data.compartments[dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
-                    data.compartments[dataPointToMove].moveText(newMousePos.x, newMousePos.y);
-                    if (controls.showIndices) {
-                        data.compartments[dataPointToMove].moveIndexText(newMousePos.x, newMousePos.y + (3 / 4) * (data.compartments[dataPointToMove].radius));
+        let data = this.dataContext;
+        if (data.editMode) {
+            if (data.mouseDown) {
+                let mousePos = this.getMousePos(this.canvas, evt);
+                let newMousePos = this.canvasToThreePos(mousePos);
+                if (data.dataPointToMove > -1) {
+                    data.compartments[data.dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
+                    data.compartments[data.dataPointToMove].moveText(newMousePos.x, newMousePos.y);
+                    if (data.showIndices()) {
+                        data.compartments[data.dataPointToMove].moveIndexText(newMousePos.x, newMousePos.y + (3 / 4) * (data.compartments[data.dataPointToMove].radius));
                     }
                 }
             }
@@ -64,7 +75,7 @@ class MouseHandler {
     }
 
     getMousePos(canvas, evt) {
-        var rect = canvas.getBoundingClientRect();
+        let rect = canvas.getBoundingClientRect();
         return {
             x: evt.clientX - rect.left,
             y: evt.clientY - rect.top
@@ -72,8 +83,8 @@ class MouseHandler {
     }
 
     canvasToThreePos(mousePos) {
-        var rect = canvas.getBoundingClientRect();
-        var newX, newY;
+        let rect = this.canvas.getBoundingClientRect();
+        let newX, newY;
         newX = (rect.width / 2) - mousePos.x;
         newY = mousePos.y - (rect.height / 2);
         return {
@@ -83,53 +94,52 @@ class MouseHandler {
     }
 
     checkWithinRange(canvas, evt) {
-        var mousePos = canvasToThreePos(getMousePos(canvas, evt));
-        //Check if click was on data point
-        controls.compIndex = ""; //Clear
-        controls.label = ""; //Clear
-        if (editMode) {
+        let mousePos = this.canvasToThreePos(this.getMousePos(canvas, evt));
+        this.dataContext.updateDisplay("", "");
+        let data = this.dataContext;
+        if (data.editMode) {
             for (var i = 0; i < data.compartments.length; i++) {
-                var selected = data.compartments[i].withinCircle(mousePos.x, mousePos.y);
-                if (selected && arrowMode === 1) {
+                let selected = data.compartments[i].withinCircle(mousePos.x, mousePos.y);
+                if (selected && data.arrowMode === 1) {
                     data.compartments[i].shadow.mesh.material.color.set("#ffff00");
-                    arrowPoints[0] = i
-                } else if (selected && arrowMode === 2) {
+                    data.arrowPoints[0] = i
+                } else if (selected && data.arrowMode === 2) {
                     data.compartments[i].shadow.mesh.material.color.set("#ffff00");
-                    arrowPoints[1] = i
+                    data.arrowPoints[1] = i
                 } else if (selected) {
-                    if (userSelectedDataPoint !== -1) {
-                        data.compartments[userSelectedDataPoint].shadow.mesh.material.color.set("#cccccc");
+                    if (data.userSelectedDataPoint !== -1) {
+                        data.compartments[data.userSelectedDataPoint].shadow.mesh.material.color.set("#cccccc");
                     }
                     data.compartments[i].shadow.mesh.material.color.set("#ffff00");
-                    dataPointToMove = i;
-                    controls.compIndex = data.compartments[i].dataIndex;
-                    controls.label = data.compartments[i].labelText;
-                    userSelectedDataPoint = i;
+                    data.dataPointToMove = i;
+                    data.updateDisplay(data.compartments[i].dataIndex, data.compartments[i].labelText);
+                    data.userSelectedDataPoint = i;
                     break;
                 } else if (!isUndefined(data.compartments[i])) {
                     data.compartments[i].shadow.mesh.material.color.set("#cccccc");
                 }
             }
         }
-        if (dataPointToMove === -1 && progressBar) { //Click was not on a datapoint
-            userSelectedDataPoint = -1; //Deselect previous selection
-            if (data.animationData && !isDataLoaded()) {
+        if (data.dataPointToMove === -1 && data.progressBar) { //Click was not on a datapoint
+            data.userSelectedDataPoint = -1; //Deselect previous selection
+            if (data.animationData && !this.isDataLoaded()) {
                 alert("Please import data first");
                 return;
             }
 
             //Check if click was on progress bar
-            if (progressBar.withinBar(mousePos.x, mousePos.y) && data.animationData) {
-                var clickedStep = progressBar.getStep(mousePos.x);
+            if (data.progressBar.withinBar(mousePos.x, mousePos.y) && data.animationData) {
+                let clickedStep = data.progressBar.getStep(mousePos.x);
                 let text = data.animationData[clickedStep - 1];
-                updateProgressBar(clickedStep, text ? text[0] : "0");
+                this.sceneManager.updateProgressBar(clickedStep, text ? text[0] : "0");
                 data.step = clickedStep - 1;
-                applyStep();
+                this.applyStep();
             }
         }
     }
 
     isDataLoaded() {
+        let data = this.dataContext;
         if (data && !data.dataLoaded()) {
             alert("Please import data first");
         }

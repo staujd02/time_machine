@@ -1,5 +1,3 @@
-'use strict';
-
 import ActionUtilities from '../utilities/ActionUtilities';
 
 const actionUtil = new ActionUtilities();
@@ -9,34 +7,61 @@ class Controller {
     constructor(dataContext, sceneManager) {
         this.dataContext = dataContext;
         this.sceneManager = sceneManager;
-        this.controls = createControls(dataContext);
-        this.callbacks = createCallbacks(this);
+        this.controls = this.createControls.bind(this)(dataContext);
+        this.callbacks = this.createCallbacks(this);
+        this.dataContext.showIndices = () => {
+            return this.controls.showIndices;
+        };
+        this.dataContext.updateDisplay = (cIndex, label) => {
+            this.controls.compIndex = cIndex; 
+            this.controls.label = label; 
+        };
     }
 
     createControls(data) {
+        this.bindControllerFunctions(this);
         return {
-            size: radius,
+            size: data.radius,
             valueMax: data.valueMax,
             fluxMax: data.fluxMax,
             stepDelay: data.stepDelay,
             color: data.color,
             skipSteps: data.skipSteps,
-            generateCompartments: generateCompartments,
-            generateFluxArrows: generateFluxArrows,
-            seekHelp: seekHelp,
-            singleStep: singleStep,
-            startStepping: startStepping,
-            pauseAnimation: pauseAnimation,
-            resetAnimation: reset,
-            addPoint: addPoint,
-            addArrow: addArrow,
-            deletePoint: deletePoint,
+            generateCompartments: this.generateCompartments,
+            generateFluxArrows: this.generateFluxArrows,
+            seekHelp: this.seekHelp,
+            singleStep: this.singleStep,
+            startStepping: this.startStepping,
+            pauseAnimation: this.pauseAnimation,
+            resetAnimation: this.reset,
+            addPoint: this.addPoint,
+            addArrow: this.addArrow,
+            deletePoint: this.deletePoint,
             showIndices: false,
             compIndex: "",
             label: "",
             editMode: false,
             labelMode: false
         }
+    }
+
+    bindControllerFunctions(controller) {
+        controller.singleStep = controller.singleStep.bind(controller);
+        controller.generateCompartments = controller.generateCompartments.bind(controller);
+        controller.generateFluxArrows = controller.generateFluxArrows.bind(controller);
+        controller.startStepping = controller.startStepping.bind(controller);
+        controller.pauseAnimation = controller.pauseAnimation.bind(controller);
+        controller.resetAnimation = controller.reset.bind(controller);
+        controller.addPoint = controller.addPoint.bind(controller);
+        controller.addCompartment = controller.addCompartment.bind(controller);
+        controller.addArrow = controller.addArrow.bind(controller);
+        controller.deletePoint = controller.deletePoint.bind(controller);
+
+        controller.isDataLoaded = controller.isDataLoaded.bind(controller);
+        controller.applyStep = controller.applyStep.bind(controller);
+        controller.stepForward = controller.stepForward.bind(controller);
+        controller.updateProgressBar = controller.updateProgressBar.bind(controller);
+        controller.deleteDataPoint = controller.deleteDataPoint.bind(controller);
     }
 
     createCallbacks(Controller) {
@@ -53,52 +78,52 @@ class Controller {
     }
 
     colorCallback(newValue) {
-        baseColor = newValue;
-        changeColor(baseColor);
+        this.dataContext.baseColor = newValue;
+        this.sceneManager.changeColor(newValue);
     }
 
     fluxMaxCallback(newValue) {
-        data.fluxMax = newValue;
-        halfFlux = data.fluxMax / 2.0;
+        this.dataContext.fluxMax = newValue;
+        this.dataContext.halfFlux = this.dataContext.fluxMax / 2.0;
     }
 
     valueMaxCallback(newValue) {
-        data.valueMax = newValue;
-        halfQuantity = data.valueMax / 2.0;
+        this.dataContext.valueMax = newValue;
+        this.dataContext.halfQuantity = this.dataContext.fluxMax / 2.0;
     }
 
     sizeCallback(newValue) {
-        radius = newValue; //Ratio of original size
-        data.radius = radius;
-        changeAllRadius();
+        this.dataContext.radius = newValue;
+        this.sceneManager.changeAllRadius();
     }
 
     labelCallback(newValue) {
-        renameCompartment(data.compartments[userSelectedDataPoint], newValue);
+        this.sceneManager.renameCompartment(this.dataContext.compartments[this.dataContext.userSelectedDataPoint], newValue);
     }
 
     compIndexCallback(newValue) {
-        if (userSelectedDataPoint !== -1) {
-            if ((newValue > data.compartments.length) || (newValue < 1)) {
+        if (this.dataContext.userSelectedDataPoint !== -1) {
+            if ((newValue > this.dataContext.compartments.length) || (newValue < 1)) {
                 alert("Invalid Index");
             } else {
-                let compartment = data.compartments[userSelectedDataPoint];
+                let compartment = this.dataContext.compartments[this.dataContext.userSelectedDataPoint];
                 compartment.dataIndex = newValue;
-                this.sceneManager.updateCompartmentIndexText(compartment, controls.showIndices);
+                this.sceneManager.updateCompartmentIndexText(compartment, this.controls.showIndices);
             }
         }
     }
 
     showIndicesCallback(show) {
-        revealIndices(show);
+        this.revealIndices(show);
+        this.revealIndices = this.revealIndices.bind(this);
     }
 
     labelModeCallback(newValue) {
-        data.labelMode = newValue;
+        this.dataContext.labelMode = newValue;
     }
 
     editModeCallback(newValue) {
-        editMode = newValue;
+        this.dataContext.editMode = newValue;
     }
 
     skipStepsCallback(newValue) {
@@ -110,118 +135,56 @@ class Controller {
     }
 
     isDataLoaded() {
-        if (data && !data.dataLoaded()) {
+        if (this.dataContext && !this.dataContext.dataLoaded()) {
             alert("Please import data first");
         }
-        return data.dataLoaded();
+        return this.dataContext.dataLoaded();
     }
 
     revealIndices(show) {
         if (show) {
-            for (let i = 0; i < data.compartments.length; i++) {
-                this.sceneManager.showCompartmentIndexText(data.compartments[i]);
+            for (let i = 0; i < this.dataContext.compartments.length; i++) {
+                this.sceneManager.showCompartmentIndexText(this.dataContext.compartments[i]);
             }
-            for (let i = 0; i < data.arrows.length; i++) {
-                this.sceneManager.showFluxIndexText(data.arrows[i]);
+            for (let i = 0; i < this.dataContext.arrows.length; i++) {
+                this.sceneManager.showFluxIndexText(this.dataContext.arrows[i]);
             }
             return;
         }
 
-        for (let i = 0; i < data.compartments.length; i++) {
-            this.sceneManager.hideCompartmentIndexText(data.compartments[i]);
+        for (let i = 0; i < this.dataContext.compartments.length; i++) {
+            this.sceneManager.hideCompartmentIndexText(this.dataContext.compartments[i]);
         }
-        for (let i = 0; i < data.arrows.length; i++) {
-            this.sceneManager.hideFluxIndexText(data.arrows[i]);
+        for (let i = 0; i < this.dataContext.arrows.length; i++) {
+            this.sceneManager.hideFluxIndexText(this.dataContext.arrows[i]);
         }
     }
 
-    addArrow() {
-        let arrows = data.arrows;
-        var shift = false;
-        //Check if new arrow is between an already arrowed combination
-        for (var i = 0; i < arrows.length; i++) {
-            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[0] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[1]) {
-                //Arrow already exists in that direction-- do nothing
-                return
-            }
-            if (arrows[i].arrowInfo.pointIndex1 === arrowPoints[1] && arrows[i].arrowInfo.pointIndex2 === arrowPoints[0]) {
-                //Arrow exists in opposite direction-- shift new arrow
-                shift = true;
-            }
-        }
-        var arrowInfo = {
-            shift: shift,
-            len: 200,
-            pointIndex1: arrowPoints[0],
-            pointIndex2: arrowPoints[1],
-            point1: data.compartments[arrowPoints[0]].position,
-            point2: data.compartments[arrowPoints[1]].position,
-            dataPointRadius: radius,
-            dataIndex: data.arrows.length + 1,
-        }
-        this.sceneManager.addFluxArrow(arrowInfo);
-    }
 
     deleteDataPoint() {
-        if (userSelectedDataPoint > -1) {
-            removeFromScene(data.compartments[userSelectedDataPoint]);
-            data.compartments.splice(userSelectedDataPoint, 1);
-            userSelectedDataPoint = -1;
+        if (this.dataContext.userSelectedDataPoint > -1) {
+            this.sceneManager.removeFromScene(this.dataContext.compartments[this.dataContext.userSelectedDataPoint]);
+            this.dataContext.compartments.splice(this.dataContext.userSelectedDataPoint, 1);
+            this.dataContext.userSelectedDataPoint = -1;
         }
-        updateArrows(userSelectedDataPoint);
+        this.sceneManager.updateArrows(this.dataContext.userSelectedDataPoint);
     }
 
     applyStep() {
-        let text = data.step < 0 ? '0' : data.animationData[data.step][0];
-        if (data.step >= 0) {
-            colorPoints();
+        let text = this.dataContext.step < 0 ? '0' : this.dataContext.animationData[this.dataContext.step][0];
+        if (this.dataContext.step >= 0) {
+            this.sceneManager.colorPoints();
         }
-        updateProgressBar(data.step + 1, text);
+        this.updateProgressBar(this.dataContext.step + 1, text);
     }
 
-    colorPoints() {
-        let changePercent, diff;
-
-        for (let i = 0; i < data.compartments.length; i++) {
-            if (data.animationData[data.step][data.compartments[i].dataIndex] > halfQuantity) { //i+1 because column 0 holds time info
-                //Darken
-                diff = data.animationData[data.step][data.compartments[i].dataIndex] - halfQuantity;
-                changePercent = diff / halfQuantity;
-                data.compartments[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
-            } else {
-                //Lighten
-                diff = halfQuantity - data.animationData[data.step][data.compartments[i].dataIndex];
-                changePercent = diff / halfQuantity;
-                data.compartments[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
-            }
-        }
-        if (data.fluxData != null) {
-            for (let i = 0; i < data.arrows.length - 1; i++) {
-                if (data.fluxData[data.step][data.arrows[i].arrowInfo.dataIndex] > halfFlux) { //i+1 because column 0 holds time info
-                    //Darken
-                    diff = data.fluxData[data.step][data.arrows[i].arrowInfo.dataIndex] - halfFlux;
-                    changePercent = diff / halfFlux;
-                    scene.remove(data.arrows[i].object);
-                    data.arrows[i].darkenColor(changePercent * 50); //Multiply by 50 - percent available to darken by
-                    scene.add(data.arrows[i].object) //Add newly colored arrow
-                } else {
-                    //Lighten
-                    diff = halfFlux - data.fluxData[data.step][data.arrows[i].arrowInfo.dataIndex];
-                    changePercent = diff / halfFlux;
-                    scene.remove(data.arrows[i].object);
-                    data.arrows[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
-                    scene.add(data.arrows[i].object) //Add newly colored arrow
-                }
-            }
-        }
-    }
 
     reset() {
-        if (data.animationData) {
-            data.step = 0;
-            paused = true;
-            updateProgressBar(0, data.animationData[0][0]);
-            applyStep();
+        if (this.dataContext.animationData) {
+            this.dataContext.step = 0;
+            this.dataContext.paused = true;
+            this.updateProgressBar(0, this.dataContext.animationData[0][0]);
+            this.applyStep();
         }
     }
 
@@ -229,17 +192,17 @@ class Controller {
         this.sceneManager.updateProgressBar(step, text);
     }
 
-    addPoint() {
+    addCompartment() {
+        let data = this.dataContext;
         let labels = data.labels;
         let labelMode = data.labelMode;
         let compartments = data.compartments;
-        var labelText;
+        let labelText;
         if (labelMode && labels.length > compartments.length + 1) {
             labelText = labels[compartments.length + 1]
         } else {
             if (labelMode && labels.length <= compartments.length) {
                 labelText = window.prompt("Imported data does not contain a column #" + compartments.length + ".\nPlease label your data point: ");
-
             } else {
                 labelText = window.prompt("Label your data point: ");
             }
@@ -248,30 +211,30 @@ class Controller {
             alert("No label entered");
             return;
         }
-        this.sceneManager.addCompartment(labelText, controls.showIndices);
+        this.sceneManager.addCompartment(labelText, this.controls.showIndices);
     }
 
 
     deletePoint() {
-        if (editMode) {
-            deleteDataPoint();
+        if (this.dataContext.editMode) {
+            this.deleteDataPoint();
         }
     }
 
     addArrow() {
-        if (editMode) {
-            arrowMode = 1;
+        if (this.dataContext.editMode) {
+            this.dataContext.arrowMode = 1;
         }
     }
 
     addPoint() {
-        if (editMode) {
-            addPoint();
+        if (this.dataContext.editMode) {
+            this.addCompartment();
         }
     }
 
     pauseAnimation() {
-        paused = true;
+        this.dataContext.paused = true;
     }
 
     seekHelp() {
@@ -279,30 +242,31 @@ class Controller {
     }
 
     singleStep() {
-        startStepping(true);
+        this.startStepping(true);
     }
 
     async startStepping(singleStep = false) {
-        if (isDataLoaded()) {
-            paused = false;
-            stepForward(singleStep);
+        if (this.isDataLoaded()) {
+            this.dataContext.paused = false;
+            this.stepForward(singleStep);
         }
     }
 
     async stepForward(singleStep = false) {
-        if (data.hasNextStep()) {
-            if (!paused) {
-                applyStep();
-                data.step += stepInc;
-                await actionUtil.sleep(data.stepDelay);
+        if (this.dataContext.hasNextStep()) {
+            if (!this.dataContext.paused) {
+                this.applyStep();
+                this.dataContext.step += this.controls.stepInc;
+                await actionUtil.sleep(this.dataContext.stepDelay);
                 if (!singleStep)
-                    stepForward();
+                    this.stepForward();
             }
         }
     }
 
 
     generateCompartments() {
+        let data = this.dataContext;
         if (data.animationData == null) {
             alert("Compartment data must be uploaded first");
             return;
@@ -310,23 +274,24 @@ class Controller {
             alert("Compartments already exist");
             return;
         }
-        var rect = canvas.getBoundingClientRect();
-        var freeSpace = rect.width - (data.animationData[0].length * (radius * 2)) - 2 * radius; // - 2*radius allocates for a radius buffer space on each end
-        var spaceBetween = freeSpace / (data.animationData[0].length - 1);
-        for (var i = 0; i < data.animationData[0].length; i++) {
-            let xPos = -((rect.width / 2) - radius) + (i * radius * 2) + (i * spaceBetween) + radius; // + radius gives a radius buffer space on each end
+        let rect = this.canvas.getBoundingClientRect();
+        let freeSpace = rect.width - (data.animationData[0].length * (data.radius * 2)) - 2 * data.radius; // - 2*radius allocates for a radius buffer space on each end
+        let spaceBetween = freeSpace / (data.animationData[0].length - 1);
+        for (let i = 0; i < data.animationData[0].length; i++) {
+            let xPos = -((rect.width / 2) - data.radius) + (i * data.radius * 2) + (i * spaceBetween) + data.radius; // + radius gives a radius buffer space on each end
             let label = !!data.labels[i + 1] ? data.labels[i + 1] : (i + 1).toString();
-            this.sceneManager.addCompartment(label, controls.showIndices);
+            this.sceneManager.addCompartment(label, this.controls.showIndices);
             //Move to appropriate location
             data.compartments[i].setPosition(-xPos, -1, 0);
             data.compartments[i].moveText(-xPos, 0);
-            if (controls.showIndices) {
-                data.compartments[i].moveIndexText(-xPos, (3 / 4) * (data.compartments[dataPointToMove].radius));
+            if (this.controls.showIndices) {
+                data.compartments[i].moveIndexText(-xPos, (3 / 4) * (data.compartments[data.dataPointToMove].radius));
             }
         }
     }
 
     generateFluxArrows() {
+        let data = this.dataContext;
         if (data.arrows.length > 0) {
             alert("Flux Arrows already exist");
             return;
@@ -346,22 +311,22 @@ class Controller {
                 break;
             if (!data.fluxDestinationLabels[i] || !data.fluxOriginLabels[i])
                 continue;
-            arrowPoints[0] = null;
-            arrowPoints[1] = null;
+            data.arrowPoints[0] = null;
+            data.arrowPoints[1] = null;
             for (let j = 0; j < data.compartments.length; j++) {
                 const element = data.compartments[j].labelText.toLowerCase().trim();
                 if (element === data.fluxOriginLabels[i].toLowerCase().trim()) {
-                    arrowPoints[0] = j;
-                    if (arrowPoints[1] !== null) {
-                        addArrow();
+                    data.arrowPoints[0] = j;
+                    if (data.arrowPoints[1] !== null) {
+                        this.sceneManager.addArrow();
                         break;
                     }
                     continue;
                 }
                 if (element === data.fluxDestinationLabels[i].toLowerCase().trim()) {
-                    arrowPoints[1] = j;
-                    if (arrowPoints[0] !== null) {
-                        addArrow();
+                    data.arrowPoints[1] = j;
+                    if (data.arrowPoints[0] !== null) {
+                        this.sceneManager.addArrow();
                         break;
                     }
                     continue;

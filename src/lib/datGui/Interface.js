@@ -6,8 +6,8 @@ class Interface {
         this.gui = new dat.GUI({
             autoPlace: false
         });
-        createHTMLElement(this.gui);
-        createMenu(this.gui, controller);
+        this.createHTMLElement(this.gui);
+        this.createMenu.bind(this)(this.gui, controller);
         this.updateDisplay = this.gui.updateDisplay;
     }
 
@@ -18,9 +18,9 @@ class Interface {
 
     createMenu(gui, controller) {
         gui.add(controller.controls, 'seekHelp').name("Help");
-        buildAnimationFolder(gui.addFolder("Animation"), controller);
-        buildEditingFolder(gui.addFolder("Model Editing"), controller);
-        buildInterpretationFolder(gui.addFolder("Interpretation"), controller);
+        this.buildAnimationFolder(gui.addFolder("Animation"), controller);
+        this.buildEditingFolder(gui.addFolder("Model Editing"), controller);
+        this.buildInterpretationFolder(gui.addFolder("Interpretation"), controller);
     }
 
     buildAnimationFolder(folder, controller) {
@@ -56,7 +56,7 @@ class Interface {
         editFolder.add(controller.controls, 'addPoint').name("Add Compartment");
         editFolder.add(controller.controls, 'addArrow').name("Add Arrow");
         editFolder.add(controller.controls, 'deletePoint').name("Delete Compartment");
-        editFolder.add(controls, 'size').name("Size")
+        editFolder.add(controller.controls, 'size').name("Size")
             .min(10)
             .max(100)
             .step(1)
