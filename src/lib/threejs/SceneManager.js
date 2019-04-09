@@ -14,6 +14,7 @@ class SceneManager {
         this.dataContext = dataContext;
         this.dataContext.origin = new THREE.Vector3(0, 0, 0);
         this.loadFont(this.fontLoadingComplete.bind(this));
+        this.canvas = canvas;
         this.scene = this.buildScene();
         this.renderer = this.buildRender(screenDimensions, canvas);
         this.camera = this.buildCamera(screenDimensions, this.dataContext);
@@ -141,7 +142,7 @@ class SceneManager {
                 scene.add(dataContext.progressBar.textMesh);
             }
         };
-        dataContext.registerCallback(reloadScene);
+        dataContext.registerCallback(reloadScene.bind(this));
     }
 
     reloadScene() {
@@ -251,7 +252,7 @@ class SceneManager {
                 shift = true;
             }
         }
-        this.scene.addFluxArrow({
+        this.addFluxArrow({
             shift: shift,
             len: 200,
             pointIndex1: data.arrowPoints[0],

@@ -21,6 +21,7 @@ class MouseHandler {
         handler.isDataLoaded = handler.isDataLoaded.bind(handler); 
         handler.checkWithinRange = handler.checkWithinRange.bind(handler);
         handler.canvasToThreePos = handler.canvasToThreePos.bind(handler);
+        handler.applyStep = handler.applyStep.bind(handler);
     }
 
     mouseDown(evt) {
@@ -144,6 +145,14 @@ class MouseHandler {
             alert("Please import data first");
         }
         return data.dataLoaded();
+    }
+
+    applyStep() {
+        let text = this.dataContext.step < 0 ? '0' : this.dataContext.animationData[this.dataContext.step][0];
+        if (this.dataContext.step >= 0) {
+            this.sceneManager.colorPoints();
+        }
+        this.sceneManager.updateProgressBar(this.dataContext.step + 1, text);
     }
 
 

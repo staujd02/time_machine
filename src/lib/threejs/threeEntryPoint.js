@@ -12,7 +12,7 @@ export default (container, dataContext) => {
     const menu = new Interface(controller);
 
     dataContext.registerCallback(() => {
-        updatePanel(menu, dataContext);
+        updatePanel(menu, controller, dataContext);
     });
 
     render();
@@ -58,7 +58,7 @@ export default (container, dataContext) => {
         dataContext.fontResource = null;
     }
 
-    function updatePanel(gui, data) {
+    function updatePanel(gui, controller, data) {
         data.skipSteps = data.skipSteps || 1;
         data.stepDelay = data.stepDelay || 300;
         data.valueMax = data.valueMax || 1;
@@ -67,14 +67,13 @@ export default (container, dataContext) => {
         data.radius = data.radius || data.origRadius;
         data.halfQuantity = data.valueMax / 2.0;
         data.halfFlux = data.fluxMax / 2.0;
-        gui.controls.size = data.radius;
-        gui.controls.skipSteps = data.skipSteps;
-        gui.controls.valueMax = data.valueMax;
-        gui.controls.fluxMax = data.fluxMax;
-        gui.controls.stepDelay = data.stepDelay;
-        gui.controls.color = data.color;
+        controller.controls.size = data.radius;
+        controller.controls.skipSteps = data.skipSteps;
+        controller.controls.valueMax = data.valueMax;
+        controller.controls.fluxMax = data.fluxMax;
+        controller.controls.stepDelay = data.stepDelay;
+        controller.controls.color = data.color;
         gui.updateDisplay();
     }
-
 
 }

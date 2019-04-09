@@ -27,16 +27,16 @@ class Controller {
             stepDelay: data.stepDelay,
             color: data.color,
             skipSteps: data.skipSteps,
-            generateCompartments: this.generateCompartments,
-            generateFluxArrows: this.generateFluxArrows,
-            seekHelp: this.seekHelp,
-            singleStep: this.singleStep,
-            startStepping: this.startStepping,
-            pauseAnimation: this.pauseAnimation,
-            resetAnimation: this.reset,
-            addPoint: this.addPoint,
-            addArrow: this.addArrow,
-            deletePoint: this.deletePoint,
+            generateCompartments: this.generateCompartments.bind(this),
+            generateFluxArrows: this.generateFluxArrows.bind(this),
+            seekHelp: this.seekHelp.bind(this),
+            singleStep: this.singleStep.bind(this),
+            startStepping: this.startStepping.bind(this),
+            pauseAnimation: this.pauseAnimation.bind(this),
+            resetAnimation: this.reset.bind(this),
+            addPoint: this.addPoint.bind(this),
+            addArrow: this.addArrow.bind(this),
+            deletePoint: this.deletePoint.bind(this),
             showIndices: false,
             compIndex: "",
             label: "",
@@ -60,12 +60,12 @@ class Controller {
         controller.isDataLoaded = controller.isDataLoaded.bind(controller);
         controller.applyStep = controller.applyStep.bind(controller);
         controller.stepForward = controller.stepForward.bind(controller);
-        controller.updateProgressBar = controller.updateProgressBar.bind(controller);
         controller.deleteDataPoint = controller.deleteDataPoint.bind(controller);
     }
 
     createCallbacks(Controller) {
         Controller.stepDelayCallback = this.stepDelayCallback.bind(this);
+        Controller.editModeCallback = this.editModeCallback.bind(this);
         Controller.skipStepsCallback = this.skipStepsCallback.bind(this);
         Controller.labelModeCallback = this.labelModeCallback.bind(this);
         Controller.showIndicesCallback = this.showIndicesCallback.bind(this);
@@ -162,12 +162,13 @@ class Controller {
 
 
     deleteDataPoint() {
+        let deletedPoint = this.dataContext.userSelectedDataPoint;
         if (this.dataContext.userSelectedDataPoint > -1) {
             this.sceneManager.removeFromScene(this.dataContext.compartments[this.dataContext.userSelectedDataPoint]);
             this.dataContext.compartments.splice(this.dataContext.userSelectedDataPoint, 1);
             this.dataContext.userSelectedDataPoint = -1;
         }
-        this.sceneManager.updateArrows(this.dataContext.userSelectedDataPoint);
+        this.sceneManager.updateArrows(deletedPoint);
     }
 
     applyStep() {
@@ -175,7 +176,7 @@ class Controller {
         if (this.dataContext.step >= 0) {
             this.sceneManager.colorPoints();
         }
-        this.updateProgressBar(this.dataContext.step + 1, text);
+        this.sceneManager.updateProgressBar(this.dataContext.step + 1, text);
     }
 
 
@@ -183,13 +184,9 @@ class Controller {
         if (this.dataContext.animationData) {
             this.dataContext.step = 0;
             this.dataContext.paused = true;
-            this.updateProgressBar(0, this.dataContext.animationData[0][0]);
+            this.sceneManager.updateProgressBar(0, this.dataContext.animationData[0][0]);
             this.applyStep();
         }
-    }
-
-    updateProgressBar(step, text) {
-        this.sceneManager.updateProgressBar(step, text);
     }
 
     addCompartment() {
@@ -248,7 +245,7 @@ class Controller {
     async startStepping(singleStep = false) {
         if (this.isDataLoaded()) {
             this.dataContext.paused = false;
-            this.stepForward(singleStep);
+            await this.stepForward(singleStep);
         }
     }
 
