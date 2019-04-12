@@ -59,6 +59,7 @@ export default (container, dataContext) => {
     }
 
     function updatePanel(gui, controller, data) {
+        data.userSelectedDataPoint = -1;
         data.skipSteps = data.skipSteps || 1;
         data.stepDelay = data.stepDelay || 300;
         data.valueMax = data.valueMax || 1;

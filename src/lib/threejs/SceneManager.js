@@ -33,6 +33,7 @@ class SceneManager {
         this.addArrow = this.addArrow.bind(this);
         this.renameCompartment = this.renameCompartment.bind(this);
         this.updateCompartmentIndexText = this.updateCompartmentIndexText.bind(this);
+        this.generateCompartments = this.generateCompartments.bind(this);
         this.showCompartmentIndexText = this.showCompartmentIndexText.bind(this);
         this.hideCompartmentIndexText = this.hideCompartmentIndexText.bind(this);
         this.showFluxIndexText = this.showFluxIndexText.bind(this);
@@ -348,6 +349,32 @@ class SceneManager {
                     data.arrows[i].lightenColor(changePercent * 50); //Multiply by 50 - percent available to lighten by
                     this.scene.add(data.arrows[i].object) //Add newly colored arrow
                 }
+            }
+        }
+    }
+    
+    generateCompartments(showIndex) {
+        let data = this.dataContext;
+        if (data.animationData == null) {
+            alert("Compartment data must be uploaded first");
+            return;
+        } else if (data.compartments.length > 0) {
+            alert("Compartments already exist");
+            return;
+        }
+        let rect = this.canvas.getBoundingClientRect();
+        let freeSpace = rect.width - ((data.animationData[0].length - 1) * (data.radius * 2)) - 2 * data.radius; // - 2*radius allocates for a radius buffer space on each end
+        let spaceBetween = freeSpace / (data.animationData[0].length - 2);
+        for (let eColumn = 1; eColumn < data.animationData[0].length; eColumn++) {
+            let compartmentIndex = eColumn - 1;
+            let xPos = -((rect.width / 2) - data.radius) + (compartmentIndex * data.radius * 2) + (compartmentIndex * spaceBetween) + data.radius; // + radius gives a radius buffer space on each end
+            let label = !!data.labels[eColumn] ? data.labels[eColumn] : (eColumn).toString();
+            this.addCompartment(label, showIndex);
+            //Move to appropriate location
+            data.compartments[compartmentIndex].setPosition(-xPos, -1, 0);
+            data.compartments[compartmentIndex].moveText(-xPos, 0);
+            if (showIndex) {
+                data.compartments[compartmentIndex].moveIndexText(-xPos, (3 / 4) * (data.compartments[compartmentIndex].radius));
             }
         }
     }

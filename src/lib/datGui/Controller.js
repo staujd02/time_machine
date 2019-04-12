@@ -245,7 +245,7 @@ class Controller {
     async startStepping(singleStep = false) {
         if (this.isDataLoaded()) {
             this.dataContext.paused = false;
-            await this.stepForward(singleStep);
+            this.stepForward(singleStep);
         }
     }
 
@@ -253,7 +253,7 @@ class Controller {
         if (this.dataContext.hasNextStep()) {
             if (!this.dataContext.paused) {
                 this.applyStep();
-                this.dataContext.step += this.controls.stepInc;
+                this.dataContext.step += this.controls.skipSteps;
                 await actionUtil.sleep(this.dataContext.stepDelay);
                 if (!singleStep)
                     this.stepForward();
@@ -263,28 +263,7 @@ class Controller {
 
 
     generateCompartments() {
-        let data = this.dataContext;
-        if (data.animationData == null) {
-            alert("Compartment data must be uploaded first");
-            return;
-        } else if (data.compartments.length > 0) {
-            alert("Compartments already exist");
-            return;
-        }
-        let rect = this.canvas.getBoundingClientRect();
-        let freeSpace = rect.width - (data.animationData[0].length * (data.radius * 2)) - 2 * data.radius; // - 2*radius allocates for a radius buffer space on each end
-        let spaceBetween = freeSpace / (data.animationData[0].length - 1);
-        for (let i = 0; i < data.animationData[0].length; i++) {
-            let xPos = -((rect.width / 2) - data.radius) + (i * data.radius * 2) + (i * spaceBetween) + data.radius; // + radius gives a radius buffer space on each end
-            let label = !!data.labels[i + 1] ? data.labels[i + 1] : (i + 1).toString();
-            this.sceneManager.addCompartment(label, this.controls.showIndices);
-            //Move to appropriate location
-            data.compartments[i].setPosition(-xPos, -1, 0);
-            data.compartments[i].moveText(-xPos, 0);
-            if (this.controls.showIndices) {
-                data.compartments[i].moveIndexText(-xPos, (3 / 4) * (data.compartments[data.dataPointToMove].radius));
-            }
-        }
+        this.sceneManager.generateCompartments(this.controls.showIndices);
     }
 
     generateFluxArrows() {
