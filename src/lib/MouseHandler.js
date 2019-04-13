@@ -84,6 +84,7 @@ class MouseHandler {
     
     checkWithinRange(canvas, evt) {
         let mousePos = this.sceneManager.canvasToThreePos(this.getMousePos(canvas, evt));
+        let mousePosUncorrected = this.sceneManager.canvasToThreePos(this.getMousePos(canvas, evt), true);
         this.dataContext.updateDisplay("", "");
         let data = this.dataContext;
         if (data.editMode) {
@@ -117,8 +118,8 @@ class MouseHandler {
             }
 
             //Check if click was on progress bar
-            if (data.progressBar.withinBar(mousePos.x, mousePos.y) && data.animationData) {
-                let clickedStep = data.progressBar.getStep(mousePos.x);
+            if (data.progressBar.withinBar(mousePosUncorrected.x, mousePosUncorrected.y) && data.animationData) {
+                let clickedStep = data.progressBar.getStep(mousePosUncorrected.x);
                 let text = data.animationData[clickedStep - 1];
                 this.sceneManager.updateProgressBar(clickedStep, text ? text[0] : "0");
                 data.step = clickedStep - 1;

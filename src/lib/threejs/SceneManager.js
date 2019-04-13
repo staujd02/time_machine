@@ -42,13 +42,14 @@ class SceneManager {
         this.colorPoints = this.colorPoints.bind(this);
         this.moveCamera = this.moveCamera.bind(this);
         this.canvasToThreePos = this.canvasToThreePos.bind(this);
+        this.moveProgressBar = this.moveProgressBar.bind(this);
     }
 
-    updateProgressBar(step, text){
+    updateProgressBar(step, text) {
         if (this.dataContext.progressBar.textMesh) {
             this.scene.remove(this.dataContext.progressBar.textMesh);
         }
-        this.dataContext.progressBar.updateProgress(step, text);
+        this.dataContext.progressBar.updateProgress(step, text, this.camera.position.x, this.camera.position.y);
         this.scene.add(this.dataContext.progressBar.textMesh);
     }
 
@@ -133,13 +134,29 @@ class SceneManager {
         return (camera);
     }
 
-    moveCamera(x, y){
+    moveCamera(x, y) {
         this.camera.position.x += x;
         this.camera.position.y += y;
+        this.moveProgressBar(x, y);
+    }
+
+    moveProgressBar(x, y) {
+        let c = [
+            this.dataContext.progressBar.textMesh,
+            this.dataContext.progressBar.titleTextMesh,
+            this.dataContext.progressBar.bar.mesh,
+            this.dataContext.progressBar.progress.mesh
+        ];
+
+        for (let index = 0; index < c.length; index++) {
+            // c[index].setPosition(c[index].position.x + adjX, c[index].position.y + adjY, c[index].z);
+            c[index].position.x += x;
+            c[index].position.y += y;
+        }
     }
 
     registerCallbacks(dataContext, scene, reloadScene) {
-        dataContext.onFluxLoad = () => {};
+        dataContext.onFluxLoad = () => { };
         dataContext.onLoad = () => {
             if (dataContext.animationData != null) {
                 if (dataContext.progressBar.textMesh) {
@@ -180,12 +197,16 @@ class SceneManager {
         });
         this.dataContext.arrows = hydratedArrows;
     }
-    
-    canvasToThreePos(mousePos) {
+
+    canvasToThreePos(mousePos, asIs = false) {
         let rect = this.canvas.getBoundingClientRect();
         let newX, newY;
         newX = (rect.width / 2) - mousePos.x + this.camera.position.x;
         newY = mousePos.y - (rect.height / 2) + this.camera.position.y;
+        if(asIs){
+            newX -= this.camera.position.x; 
+            newY -= this.camera.position.y; 
+        }
         return {
             x: newX,
             y: newY
@@ -256,7 +277,7 @@ class SceneManager {
         compartment.setPosition(0, 0, 0);
         compartment.moveText(0, 0);
     }
-    
+
     addArrow() {
         let arrows = this.dataContext.arrows;
         let data = this.dataContext;
@@ -282,7 +303,7 @@ class SceneManager {
             dataPointRadius: data.radius,
             dataIndex: data.arrows.length + 1,
         }
-);
+        );
     }
 
     removeFromScene(compartment) {
@@ -333,7 +354,7 @@ class SceneManager {
             this.dataContext.compartments[i].changeColor(newColor);
         }
     }
-    
+
     colorPoints() {
         let changePercent, diff;
         let data = this.dataContext;
@@ -371,7 +392,7 @@ class SceneManager {
             }
         }
     }
-    
+
     generateCompartments(showIndex) {
         let data = this.dataContext;
         if (data.animationData == null) {

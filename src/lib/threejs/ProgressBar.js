@@ -39,16 +39,17 @@ class ProgressBar {
         this.getBar = this.getBar.bind(this);
     }
 
-    updateProgress(step, timeInfo) {
+    updateProgress(step, timeInfo, cX, cY) {
         if (this.stepLength * step <= barLength) {
             this.progressLength = this.stepLength * step;
             this.progress.mesh.geometry = new THREE.BoxGeometry(this.progressLength, 20, 1);
-            this.progress.mesh.position.set((barLength - this.progressLength) / 2, this.yPos, 0); //TODO: Make height to bottom of screen + padding
-            this.createText(timeInfo)
+            // this.progress.mesh.position.set(((barLength - this.progressLength) / 2) - cX, this.yPos + cY, 0); //TODO: Make height to bottom of screen + padding
+            this.progress.mesh.position.set(((barLength - this.progressLength) / 2) + cX, this.yPos + cY, 0); //TODO: Make height to bottom of screen + padding
+            this.createText(timeInfo, cX, cY);
         }
     }
 
-    createText(text) {
+    createText(text, cX, cY) {
         var geometry = new THREE.TextGeometry(text, {
             font: this.fontResource,
             size: 10,
@@ -63,7 +64,7 @@ class ProgressBar {
             color: 0x000000
         });
         this.textMesh = new THREE.Mesh(geometry, material);
-        this.textMesh.position.set(250 - this.progressLength, this.yPos + 25, 0);
+        this.textMesh.position.set(250 - this.progressLength + cX, this.yPos + 25 + cY, 0);
         this.textMesh.rotation.set(0, 0, Math.PI);
     }
 
@@ -92,9 +93,9 @@ class ProgressBar {
     }
 
     withinBar(x, y) {
-        var withinHeight = (y < this.yPos + 10) && (y > this.yPos - 10)
-        var withinWidth = (x < 250) && (x > -250)
-        return withinHeight && withinWidth
+        var withinHeight = (y < this.yPos + 10) && (y > this.yPos - 10);
+        var withinWidth = (x < 250) && (x > -250);
+        return withinHeight && withinWidth;
     }
 
     getStep(x) {
