@@ -89,7 +89,7 @@ class Controller {
 
     valueMaxCallback(newValue) {
         this.dataContext.valueMax = newValue;
-        this.dataContext.halfQuantity = this.dataContext.fluxMax / 2.0;
+        this.dataContext.halfQuantity = this.dataContext.valueMax / 2.0;
     }
 
     sizeCallback(newValue) {
