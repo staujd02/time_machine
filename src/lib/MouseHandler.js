@@ -20,7 +20,6 @@ class MouseHandler {
         handler.getMousePos = handler.getMousePos.bind(handler);
         handler.isDataLoaded = handler.isDataLoaded.bind(handler); 
         handler.checkWithinRange = handler.checkWithinRange.bind(handler);
-        handler.canvasToThreePos = handler.canvasToThreePos.bind(handler);
         handler.applyStep = handler.applyStep.bind(handler);
     }
 
@@ -57,7 +56,7 @@ class MouseHandler {
         if (data.editMode) {
             if (data.mouseDown) {
                 let mousePos = this.getMousePos(this.canvas, evt);
-                let newMousePos = this.canvasToThreePos(mousePos);
+                let newMousePos = this.sceneManager.canvasToThreePos(mousePos);
                 if (data.dataPointToMove > -1) {
                     data.compartments[data.dataPointToMove].setPosition(newMousePos.x, newMousePos.y, 0);
                     data.compartments[data.dataPointToMove].moveText(newMousePos.x, newMousePos.y);
@@ -82,20 +81,9 @@ class MouseHandler {
             y: evt.clientY - rect.top
         };
     }
-
-    canvasToThreePos(mousePos) {
-        let rect = this.canvas.getBoundingClientRect();
-        let newX, newY;
-        newX = (rect.width / 2) - mousePos.x;
-        newY = mousePos.y - (rect.height / 2);
-        return {
-            x: newX,
-            y: newY
-        };
-    }
-
+    
     checkWithinRange(canvas, evt) {
-        let mousePos = this.canvasToThreePos(this.getMousePos(canvas, evt));
+        let mousePos = this.sceneManager.canvasToThreePos(this.getMousePos(canvas, evt));
         this.dataContext.updateDisplay("", "");
         let data = this.dataContext;
         if (data.editMode) {

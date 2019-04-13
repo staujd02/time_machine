@@ -40,6 +40,8 @@ class SceneManager {
         this.hideFluxIndexText = this.hideFluxIndexText.bind(this);
         this.updateProgressBar = this.updateProgressBar.bind(this);
         this.colorPoints = this.colorPoints.bind(this);
+        this.moveCamera = this.moveCamera.bind(this);
+        this.canvasToThreePos = this.canvasToThreePos.bind(this);
     }
 
     updateProgressBar(step, text){
@@ -131,6 +133,11 @@ class SceneManager {
         return (camera);
     }
 
+    moveCamera(x, y){
+        this.camera.position.x += x;
+        this.camera.position.y += y;
+    }
+
     registerCallbacks(dataContext, scene, reloadScene) {
         dataContext.onFluxLoad = () => {};
         dataContext.onLoad = () => {
@@ -173,6 +180,18 @@ class SceneManager {
         });
         this.dataContext.arrows = hydratedArrows;
     }
+    
+    canvasToThreePos(mousePos) {
+        let rect = this.canvas.getBoundingClientRect();
+        let newX, newY;
+        newX = (rect.width / 2) - mousePos.x + this.camera.position.x;
+        newY = mousePos.y - (rect.height / 2) + this.camera.position.y;
+        return {
+            x: newX,
+            y: newY
+        };
+    }
+
 
     reloadCompartments() {
         let hydratedCompartments = [];

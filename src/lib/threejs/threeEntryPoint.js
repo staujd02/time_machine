@@ -2,12 +2,14 @@ import SceneManager from './SceneManager';
 import Interface from '../datGui/Interface';
 import Controller from '../datGui/Controller';
 import MouseHandler from '../MouseHandler';
+import KeyboardHandler from '../KeyboardHandler';
 
 export default (container, dataContext) => {
     const canvas = createCanvas(document, container);
     ensureDefaults(dataContext, canvas);
     const sceneManager = new SceneManager(canvas, dataContext);
     new MouseHandler(canvas, dataContext, sceneManager);
+    new KeyboardHandler(dataContext, sceneManager);
     const controller = new Controller(dataContext, sceneManager);
     const menu = new Interface(controller);
 
