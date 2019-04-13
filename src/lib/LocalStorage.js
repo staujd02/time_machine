@@ -1,4 +1,4 @@
-import Model from './threejs/Model';
+import Model from './Model';
 import localforage from 'localforage';
 
 const WEB_STORAGE_KEY = "plots";
