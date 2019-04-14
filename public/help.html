@@ -2,73 +2,242 @@
 <html lang="en">
 
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <title>Help Page</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Help Page</title>
+  <link crossorigin="anonymous" media="all"
+    integrity="sha512-HlgX4s+P4ikUGWRu6fvWIVak24jAHDOE7IzlHFtcW54px5zDZvAXO8xY42wXJNZ7PChlgxFwwdMH4tyMFCop6g=="
+    rel="stylesheet" href="https://github.githubassets.com/assets/frameworks-2322f54af916007dd939df6c24bd2264.css" />
+  <link crossorigin="anonymous" media="all"
+    integrity="sha512-5aDIqpwld2jpJ1zumf4jmDHMLhvGP2q+70nS+7tIRgyXvSdkeLhArVJIEWOzy0mBUxkCrTBch8hqwWpSRW/Zzg=="
+    rel="stylesheet" href="https://github.githubassets.com/assets/github-b12df75472e94f7ba47894c891ffa407.css" />
 </head>
 
 <body>
-    <h1><a id="Visual_Interface_Designed_for_the_Animation_of_Compartment_Models_0"></a>Visual Interface Designed for the Animation of Compartment Models</h1>
-    <p>The program is available <a href="https://staujd02.github.io/time_machine/">here</a>.  It will run in Chrome, Edge, Internet Explorer or Firefox.  Once the program is activated all operations and file storage are on the local computer. It will animate compartment mass and flux data provided by you.  It does not compute or predict data beyond what you provided.<br>
-    &lt;br&gt;</p>
-    <h3><a id="Authors_Kimberley_Grobien_Joel_Stauffer_Beomjin_Kim_Douglas_Townsend_Stephen_Coburn_5"></a>Authors: Kimberley Grobien, Joel Stauffer, Beomjin Kim, Douglas Townsend, Stephen Coburn</h3>
-    <pre><code>  Department of Computer Science,
-      Department of Mathematical Sciences,
-      Department of Chemistry, 
-      Purdue University Fort Wayne, Fort Wayne, IN.  
-    </code></pre>
-    <p><strong>Correspondence to: <a href="mailto:coburn@pfw.edu">coburn@pfw.edu</a></strong></p>
-    <h2><a id="Table_of_Contents__Instructions_15"></a>Table of Contents - Instructions</h2>
-    <ul>
-    <li><a href="#creating-a-new-model">Creating a new Model</a></li>
-    <li><a href="#file-format-specifications">File Format Specifications</a></li>
-    <li><a href="#labeling-your-compartments">Labeling your Compartments</a></li>
-    <li><a href="#automatically-generate-a-model">Automatic Model Generation</a></li>
-    <li><a href="#adjusting-the-model">Adjusting the Model</a></li>
-    <li><a href="#flux-arrows">Flux Arrows</a></li>
-    <li><a href="#how-to-specify-model-animation-values">How to Specify Model Animation Values</a></li>
-    <li><a href="#controlling-the-animation">Controlling the Animation</a></li>
-    <li><a href="#scrolling">Scrolling</a></li>
-    <li><a href="#saving-the-model">Saving the Model</a></li>
-    <li><a href="#exporting-models">Exporting Models</a></li>
-    <li><a href="#importing-models">Importing Models</a></li>
-    <li><a href="#important-notes">Important Notes</a></li>
-    </ul>
-    <h2><a id="Creating_a_new_Model_31"></a>Creating a new Model</h2>
-    <p>To create a new model click on <code>Model Editing</code> to expand the folder.  Then click on <code>Edit Mode</code> to enable editing.  Nothing in the white space can be changed unless <code>Edit Mode</code> is checked.  Compartments are created by clicking on <code>Add Compartment</code> and then entering the name of the compartment.  You must click on <code>Add Data Point</code> every time you want to add a compartment.<br>
-    &lt;br&gt;</p>
-    <h2><a id="File_Format_Specifications_34"></a>File Format Specifications</h2>
-    <p>The input for compartment data is a single page Excel file with time in the first column and compartment masses to the right.  Row 1 contains labels.  The first compartment created on the screen will be associated with the data in column 2; the next compartment with column 3, etc.<br>
-    &lt;br&gt;</p>
-    <h2><a id="Labeling_your_Compartments_37"></a>Labeling your Compartments</h2>
-    <p>Compartment labels may be entered manually or by checking the <code>Import Labels</code> box.  If no data file has been imported, click <code>Upload Compartment Data</code> to provide an Excel file with the label information in row 1 as noted above. To change an existing label, click on the compartment, and then enter the new name in the <code>Comp. Label</code> field.<br>
-    &lt;br&gt;</p>
-    <h2><a id="Automatically_Generate_a_Model_40"></a>Automatically Generate a Model</h2>
-    <p>To save the user time, a model layout can be inferred from the data uploaded by the <code>Upload Compartment Data</code> and <code>Upload Flux Data</code> processes. To ensure maximum effectiveness, ensure each column of data in the excel upload begins with a text label (i.e. row one should be composed of all the labels for the compartments). A SPECIAL format must be followed for the flux arrows to be generated effectively. The first row of the flux data in excel will be considered the label of “Originating” compartment. The second row of the flux data will be considered the label of the “Destination” compartment. To begin automatic generation, upload the excel data via <code>Upload Compartment Data</code>. Then click <code>Generate Comps.</code> to generate a compartment for each column of data in the excel document. Currently these compartments are generated in a straight line with equal spacing. Optionally, upload flux data via <code>Upload Flux Data</code> and then click <code>Generate Flux.</code>. When the <code>Generate Flux.</code> operation begins, the system will attempt to locate an existing compartment with a label that matches the “Origination” label and then locate an existing compartment with a label that matches the “Destination” compartment. If both compartments can be located, a flux arrow will automatically be created between the origin compartment and the destination compartment.<br>
-    &lt;br&gt;</p>
-    <h2><a id="Adjusting_the_Model_43"></a>Adjusting the Model</h2>
-    <p>The compartments can be dragged to any location in the white space.  The size of the compartments can be adjusted using the slider labeled <code>Size</code>. Click <code>Show Indices</code> to render gray numbers representing the compartments or flux arrows data index. An arrow’s index number is rendered at its origin . For instance, if a compartment has a gray ‘1’ digit, that compartment will  correspond to the first compartment column found in the uploaded excel data. This index can be changed by clicking on a compartment, and then entering a new index number into the the field right of <code>Data Index</code>.<br>
-    &lt;br&gt;</p>
-    <h2><a id="Flux_Arrows_46"></a>Flux Arrows</h2>
-    <p>Arrows can be added by clicking on <code>Add Arrow</code>.  Then click on the From compartment and drag to the To compartment.  Arrows can be added without any flux data.  This will not affect the animation of the compartment circles.  The only effect of omitting the flux data is that the arrows will not change color. The input for flux data is an Excel file with time in the first column and data in the columns to the right.  As with the compartments, the first arrow created on the screen will be associated with column 2; the next arrow with column 3, etc.<br>
-    &lt;br&gt;</p>
-    <h2><a id="How_to_Specify_Model_Animation_Values_49"></a>How to Specify Model Animation Values</h2>
-    <p>All specifications are under the <code>Interpretation</code> folder. Click the <code>Interpretation</code> folder to expand it. The user must set the maximum value for compartment mass in the box to the right of <code>Comp. Maximum</code>.  A maximum flux value must be entered in the box to the right of <code>Flux Maximum</code>. The compartment color at any given time will be based on its percentage of the maximum value.  Therefore, the maximum value does not have to be the exact maximum value of the compartments.  The chosen maximum value applies to all compartments.  If there is a wide variation in compartment masses, the animation could be repeated with different maximum values to visualize large and small compartments. The color of the compartments ranges from white when empty to black when at or above the maximum value. The arrows change in gray scale from lighter to darker as the flux increases. The hue and intensity of the intermediate color can be set by holding the cursor over the bar to the right of <code>50% Max Color</code> moving the circle to get the desired result.  The initial color shown in the compartments and the color chooser box represents 50% of the maximum value.<br>
-    &lt;br&gt;</p>
-    <h2><a id="Controlling_the_Animation_52"></a>Controlling the Animation</h2>
-    <p>All animation controls are nested under the <code>Animation</code> folder. Click <code>Animation</code> to expand the folder. To start the animation click on <code>Start</code>. If the animation does not start, click the <code>Reset</code> button.  The speed can be adjusted by moving the slider labeled <code>Delay (in ms)</code>.  Increasing the delay will slow the animation.  Individual steps can be shown by clicking the appropriate time value on the gray bar in the white space label “Progress Bar”.  If there is a very large number of data points, the animation could also be shortened by skipping some data points.  Click on <code>Step Size</code> and then enter the number of points to increment by.  An entry of 5, would result in every 5th data point (excel row) being utilized. The <code>reset</code> button sets the time index of the animation back to start time.<br>
-    &lt;br&gt;</p>
-    <h2><a id="Scrolling_55"></a>Scrolling</h2>
-    <p>A user may scroll or pan using the arrow keys on their keyboard. This allows for compartments larger than current white field to be created.<br>
-    &lt;br&gt;</p>
-    <h2><a id="Saving_the_Model_58"></a>Saving the Model</h2>
-    <p>Clicking <code>Save</code> by Default Storage saves the current model diagram in the browser.  Clicking that Save button after changing the model will over-write the previous file.  Clicking <code>New Model</code> allows you to name the model which will be stored in the browser.  The name will be listed below <code>Default Storage</code>.  Only the diagram is stored. The data is not stored and must be uploaded each time the program is opened.</p>
-    <h2><a id="Exporting_Models_60"></a>Exporting Models</h2>
-    <p>Clicking on the <code>Export Models</code> button will save all models to an external file in your local <code>Downloads</code> folder.</p>
-    <h2><a id="Importing_Models_62"></a>Importing Models</h2>
-    <p>Clicking on <code>Upload Compartment Models</code> opens a file explorer so that you can import a saved file.  Importing overwrites all current models so be sure to save and export current work before importing new files.  Uploading the model does not upload the associated data.  The mass and flux data must also be uploaded.  If the animation does not start when clicking the Start button after an upload, click on Reset.</p>
-    <h2><a id="Important_Notes_64"></a>Important Notes</h2>
-    <p>If the browser shows a window asking <code>Prevent page from creating additional dialogue?</code> close the window. Activating that command will prevent proper functioning of the program.<br>
-    As indicated above, the first compartment created on the screen is associated with the second column of data in the spread sheet.  Subsequent compartments are associated with the third, fourth columns, etc. Similarly, the first arrow is associated with the second column of flux data, etc. At this time, removing and replacing compartments or arrows may upset that relationship. Therefore, it is essential that the compartments and arrows be added in the same sequence as the data columns. In the current state of affairs, corrections cannot be made. A new model diagram must be created.</p>
+  <div class="Box-body">
+    <article class="markdown-body entry-content p-5" itemprop="text">
+      <h1><a id="user-content-visual-interface-designed-for-the-animation-of-compartment-models" class="anchor"
+          aria-hidden="true" href="#visual-interface-designed-for-the-animation-of-compartment-models"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Visual Interface Designed for the Animation of Compartment Models</h1>
+      <p>The program is available <a href="https://staujd02.github.io/time_machine/" rel="nofollow">here</a>. It will
+        run in Chrome, Edge, Internet Explorer or Firefox. Once the program is activated all operations and file storage
+        are on the local computer. It will animate compartment mass and flux data provided by you. It does not compute
+        or predict data beyond what you provided.
+        <br></p>
+      <h3><a id="user-content-authors-kimberley-grobien-joel-stauffer-beomjin-kim-douglas-townsend-stephen-coburn"
+          class="anchor" aria-hidden="true"
+          href="#authors-kimberley-grobien-joel-stauffer-beomjin-kim-douglas-townsend-stephen-coburn"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Authors: Kimberley Grobien, Joel Stauffer, Beomjin Kim, Douglas Townsend, Stephen Coburn</h3>
+      <pre><code>  Department of Computer Science,
+  Department of Mathematical Sciences,
+  Department of Chemistry, 
+  Purdue University Fort Wayne, Fort Wayne, IN.  
+</code></pre>
+      <p><strong>Correspondence to: <a href="mailto:coburn@pfw.edu">coburn@pfw.edu</a></strong></p>
+      <h2><a id="user-content-table-of-contents---instructions" class="anchor" aria-hidden="true"
+          href="#table-of-contents---instructions"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1"
+            width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Table of Contents - Instructions</h2>
+      <ul>
+        <li><a href="#creating-a-new-model">Creating a new Model</a></li>
+        <li><a href="#file-format-specifications">File Format Specifications</a></li>
+        <li><a href="#labeling-your-compartments">Labeling your Compartments</a></li>
+        <li><a href="#automatically-generate-a-model">Automatic Model Generation</a></li>
+        <li><a href="#adjusting-the-model">Adjusting the Model</a></li>
+        <li><a href="#flux-arrows">Flux Arrows</a></li>
+        <li><a href="#how-to-specify-model-animation-values">How to Specify Model Animation Values</a></li>
+        <li><a href="#controlling-the-animation">Controlling the Animation</a></li>
+        <li><a href="#scrolling">Scrolling</a></li>
+        <li><a href="#saving-the-model">Saving the Model</a></li>
+        <li><a href="#exporting-models">Exporting Models</a></li>
+        <li><a href="#importing-models">Importing Models</a></li>
+        <li><a href="#important-notes">Important Notes</a></li>
+      </ul>
+      <h2><a id="user-content-creating-a-new-model" class="anchor" aria-hidden="true" href="#creating-a-new-model"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Creating a new Model</h2>
+      <p>To create a new model click on <code>Model Editing</code> to expand the folder. Then click on
+        <code>Edit Mode</code> to enable editing. Nothing in the white space can be changed unless
+        <code>Edit Mode</code> is checked. Compartments are created by clicking on <code>Add Compartment</code> and then
+        entering the name of the compartment. You must click on <code>Add Data Point</code> every time you want to add a
+        compartment.<br>
+        <br></p>
+      <h2><a id="user-content-file-format-specifications" class="anchor" aria-hidden="true"
+          href="#file-format-specifications"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1"
+            width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>File Format Specifications</h2>
+      <p>The input for compartment data is a single page Excel file with time in the first column and compartment masses
+        to the right. Row 1 contains labels. The first compartment created on the screen will be associated with the
+        data in column 2; the next compartment with column 3, etc.<br>
+        <br></p>
+      <h2><a id="user-content-labeling-your-compartments" class="anchor" aria-hidden="true"
+          href="#labeling-your-compartments"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1"
+            width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Labeling your Compartments</h2>
+      <p>Compartment labels may be entered manually or by checking the <code>Import Labels</code> box. If no data file
+        has been imported, click <code>Upload Compartment Data</code> to provide an Excel file with the label
+        information in row 1 as noted above. To change an existing label, click on the compartment, and then enter the
+        new name in the <code>Comp. Label</code> field.<br>
+        <br></p>
+      <h2><a id="user-content-automatically-generate-a-model" class="anchor" aria-hidden="true"
+          href="#automatically-generate-a-model"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1"
+            width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Automatically Generate a Model</h2>
+      <p>To save the user time, a model layout can be inferred from the data uploaded by the
+        <code>Upload Compartment Data</code> and <code>Upload Flux Data</code> processes. To ensure maximum
+        effectiveness, ensure each column of data in the excel upload begins with a text label (i.e. row one should be
+        composed of all the labels for the compartments). A SPECIAL format must be followed for the flux arrows to be
+        generated effectively. The first row of the flux data in excel will be considered the label of "Originating"
+        compartment. The second row of the flux data will be considered the label of the "Destination" compartment. To
+        begin automatic generation, upload the excel data via <code>Upload Compartment Data</code>. Then click
+        <code>Generate Comps.</code> to generate a compartment for each column of data in the excel document. Currently
+        these compartments are generated in a straight line with equal spacing. Optionally, upload flux data via
+        <code>Upload Flux Data</code> and then click <code>Generate Flux.</code>. When the <code>Generate Flux.</code>
+        operation begins, the system will attempt to locate an existing compartment with a label that matches the
+        "Origination" label and then locate an existing compartment with a label that matches the "Destination"
+        compartment. If both compartments can be located, a flux arrow will automatically be created between the origin
+        compartment and the destination compartment.
+        <br></p>
+      <h2><a id="user-content-adjusting-the-model" class="anchor" aria-hidden="true" href="#adjusting-the-model"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Adjusting the Model</h2>
+      <p>The compartments can be dragged to any location in the white space. The size of the compartments can be
+        adjusted using the slider labeled <code>Size</code>. Click <code>Show Indices</code> to render gray numbers
+        representing the compartments or flux arrows data index. An arrow's index number is rendered at its origin . For
+        instance, if a compartment has a gray '1' digit, that compartment will correspond to the first compartment
+        column found in the uploaded excel data. This index can be changed by clicking on a compartment, and then
+        entering a new index number into the the field right of <code>Data Index</code>.
+        <br></p>
+      <h2><a id="user-content-flux-arrows" class="anchor" aria-hidden="true" href="#flux-arrows"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Flux Arrows</h2>
+      <p>Arrows can be added by clicking on <code>Add Arrow</code>. Then click on the From compartment and drag to the
+        To compartment. Arrows can be added without any flux data. This will not affect the animation of the compartment
+        circles. The only effect of omitting the flux data is that the arrows will not change color. The input for flux
+        data is an Excel file with time in the first column and data in the columns to the right. As with the
+        compartments, the first arrow created on the screen will be associated with column 2; the next arrow with column
+        3, etc.<br>
+        <br></p>
+      <h2><a id="user-content-how-to-specify-model-animation-values" class="anchor" aria-hidden="true"
+          href="#how-to-specify-model-animation-values"><svg class="octicon octicon-link" viewBox="0 0 16 16"
+            version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>How to Specify Model Animation Values</h2>
+      <p>All specifications are under the <code>Interpretation</code> folder. Click the <code>Interpretation</code>
+        folder to expand it. The user must set the maximum value for compartment mass in the box to the right of
+        <code>Comp. Maximum</code>. A maximum flux value must be entered in the box to the right of
+        <code>Flux Maximum</code>. The compartment color at any given time will be based on its percentage of the
+        maximum value. Therefore, the maximum value does not have to be the exact maximum value of the compartments. The
+        chosen maximum value applies to all compartments. If there is a wide variation in compartment masses, the
+        animation could be repeated with different maximum values to visualize large and small compartments. The color
+        of the compartments ranges from white when empty to black when at or above the maximum value. The arrows change
+        in gray scale from lighter to darker as the flux increases. The hue and intensity of the intermediate color can
+        be set by holding the cursor over the bar to the right of <code>50% Max Color</code> moving the circle to get
+        the desired result. The initial color shown in the compartments and the color chooser box represents 50% of the
+        maximum value.
+        <br></p>
+      <h2><a id="user-content-controlling-the-animation" class="anchor" aria-hidden="true"
+          href="#controlling-the-animation"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1"
+            width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Controlling the Animation</h2>
+      <p>All animation controls are nested under the <code>Animation</code> folder. Click <code>Animation</code> to
+        expand the folder. To start the animation click on <code>Start</code>. If the animation does not start, click
+        the <code>Reset</code> button. The speed can be adjusted by moving the slider labeled
+        <code>Delay (in ms)</code>. Increasing the delay will slow the animation. Individual steps can be shown by
+        clicking the appropriate time value on the gray bar in the white space label "Progress Bar". If there is a very
+        large number of data points, the animation could also be shortened by skipping some data points. Click on
+        <code>Step Size</code> and then enter the number of points to increment by. An entry of 5, would result in every
+        5th data point (excel row) being utilized. The <code>reset</code> button sets the time index of the animation
+        back to start time.
+        <br></p>
+      <h2><a id="user-content-scrolling" class="anchor" aria-hidden="true" href="#scrolling"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Scrolling</h2>
+      <p>A user may scroll or pan using the arrow keys on their keyboard. This allows for compartments larger than
+        current white field to be created.
+        <br></p>
+      <h2><a id="user-content-saving-the-model" class="anchor" aria-hidden="true" href="#saving-the-model"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Saving the Model</h2>
+      <p>Clicking <code>Save</code> by Default Storage saves the current model diagram in the browser. Clicking that
+        Save button after changing the model will over-write the previous file. Clicking <code>New Model</code> allows
+        you to name the model which will be stored in the browser. The name will be listed below
+        <code>Default Storage</code>. Only the diagram is stored. The data is not stored and must be uploaded each time
+        the program is opened.</p>
+      <h2><a id="user-content-exporting-models" class="anchor" aria-hidden="true" href="#exporting-models"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Exporting Models</h2>
+      <p>Clicking on the <code>Export Models</code> button will save all models to an external file in your local
+        <code>Downloads</code> folder.</p>
+      <h2><a id="user-content-importing-models" class="anchor" aria-hidden="true" href="#importing-models"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Importing Models</h2>
+      <p>Clicking on <code>Upload Compartment Models</code> opens a file explorer so that you can import a saved file.
+        Importing overwrites all current models so be sure to save and export current work before importing new files.
+        Uploading the model does not upload the associated data. The mass and flux data must also be uploaded. If the
+        animation does not start when clicking the Start button after an upload, click on Reset.
+        <br></p>
+      <h2><a id="user-content-important-notes" class="anchor" aria-hidden="true" href="#important-notes"><svg
+            class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+            </path>
+          </svg></a>Important Notes</h2>
+      <p>If the browser shows a window asking <code>Prevent page from creating additional dialogue?</code> close the
+        window. Activating that command will prevent proper functioning of the program.
+        As indicated above, the first compartment created on the screen is associated with the second column of data in
+        the spread sheet. Subsequent compartments are associated with the third, fourth columns, etc. Similarly, the
+        first arrow is associated with the second column of flux data, etc. At this time, removing and replacing
+        compartments or arrows may upset that relationship. Therefore, it is essential that the compartments and arrows
+        be added in the same sequence as the data columns. In the current state of affairs, corrections cannot be made.
+        A new model diagram must be created.</p>
+    </article>
+  </div>
 </body>
 
 </html>
