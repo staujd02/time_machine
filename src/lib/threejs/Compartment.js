@@ -6,6 +6,12 @@ const origRadius = 40;
 
 class Compartment {
 
+    originalPosition = {
+        x: 0,
+        y: 0,
+        z: 0
+    }
+
     constructor(index, previousState = null) {
 
         let isState = !!previousState;
@@ -50,6 +56,12 @@ class Compartment {
             this.object.mesh.position.set(previousState.position.x, previousState.position.y, previousState.position.z);
             this.shadow.mesh.position.set(previousState.shadow.position.x, previousState.shadow.position.y, previousState.shadow.position.z);
         }
+
+        this.originalPosition = {
+            x: this.object.mesh.position.x,
+            y: this.object.mesh.position.y,
+            z: this.object.mesh.position.z
+        } 
 
         this.withinCircle = this.withinCircle.bind(this);
         this.adjustScale = this.adjustScale.bind(this);
