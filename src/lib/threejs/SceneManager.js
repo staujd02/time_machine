@@ -141,7 +141,7 @@ class SceneManager {
     }
 
     zoomCamera = zoom => {
-        const newZoom = (zoom * .05) + this.camera.zoom;
+        const newZoom = (zoom * .025) + this.camera.zoom;
         if(newZoom > 0){
             this.camera.zoom = newZoom;
             this.camera.updateProjectionMatrix();

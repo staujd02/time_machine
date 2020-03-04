@@ -7,22 +7,21 @@ import LocalStorage from './lib/LocalStorage.js';
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
-import Image from 'react-bootstrap/lib/Image';
 import DataContext from './lib/DataContext';
 
 class App extends Component {
- 
-  constructor(props){
+
+  constructor(props) {
     super(props);
     this.ThreeController = {
-      resetDataAnimation: function() {},
-      onLoad: function() {},
-      onFluxLoad: function() {}
+      resetDataAnimation: function () { },
+      onLoad: function () { },
+      onFluxLoad: function () { }
     };
     this.fetchSaves()
   }
 
-  async fetchSaves(){
+  async fetchSaves() {
     let saves = await ((new LocalStorage()).loadFromStorage(this.ThreeController));
     console.log(saves);
     let currentPlot = saves[0].versions[saves[0].versions.length - 1].plot;
@@ -35,30 +34,32 @@ class App extends Component {
   }
 
   render() {
-    if(!this.state || !this.state.currentContext)
+    if (!this.state || !this.state.currentContext)
       return (<div>Loading From Storage</div>);
 
     return (
       <div className="app">
-            <Grid fluid={true} className='fill'>
-              <Row>
-                  <Navigation dataContext={this.state.currentContext} IController={this.ThreeController} />
+        <Grid fluid={true} className='fill'>
+          <Row>
+            <Navigation dataContext={this.state.currentContext} IController={this.ThreeController} />
+          </Row>
+          <Row className='fill'>
+            <Col sm={2} md={2} className='sidebar'>
+              <Row sm={2} md={2}>
+                <div className='dat-style' id="datGuiAnchor"></div>
               </Row>
-              <Row className='fill'>
-                <Col sm={2} md={2} className='sidebar'>
-                  <Row sm={2} md={2}>
-                    <div className='dat-style' id="datGuiAnchor"></div>
-                  </Row>
-                  <Row sm={2} md={2}>
-                    <StorageList dataContext={this.state.currentContext} saves={this.saves}></StorageList>
-                  </Row>
-                  <Image className="logo" src="./pfw-white.png"></Image>
-                </Col>
-                <Col sm={10} md={10} className='threeContainer'> 
-                  <ThreeContainer dataContext={this.state.currentContext} IController={this.ThreeController}/> 
-                </Col>
+              <Row sm={2} md={2}>
+                <StorageList dataContext={this.state.currentContext} saves={this.saves}></StorageList>
               </Row>
-            </Grid>
+              <div className="wrapper">
+                <img alt="Purdue logo" className="logo" src="./pfw-white.png"></img>
+              </div>
+            </Col>
+            <Col sm={10} md={10} className='threeContainer'>
+              <ThreeContainer dataContext={this.state.currentContext} IController={this.ThreeController} />
+            </Col>
+          </Row>
+        </Grid>
       </div>
     );
   }
