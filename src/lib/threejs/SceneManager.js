@@ -12,12 +12,13 @@ class SceneManager {
             height: canvas.height
         };
         this.dataContext = dataContext;
+        this.screenDimensions = screenDimensions;
         this.dataContext.origin = new THREE.Vector3(0, 0, 0);
         this.loadFont(this.fontLoadingComplete.bind(this));
         this.canvas = canvas;
         this.scene = this.buildScene();
         this.renderer = this.buildRender(screenDimensions, canvas);
-        this.camera = this.buildCamera(screenDimensions, this.dataContext);
+        this.camera = this.buildCamera(screenDimensions, this.dataContext.origin, 2);
         this.registerCallbacks(this.dataContext, this.scene, this.reloadScene);
         this.update = this.update.bind(this);
         this.reloadScene = this.reloadScene.bind(this);
@@ -70,7 +71,6 @@ class SceneManager {
     hideFluxIndexText(arrow) {
         this.scene.remove(arrow.indexTextMesh);
     }
-
 
     renameCompartment(compartment, newName) {
         this.scene.remove(compartment.textMesh);
@@ -127,20 +127,28 @@ class SceneManager {
     buildCamera({
         width,
         height
-    }, dataContext) {
-        let camera = new THREE.OrthographicCamera(width / -2, width / 2, height / -2, height / 2, 1, 1000);
+    }, origin, zoom) {
+        let camera = new THREE.OrthographicCamera(width / (-1*zoom), width / zoom, height / (-1*zoom), height / zoom, 1, 1000);
         camera.position.set(0, 0, -10);
-        camera.lookAt(dataContext.origin);
+        camera.lookAt(origin);
         return (camera);
     }
 
     moveCamera(x, y) {
         this.camera.position.x += x;
         this.camera.position.y += y;
-        this.moveProgressBar(x, y);
+        this.moveProgressBar(x, y, 0);
     }
 
-    moveProgressBar(x, y) {
+    zoomCamera = zoom => {
+        const newZoom = (zoom * .025) + this.camera.zoom;
+        if(newZoom > 0){
+            this.camera.zoom = newZoom;
+            this.camera.updateProjectionMatrix();
+        }
+    }
+
+    moveProgressBar(x, y, z) {
         let c = [
             this.dataContext.progressBar.textMesh,
             this.dataContext.progressBar.titleTextMesh,
@@ -149,9 +157,9 @@ class SceneManager {
         ];
 
         for (let index = 0; index < c.length; index++) {
-            // c[index].setPosition(c[index].position.x + adjX, c[index].position.y + adjY, c[index].z);
             c[index].position.x += x;
             c[index].position.y += y;
+            c[index].position.z += z;
         }
     }
 

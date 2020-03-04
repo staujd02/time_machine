@@ -261,7 +261,6 @@ class Controller {
         }
     }
 
-
     generateCompartments() {
         this.sceneManager.generateCompartments(this.controls.showIndices);
     }
