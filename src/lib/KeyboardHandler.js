@@ -26,6 +26,7 @@ class keyboardHandler {
 
     keyPress = (event) => {
         let preventDefault = true;
+        console.log(event.code);
         switch (event.code) {
             case "ArrowUp":
                 this.moveScene(-1, 0);
@@ -39,9 +40,11 @@ class keyboardHandler {
             case "ArrowDown":
                 this.moveScene(1, 0);
                 break;
+            case "Minus":
             case "NumpadSubtract":
                 this.zoomScene(-1);
                 break;
+            case "Equal":
             case "NumpadAdd":
                 this.zoomScene(1);
                 break;
