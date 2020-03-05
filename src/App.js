@@ -9,6 +9,8 @@ import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
 import DataContext from './lib/DataContext';
 
+import Logo from './assets/pfw-white.png';
+
 class App extends Component {
 
   constructor(props) {
@@ -52,7 +54,7 @@ class App extends Component {
                 <StorageList dataContext={this.state.currentContext} saves={this.saves}></StorageList>
               </Row>
               <div className="wrapper">
-                <img alt="Purdue logo" className="logo" src="./pfw-white.png"></img>
+                <img alt="Purdue logo" className="logo" src={Logo}></img>
               </div>
             </Col>
             <Col sm={10} md={10} className='threeContainer'>

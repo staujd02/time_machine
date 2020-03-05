@@ -235,7 +235,7 @@ class Controller {
     }
 
     seekHelp() {
-        window.open(window.location.href + 'help.html', '_blank');
+        window.open(window.location.href + '/help.html', '_blank');
     }
 
     singleStep() {
