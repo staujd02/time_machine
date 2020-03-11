@@ -289,8 +289,8 @@ class Controller {
             data.arrowPoints[0] = null;
             data.arrowPoints[1] = null;
             for (let j = 0; j < data.compartments.length; j++) {
-                const element = data.compartments[j].labelText.toLowerCase().trim();
-                if (element === data.fluxOriginLabels[i].toLowerCase().trim()) {
+                const element = this.transformString(data.compartments[j].labelText);
+                if (element === this.transformString( data.fluxOriginLabels[i])) {
                     data.arrowPoints[0] = j;
                     if (data.arrowPoints[1] !== null) {
                         this.sceneManager.addArrow();
@@ -298,7 +298,7 @@ class Controller {
                     }
                     continue;
                 }
-                if (element === data.fluxDestinationLabels[i].toLowerCase().trim()) {
+                if (element === this.transformString(data.fluxDestinationLabels[i])) {
                     data.arrowPoints[1] = j;
                     if (data.arrowPoints[0] !== null) {
                         this.sceneManager.addArrow();
@@ -308,6 +308,10 @@ class Controller {
                 }
             }
         }
+    }
+
+    transformString(str){
+        return str.split(' ').join('').toLowerCase().trim();
     }
 }
 

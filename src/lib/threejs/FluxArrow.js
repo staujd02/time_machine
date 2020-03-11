@@ -92,8 +92,11 @@ class FluxArrow {
         this.dir.normalize();
         this.length = this.calculateLength();
         this.position = this.calculatePos();
-
-        this.object.setLength(this.length, this.arrowLength, this.arrowWidth);
+        
+        if(this.arrowLength > this.length)
+            this.object.setLength(this.arrowLength + 5, this.arrowLength, this.arrowWidth);
+        else
+            this.object.setLength(this.length, this.arrowLength, this.arrowWidth);
         this.object.setDirection(this.dir);
         this.object.position.set(this.position.x, this.position.y, 0);
     }
