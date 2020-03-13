@@ -41,6 +41,7 @@ class Interface {
     buildEditingFolder(editFolder, controller) {
         editFolder.add(controller.controls, 'generateCompartments').name("Generate Comps.");
         editFolder.add(controller.controls, 'generateFluxArrows').name("Generate Flux.");
+        editFolder.add(controller.controls, 'clearFluxArrows').name("Clear All Flux.");
         editFolder.add(controller.controls, 'editMode').name("Edit Mode")
             .onChange(controller.editModeCallback);
         editFolder.add(controller.controls, 'labelMode').name("Import Labels")
@@ -52,7 +53,7 @@ class Interface {
             .onFinishChange(controller.compIndexCallback);
         editFolder.add(controller.controls, 'label').name("Comp. Label")
             .listen()
-            .onFinishChange(controller.labelCallback);
+            .onChange(controller.labelCallback);
         editFolder.add(controller.controls, 'addPoint').name("Add Compartment");
         editFolder.add(controller.controls, 'addArrow').name("Add Arrow");
         editFolder.add(controller.controls, 'deletePoint').name("Delete Compartment");

@@ -176,7 +176,7 @@ class Compartment {
             bevelSegments: 5
         });
         let material = new THREE.MeshBasicMaterial({
-            color: 0x808080
+            color: 0x000000
         });
         this.indexTextMesh = new THREE.Mesh(geometry, material);
         this.moveIndexText(this.position.x, this.position.y + (3 / 4) * (this.radius));

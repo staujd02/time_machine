@@ -29,6 +29,7 @@ class Controller {
             skipSteps: data.skipSteps,
             generateCompartments: this.generateCompartments.bind(this),
             generateFluxArrows: this.generateFluxArrows.bind(this),
+            clearFluxArrows: this.clearFluxArrows.bind(this),
             seekHelp: this.seekHelp.bind(this),
             singleStep: this.singleStep.bind(this),
             startStepping: this.startStepping.bind(this),
@@ -56,6 +57,7 @@ class Controller {
         controller.addCompartment = controller.addCompartment.bind(controller);
         controller.addArrow = controller.addArrow.bind(controller);
         controller.deletePoint = controller.deletePoint.bind(controller);
+        controller.clearFluxArrows = controller.clearFluxArrows.bind(controller);
 
         controller.isDataLoaded = controller.isDataLoaded.bind(controller);
         controller.applyStep = controller.applyStep.bind(controller);
@@ -75,6 +77,7 @@ class Controller {
         Controller.valueMaxCallback = this.valueMaxCallback.bind(this);
         Controller.fluxMaxCallback = this.fluxMaxCallback.bind(this);
         Controller.colorCallback = this.colorCallback.bind(this);
+        Controller.clearFluxArrows = this.clearFluxArrows.bind(this);
     }
 
     colorCallback(newValue) {
@@ -98,7 +101,9 @@ class Controller {
     }
 
     labelCallback(newValue) {
-        this.sceneManager.renameCompartment(this.dataContext.compartments[this.dataContext.userSelectedDataPoint], newValue);
+        const element = this.dataContext.compartments[this.dataContext.userSelectedDataPoint];
+        if(element)
+            this.sceneManager.renameCompartment(element, newValue);
     }
 
     compIndexCallback(newValue) {
@@ -235,7 +240,7 @@ class Controller {
     }
 
     seekHelp() {
-        window.open(window.location.href + '/help.html', '_blank');
+        window.open('https://staujd02.github.io/time_machine/help.html', '_blank');
     }
 
     singleStep() {
@@ -265,6 +270,13 @@ class Controller {
         this.sceneManager.generateCompartments(this.controls.showIndices);
     }
 
+    clearFluxArrows(){
+        if(window.confirm("Are you sure? This will remove all of the flux arrows.")){
+            this.dataContext.arrows = [];
+            this.sceneManager.clearArrows();
+        }
+    }
+
     generateFluxArrows() {
         let data = this.dataContext;
         if (data.arrows.length > 0) {
@@ -281,16 +293,17 @@ class Controller {
             alert("Compartments must be created first for this operation to succeed.");
             return;
         }
-        for (let i = 0; i < data.fluxData[0].length; i++) {
-            if (data.fluxDestinationLabels.length - 1 < i || data.fluxOriginLabels.length - 1 < i)
-                break;
-            if (!data.fluxDestinationLabels[i] || !data.fluxOriginLabels[i])
+        const destinationLabels = data.fluxDestinationLabels;
+        const originLabels = data.fluxOriginLabels;
+        let min = destinationLabels.length > originLabels.length ? originLabels.length : destinationLabels.length;   
+        for (let i = 0; i < min; i++) {
+            if (!destinationLabels[i] || !originLabels[i])
                 continue;
             data.arrowPoints[0] = null;
             data.arrowPoints[1] = null;
             for (let j = 0; j < data.compartments.length; j++) {
                 const element = this.transformString(data.compartments[j].labelText);
-                if (element === this.transformString( data.fluxOriginLabels[i])) {
+                if (element === this.transformString(originLabels[i])) {
                     data.arrowPoints[0] = j;
                     if (data.arrowPoints[1] !== null) {
                         this.sceneManager.addArrow();
@@ -298,7 +311,7 @@ class Controller {
                     }
                     continue;
                 }
-                if (element === this.transformString(data.fluxDestinationLabels[i])) {
+                if (element === this.transformString(destinationLabels[i])) {
                     data.arrowPoints[1] = j;
                     if (data.arrowPoints[0] !== null) {
                         this.sceneManager.addArrow();
@@ -311,7 +324,7 @@ class Controller {
     }
 
     transformString(str){
-        return str.split(' ').join('').toLowerCase().trim();
+        return str.split(' ').join('').toLowerCase();
     }
 }
 

@@ -20,33 +20,9 @@ class SceneManager {
         this.renderer = this.buildRender(screenDimensions, canvas);
         this.camera = this.buildCamera(screenDimensions, this.dataContext.origin, 2);
         this.registerCallbacks(this.dataContext, this.scene, this.reloadScene);
-        this.update = this.update.bind(this);
-        this.reloadScene = this.reloadScene.bind(this);
-        this.reloadCompartments = this.reloadCompartments.bind(this);
-        this.reloadArrows = this.reloadArrows.bind(this);
-        this.buildProgressBar = this.buildProgressBar.bind(this);
-        this.changeAllRadius = this.changeAllRadius.bind(this);
-        this.changeColor = this.changeColor.bind(this);
-        this.updateArrows = this.updateArrows.bind(this);
-        this.addFluxArrow = this.addFluxArrow.bind(this);
-        this.removeFromScene = this.removeFromScene.bind(this);
-        this.addCompartment = this.addCompartment.bind(this);
-        this.addArrow = this.addArrow.bind(this);
-        this.renameCompartment = this.renameCompartment.bind(this);
-        this.updateCompartmentIndexText = this.updateCompartmentIndexText.bind(this);
-        this.generateCompartments = this.generateCompartments.bind(this);
-        this.showCompartmentIndexText = this.showCompartmentIndexText.bind(this);
-        this.hideCompartmentIndexText = this.hideCompartmentIndexText.bind(this);
-        this.showFluxIndexText = this.showFluxIndexText.bind(this);
-        this.hideFluxIndexText = this.hideFluxIndexText.bind(this);
-        this.updateProgressBar = this.updateProgressBar.bind(this);
-        this.colorPoints = this.colorPoints.bind(this);
-        this.moveCamera = this.moveCamera.bind(this);
-        this.canvasToThreePos = this.canvasToThreePos.bind(this);
-        this.moveProgressBar = this.moveProgressBar.bind(this);
     }
 
-    updateProgressBar(step, text) {
+    updateProgressBar = (step, text) => {
         if (this.dataContext.progressBar.textMesh) {
             this.scene.remove(this.dataContext.progressBar.textMesh);
         }
@@ -54,31 +30,32 @@ class SceneManager {
         this.scene.add(this.dataContext.progressBar.textMesh);
     }
 
-    showCompartmentIndexText(compartment) {
+    showCompartmentIndexText = compartment => {
         compartment.showIndex(this.dataContext.fontResource);
         this.scene.add(compartment.indexTextMesh);
     }
 
-    hideCompartmentIndexText(compartment) {
+    hideCompartmentIndexText = compartment => {
         this.scene.remove(compartment.indexTextMesh);
     }
 
-    showFluxIndexText(arrow) {
+    showFluxIndexText = arrow => {
         arrow.showIndex(this.dataContext.fontResource);
         this.scene.add(arrow.indexTextMesh);
     }
 
-    hideFluxIndexText(arrow) {
+    hideFluxIndexText = arrow =>  {
         this.scene.remove(arrow.indexTextMesh);
     }
 
-    renameCompartment(compartment, newName) {
-        this.scene.remove(compartment.textMesh);
+    renameCompartment = (compartment, newName) =>  {
+        if(compartment.textMesh)
+            this.scene.remove(compartment.textMesh);
         compartment.appendText(this.dataContext.fontResource, newName, compartment.position.x, compartment.position.y);
         this.scene.add(compartment.textMesh);
     }
 
-    updateCompartmentIndexText(compartment, showIndex = false) {
+    updateCompartmentIndexText = (compartment, showIndex = false) =>  {
         this.scene.remove(compartment.indexTextMesh);
         if (showIndex) {
             compartment.showIndex(this.dataContext.fontResource);
@@ -86,25 +63,25 @@ class SceneManager {
         }
     }
 
-    loadFont(fontLoadingComplete) {
+    loadFont = (fontLoadingComplete) =>  {
         (new THREE.FontLoader()).load(
             'https://threejs.org//examples/fonts/helvetiker_regular.typeface.json',
             fontLoadingComplete
         );
     }
 
-    fontLoadingComplete(font) {
+    fontLoadingComplete = (font) =>  {
         this.dataContext.fontResource = font;
         this.reloadScene();
     }
 
-    buildScene() {
+    buildScene = () =>  {
         const scene = new THREE.Scene();
         scene.background = new THREE.Color("#FFF");
         return scene;
     }
 
-    buildRender(screenDimensions, canvas) {
+    buildRender = (screenDimensions, canvas) =>  {
         const {
             width,
             height
@@ -124,17 +101,17 @@ class SceneManager {
         return renderer;
     }
 
-    buildCamera({
+    buildCamera = ({
         width,
         height
-    }, origin, zoom) {
+    }, origin, zoom) => {
         let camera = new THREE.OrthographicCamera(width / (-1*zoom), width / zoom, height / (-1*zoom), height / zoom, 1, 1000);
         camera.position.set(0, 0, -10);
         camera.lookAt(origin);
         return (camera);
     }
 
-    moveCamera(x, y) {
+    moveCamera = (x, y) =>  {
         this.camera.position.x += x;
         this.camera.position.y += y;
         this.moveProgressBar(x, y, 0);
@@ -148,7 +125,7 @@ class SceneManager {
         }
     }
 
-    moveProgressBar(x, y, z) {
+    moveProgressBar = (x, y, z) =>  {
         let c = [
             this.dataContext.progressBar.textMesh,
             this.dataContext.progressBar.titleTextMesh,
@@ -163,7 +140,7 @@ class SceneManager {
         }
     }
 
-    registerCallbacks(dataContext, scene, reloadScene) {
+    registerCallbacks = (dataContext, scene, reloadScene) =>  {
         dataContext.onFluxLoad = () => { };
         dataContext.onLoad = () => {
             if (dataContext.animationData != null) {
@@ -178,14 +155,14 @@ class SceneManager {
         dataContext.registerCallback(reloadScene.bind(this));
     }
 
-    reloadScene() {
+    reloadScene = () =>  {
         this.clearScene(this.scene);
         this.reloadCompartments();
         this.reloadArrows();
         this.buildProgressBar();
     }
 
-    clearScene(scene) {
+    clearScene = (scene) =>  {
         let remove = [];
         scene.traverse((child) => {
             if (child instanceof THREE.Mesh || child instanceof THREE.ArrowHelper) {
@@ -197,7 +174,19 @@ class SceneManager {
         }
     }
 
-    reloadArrows() {
+    clearArrows = () => {
+        let remove = [];
+        this.scene.traverse((child) => {
+            if (child instanceof THREE.ArrowHelper) {
+                remove.push(child);
+            }
+        });
+        for (let i = 0; i < remove.length; i++) {
+            this.scene.remove(remove[i]);
+        }
+    }
+
+    reloadArrows = () =>  {
         let hydratedArrows = [];
         let legacyArrowIndex = 0;
         this.dataContext.arrows.forEach(oldArrow => {
@@ -206,7 +195,7 @@ class SceneManager {
         this.dataContext.arrows = hydratedArrows;
     }
 
-    canvasToThreePos(mousePos, asIs = false) {
+    canvasToThreePos = (mousePos, asIs = false) =>  {
         let rect = this.canvas.getBoundingClientRect();
         let newX, newY;
         newX = (rect.width / 2) - mousePos.x + this.camera.position.x;
@@ -222,7 +211,7 @@ class SceneManager {
     }
 
 
-    reloadCompartments() {
+    reloadCompartments = () =>  {
         let hydratedCompartments = [];
         let c = 0;
         this.dataContext.compartments.forEach(oldPoint => {
@@ -236,7 +225,7 @@ class SceneManager {
         this.dataContext.compartments = hydratedCompartments;
     }
 
-    buildProgressBar() {
+    buildProgressBar = () =>  {
         let rect = this.canvas.getBoundingClientRect();
         this.dataContext.progressBar = new ProgressBar(this.dataContext.fontResource, (-rect.height / 2.0) + 25);
         this.scene.add(this.dataContext.progressBar.bar.mesh);
@@ -250,13 +239,13 @@ class SceneManager {
         this.scene.add(this.dataContext.progressBar.titleTextMesh);
     }
 
-    restoreArrow(savedData, legacyIndex, scene) {
+    restoreArrow = (savedData, legacyIndex, scene) => {
         let arrow = new FluxArrow(savedData.arrowInfo, legacyIndex);
         scene.add(arrow.object);
         return arrow;
     }
 
-    restoreCompartment(savedData, scene, dataContext) {
+    restoreCompartment = (savedData, scene, dataContext) =>  {
         let compartment = new Compartment(savedData.dataIndex, savedData);
         scene.add(compartment.object.mesh);
         scene.add(compartment.shadow.mesh);
@@ -268,7 +257,7 @@ class SceneManager {
         return compartment;
     }
 
-    addCompartment(labelText, showIndex = false) {
+    addCompartment = (labelText, showIndex = false) =>  {
         let compartments = this.dataContext.compartments;
         let compartment = new Compartment(compartments.length + 1);
         this.scene.add(compartment.object.mesh);
@@ -286,7 +275,7 @@ class SceneManager {
         compartment.moveText(0, 0);
     }
 
-    addArrow() {
+    addArrow = () =>  {
         let arrows = this.dataContext.arrows;
         let data = this.dataContext;
         let shift = false;
@@ -314,13 +303,13 @@ class SceneManager {
         );
     }
 
-    removeFromScene(compartment) {
+    removeFromScene = (compartment) =>  {
         this.scene.remove(compartment.object.mesh);
         this.scene.remove(compartment.shadow.mesh);
         this.scene.remove(compartment.textMesh);
     }
 
-    addFluxArrow(arrowInfo) {
+    addFluxArrow = (arrowInfo) =>  {
         let arrows = this.dataContext.arrows;
 
         this.dataContext.arrowMode = 0;
@@ -330,7 +319,7 @@ class SceneManager {
         arrows.push(arrow);
     }
 
-    updateArrows(deletedDataPoint) {
+    updateArrows = (deletedDataPoint) =>  {
         let arrows = this.dataContext.arrows;
         for (var i = 0; i < arrows.length; i++) {
             let index1 = arrows[i].arrowInfo.pointIndex1;
@@ -356,14 +345,14 @@ class SceneManager {
         }
     }
 
-    changeColor(newColor) {
+    changeColor = (newColor) =>  {
         this.dataContext.color = newColor;
         for (let i = 0; i < this.dataContext.compartments.length; i++) {
             this.dataContext.compartments[i].changeColor(newColor);
         }
     }
 
-    colorPoints() {
+    colorPoints = () =>  {
         let changePercent, diff;
         let data = this.dataContext;
 
@@ -401,7 +390,7 @@ class SceneManager {
         }
     }
 
-    generateCompartments(showIndex) {
+    generateCompartments = (showIndex) => {
         let data = this.dataContext;
         if (data.animationData == null) {
             alert("Compartment data must be uploaded first");
@@ -427,7 +416,7 @@ class SceneManager {
         }
     }
 
-    changeAllRadius() {
+    changeAllRadius = () =>  {
         let point;
         for (let i = 0; i < this.dataContext.compartments.length; i++) {
             point = this.dataContext.compartments[i];
@@ -440,7 +429,7 @@ class SceneManager {
         }
     }
 
-    update() {
+    update = () =>  {
         this.renderer.render(this.scene, this.camera);
     }
 

@@ -25,7 +25,6 @@ class App extends Component {
 
   async fetchSaves() {
     let saves = await ((new LocalStorage()).loadFromStorage(this.ThreeController));
-    console.log(saves);
     let currentPlot = saves[0].versions[saves[0].versions.length - 1].plot;
     let currentContext = new DataContext(currentPlot);
     this.setState({
