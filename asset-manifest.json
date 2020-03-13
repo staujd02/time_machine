@@ -1,16 +1,27 @@
 {
-  "main.css": "/time_machine/static/css/main.162c356e.chunk.css",
-  "main.js": "/time_machine/static/js/main.5b65cba7.chunk.js",
-  "main.js.map": "/time_machine/static/js/main.5b65cba7.chunk.js.map",
-  "runtime~main.js": "/time_machine/static/js/runtime~main.15b3aaff.js",
-  "runtime~main.js.map": "/time_machine/static/js/runtime~main.15b3aaff.js.map",
-  "static/css/2.82552781.chunk.css": "/time_machine/static/css/2.82552781.chunk.css",
-  "static/js/2.78c6b6f8.chunk.js": "/time_machine/static/js/2.78c6b6f8.chunk.js",
-  "static/js/2.78c6b6f8.chunk.js.map": "/time_machine/static/js/2.78c6b6f8.chunk.js.map",
-  "index.html": "/time_machine/index.html",
-  "precache-manifest.a149fdb2c2538ca559e805fb87551f42.js": "/time_machine/precache-manifest.a149fdb2c2538ca559e805fb87551f42.js",
-  "service-worker.js": "/time_machine/service-worker.js",
-  "static/css/2.82552781.chunk.css.map": "/time_machine/static/css/2.82552781.chunk.css.map",
-  "static/css/main.162c356e.chunk.css.map": "/time_machine/static/css/main.162c356e.chunk.css.map",
-  "static/media/bootstrap.min.css": "/time_machine/static/media/glyphicons-halflings-regular.fa277232.woff"
+  "files": {
+    "main.css": "/time_machine/static/css/main.2dbbfdcd.chunk.css",
+    "main.js": "/time_machine/static/js/main.d94de7c5.chunk.js",
+    "main.js.map": "/time_machine/static/js/main.d94de7c5.chunk.js.map",
+    "runtime-main.js": "/time_machine/static/js/runtime-main.fc327eb2.js",
+    "runtime-main.js.map": "/time_machine/static/js/runtime-main.fc327eb2.js.map",
+    "static/css/2.a8cba42d.chunk.css": "/time_machine/static/css/2.a8cba42d.chunk.css",
+    "static/js/2.224c4a04.chunk.js": "/time_machine/static/js/2.224c4a04.chunk.js",
+    "static/js/2.224c4a04.chunk.js.map": "/time_machine/static/js/2.224c4a04.chunk.js.map",
+    "index.html": "/time_machine/index.html",
+    "precache-manifest.9cf7afccc48e8241a1d3b4bbf0c1926d.js": "/time_machine/precache-manifest.9cf7afccc48e8241a1d3b4bbf0c1926d.js",
+    "service-worker.js": "/time_machine/service-worker.js",
+    "static/css/2.a8cba42d.chunk.css.map": "/time_machine/static/css/2.a8cba42d.chunk.css.map",
+    "static/css/main.2dbbfdcd.chunk.css.map": "/time_machine/static/css/main.2dbbfdcd.chunk.css.map",
+    "static/js/2.224c4a04.chunk.js.LICENSE.txt": "/time_machine/static/js/2.224c4a04.chunk.js.LICENSE.txt",
+    "static/media/bootstrap.min.css": "/time_machine/static/media/glyphicons-halflings-regular.fa277232.woff",
+    "static/media/pfw-white.png": "/time_machine/static/media/pfw-white.89b41a5c.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.fc327eb2.js",
+    "static/css/2.a8cba42d.chunk.css",
+    "static/js/2.224c4a04.chunk.js",
+    "static/css/main.2dbbfdcd.chunk.css",
+    "static/js/main.d94de7c5.chunk.js"
+  ]
 }
