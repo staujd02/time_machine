@@ -1,4 +1,5 @@
 import ActionUtilities from '../utilities/ActionUtilities';
+import Digest from '../utilities/Digest';
 
 const actionUtil = new ActionUtilities();
 
@@ -296,16 +297,21 @@ class Controller {
         const destinationLabels = data.fluxDestinationLabels;
         const originLabels = data.fluxOriginLabels;
         let min = destinationLabels.length > originLabels.length ? originLabels.length : destinationLabels.length;   
+        let digest = new Digest(data);
         for (let i = 0; i < min; i++) {
-            if (!destinationLabels[i] || !originLabels[i])
+            if (!destinationLabels[i] || !originLabels[i]){
+                digest.appendToMissingDigest(i);
                 continue;
+            }
             data.arrowPoints[0] = null;
             data.arrowPoints[1] = null;
+            let found = false;
             for (let j = 0; j < data.compartments.length; j++) {
                 const element = this.transformString(data.compartments[j].labelText);
                 if (element === this.transformString(originLabels[i])) {
                     data.arrowPoints[0] = j;
                     if (data.arrowPoints[1] !== null) {
+                        found = true;
                         this.sceneManager.addArrow();
                         break;
                     }
@@ -314,13 +320,20 @@ class Controller {
                 if (element === this.transformString(destinationLabels[i])) {
                     data.arrowPoints[1] = j;
                     if (data.arrowPoints[0] !== null) {
+                        found = true;
                         this.sceneManager.addArrow();
                         break;
                     }
                     continue;
                 }
             }
+            if(!found)
+                digest.appendToUnmappedDigest(i);
         }
+        if(digest.hasMissing())
+            alert("Flux Lines Missing Pieces: \n" + digest.enumerateMissingDigest());
+        if(digest.hasUnmapped())
+            alert("Flux Lines Not Generated: \n" + digest.enumerateUnmappedDigest())
     }
 
     transformString(str){
