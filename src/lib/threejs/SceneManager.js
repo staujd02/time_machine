@@ -283,7 +283,7 @@ class SceneManager {
         for (var i = 0; i < arrows.length; i++) {
             if (arrows[i].arrowInfo.pointIndex1 === data.arrowPoints[0] && arrows[i].arrowInfo.pointIndex2 === data.arrowPoints[1]) {
                 //Arrow already exists in that direction-- do nothing
-                return
+                return false;
             }
             if (arrows[i].arrowInfo.pointIndex1 === data.arrowPoints[1] && arrows[i].arrowInfo.pointIndex2 === data.arrowPoints[0]) {
                 //Arrow exists in opposite direction-- shift new arrow
@@ -299,8 +299,8 @@ class SceneManager {
             point2: data.compartments[data.arrowPoints[1]].position,
             dataPointRadius: data.radius,
             dataIndex: data.arrows.length + 1,
-        }
-        );
+        });
+        return true;
     }
 
     removeFromScene = (compartment) =>  {

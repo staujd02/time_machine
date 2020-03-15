@@ -312,7 +312,8 @@ class Controller {
                     data.arrowPoints[0] = j;
                     if (data.arrowPoints[1] !== null) {
                         found = true;
-                        this.sceneManager.addArrow();
+                        if(!this.sceneManager.addArrow())
+                            digest.appendToDuplicateDigest(i);
                         break;
                     }
                     continue;
@@ -321,7 +322,8 @@ class Controller {
                     data.arrowPoints[1] = j;
                     if (data.arrowPoints[0] !== null) {
                         found = true;
-                        this.sceneManager.addArrow();
+                        if(!this.sceneManager.addArrow())
+                            digest.appendToDuplicateDigest(i);
                         break;
                     }
                     continue;
@@ -331,9 +333,11 @@ class Controller {
                 digest.appendToUnmappedDigest(i);
         }
         if(digest.hasMissing())
-            alert("Flux Lines Missing Pieces: \n" + digest.enumerateMissingDigest());
+            alert("Flux Lines Missing Origin or Destination: \n" + digest.enumerateMissingDigest());
         if(digest.hasUnmapped())
             alert("Flux Lines Not Generated: \n" + digest.enumerateUnmappedDigest())
+        if(digest.hasDuplicates())
+            alert("Flux Lines Listed Multiple Times: \n" + digest.enumerateDuplicateDigest())
     }
 
     transformString(str){
